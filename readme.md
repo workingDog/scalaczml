@@ -14,7 +14,7 @@ It describes lines, points, billboards (markers), models and
 other graphical primitives, and specifies how they change with time.
 
 **scalaczml** makes the CZML JSON entities available as Scala (hence [Scala.js](http://www.scala-js.org/)) objects. 
-The library follows the specification of reference 1, but also include additional object such as Rectangle and Wall.
+The library follows the specification of reference 1, but also include additional objects such as Rectangle and Wall.
 
 ## References
  
@@ -33,7 +33,7 @@ See also the build.sbt file.
 
 ## Compiling and packaging
 
-Using [SBT](http://www.scala-sbt.org/), just type sbt package to generate a jar file that you can then 
+Using [SBT](http://www.scala-sbt.org/), just type "sbt package" to generate a jar file that you can then 
 include in your project. The jar file will be in the directory:
  ".../target/scala-2.11/scalaczml_2.11-1.0.jar" 
 

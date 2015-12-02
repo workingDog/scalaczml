@@ -7,7 +7,7 @@ import play.api.libs.json.Json
 
 
 /**
-  * supporting basic utilities
+  * basic supporting utilities
   */
 object Util {
 

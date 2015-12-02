@@ -15,7 +15,7 @@ object Example1 {
   def main(args: Array[String]) {
 
       // read a CZML document from a file
-      val jsonDoc = Source.fromFile("/Users/ringo/dev/scala/CZML/czml-protocol/test4.czml").mkString
+      val jsonDoc = Source.fromFile("/......./test4.czml").mkString
       // create a czml object from the json document
      val czml = CZML(jsonDoc)
      // create one position property
