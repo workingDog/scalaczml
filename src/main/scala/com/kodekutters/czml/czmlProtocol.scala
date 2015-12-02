@@ -679,6 +679,12 @@ package object czmlProtocol {
     def this(t: String, r: Int, g: Int, b: Int, a: Int) = this(TimeValue(t), r, g, b, a)
 
     def this(t: Double, r: Int, g: Int, b: Int, a: Int) = this(TimeValue(t), r, g, b, a)
+
+    def this(c: java.awt.Color) = this(c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def this(t: String, c: java.awt.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def this(t: Double, c: java.awt.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
   }
 
   object Rgba {
@@ -691,6 +697,12 @@ package object czmlProtocol {
     def apply(t: Double, r: Int, g: Int, b: Int, a: Int): Rgba = new Rgba(TimeValue(t), r, g, b, a)
 
     def apply(r: Int, g: Int, b: Int, a: Int): Rgba = new Rgba(None, r, g, b, a)
+
+    def apply(c: java.awt.Color): Rgba = new Rgba(c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def apply(t: String, c: java.awt.Color): Rgba = new Rgba(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def apply(t: Double, c: java.awt.Color): Rgba = new Rgba(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
   }
 
   /**
@@ -706,6 +718,12 @@ package object czmlProtocol {
     def this(t: Double, r: Int, g: Int, b: Int, a: Int) = this(Rgba(TimeValue(t), r, g, b, a))
 
     def this(t: TimeValue, r: Int, g: Int, b: Int, a: Int) = this(Rgba(t, r, g, b, a))
+
+    def this(c: java.awt.Color) = this(c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def this(t: String, c: java.awt.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def this(t: Double, c: java.awt.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
   }
 
   object RgbaList {
@@ -718,6 +736,12 @@ package object czmlProtocol {
     def apply(t: Double, r: Int, g: Int, b: Int, a: Int): RgbaList = new RgbaList(Rgba(TimeValue(t), r, g, b, a))
 
     def apply(t: TimeValue, r: Int, g: Int, b: Int, a: Int): RgbaList = new RgbaList(Rgba(t, r, g, b, a))
+
+    def apply(c: java.awt.Color): RgbaList = new RgbaList(c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def apply(t: String, c: java.awt.Color): RgbaList = new RgbaList(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
+
+    def apply(t: Double, c: java.awt.Color): RgbaList = new RgbaList(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
 
     val rgbaReads = new Reads[RgbaList] {
       def reads(js: JsValue): JsResult[RgbaList] = {
@@ -774,6 +798,13 @@ package object czmlProtocol {
     def this(r: Double, g: Double, b: Double, a: Double) = this(None, r.toFloat, g.toFloat, b.toFloat, a.toFloat)
 
     def this(r: Float, g: Float, b: Float, a: Float) = this(None, r, g, b, a)
+
+    def this(c: javafx.scene.paint.Color) = this(c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def this(t: String, c: javafx.scene.paint.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def this(t: Double, c: javafx.scene.paint.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
   }
 
   object Rgbaf {
@@ -794,6 +825,12 @@ package object czmlProtocol {
     def apply(t: Double, r: Float, g: Float, b: Float, a: Float): Rgbaf = new Rgbaf(TimeValue(t), r, g, b, a)
 
     def apply(r: Float, g: Float, b: Float, a: Float): Rgbaf = new Rgbaf(r, g, b, a)
+
+    def apply(c: javafx.scene.paint.Color): Rgbaf  = new Rgbaf(c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def apply(t: String, c: javafx.scene.paint.Color): Rgbaf  = new Rgbaf(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def apply(t: Double, c: javafx.scene.paint.Color): Rgbaf  = new Rgbaf(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
   }
 
   /**
@@ -818,6 +855,12 @@ package object czmlProtocol {
 
     def this(t: Double, r: Double, g: Double, b: Double, a: Double) = this(TimeValue(t), r, g, b, a)
 
+    def this(c: javafx.scene.paint.Color) = this(c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def this(t: String, c: javafx.scene.paint.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def this(t: Double, c: javafx.scene.paint.Color) = this(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
   }
 
   object RgbafList {
@@ -838,6 +881,13 @@ package object czmlProtocol {
     def apply(t: String, r: Double, g: Double, b: Double, a: Double): RgbafList = new RgbafList(TimeValue(t), r, g, b, a)
 
     def apply(t: Double, r: Double, g: Double, b: Double, a: Double): RgbafList = new RgbafList(TimeValue(t), r, g, b, a)
+
+    def apply(c: javafx.scene.paint.Color): RgbafList = new RgbafList(c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def apply(t: String, c: javafx.scene.paint.Color): RgbafList = new RgbafList(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
+    def apply(t: Double, c: javafx.scene.paint.Color): RgbafList = new RgbafList(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+
 
     val rgbafReads = new Reads[RgbafList] {
       def reads(js: JsValue): JsResult[RgbafList] = {
@@ -1348,14 +1398,14 @@ package object czmlProtocol {
     *                 where Time is an ISO 8601 date and time string or seconds since epoch.
     * @param interval the interval property
     */
-  final case class Color(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
-                         interval: Option[String] = None,
-                         reference: Option[String] = None, epoch: Option[String] = None,
-                         nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                         interpolationAlgorithm: Option[String] = None, interpolationDegree: Option[Int] = None,
-                         forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                         backwardExtrapolationType: Option[String] = None,
-                         backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+  final case class CzmlColor(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
+                             interval: Option[String] = None,
+                             reference: Option[String] = None, epoch: Option[String] = None,
+                             nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                             interpolationAlgorithm: Option[String] = None, interpolationDegree: Option[Int] = None,
+                             forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                             backwardExtrapolationType: Option[String] = None,
+                             backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(rgba: RgbaList, interval: String) = this(Option(rgba), None, Option(interval))
 
@@ -1372,26 +1422,35 @@ package object czmlProtocol {
     def this(rgbaf: Rgbaf) = this(None, Option(new RgbafList(rgbaf)))
 
     def this(rgbaf: Rgbaf, interval: String) = this(None, Option(new RgbafList(rgbaf)), None, Option(interval))
+
+    def this(c: javafx.scene.paint.Color) = this(Rgbaf(c.getRed, c.getGreen, c.getBlue, c.getOpacity))
+
+    def this(c: java.awt.Color) = this(Rgba(c.getRed, c.getGreen, c.getBlue, c.getAlpha))
+
   }
 
-  object Color {
-    implicit val fmt = Json.format[Color]
+  object CzmlColor {
+    implicit val fmt = Json.format[CzmlColor]
 
-    def apply(rgba: RgbaList, interval: String): Color = new Color(rgba, interval)
+    def apply(rgba: RgbaList, interval: String): CzmlColor = new CzmlColor(rgba, interval)
 
-    def apply(rgba: RgbaList): Color = new Color(rgba)
+    def apply(rgba: RgbaList): CzmlColor = new CzmlColor(rgba)
 
-    def apply(rgbaf: RgbafList, interval: String): Color = new Color(rgbaf, interval)
+    def apply(rgbaf: RgbafList, interval: String): CzmlColor = new CzmlColor(rgbaf, interval)
 
-    def apply(rgbaf: RgbafList): Color = new Color(rgbaf)
+    def apply(rgbaf: RgbafList): CzmlColor = new CzmlColor(rgbaf)
 
-    def apply(rgba: Rgba, interval: String): Color = new Color(rgba, interval)
+    def apply(rgba: Rgba, interval: String): CzmlColor = new CzmlColor(rgba, interval)
 
-    def apply(rgba: Rgba): Color = new Color(rgba)
+    def apply(rgba: Rgba): CzmlColor = new CzmlColor(rgba)
 
-    def apply(rgbaf: Rgbaf, interval: String): Color = new Color(rgbaf, interval)
+    def apply(rgbaf: Rgbaf, interval: String): CzmlColor = new CzmlColor(rgbaf, interval)
 
-    def apply(rgbaf: Rgbaf): Color = new Color(rgbaf)
+    def apply(rgbaf: Rgbaf): CzmlColor = new CzmlColor(rgbaf)
+
+    def apply(c: javafx.scene.paint.Color): CzmlColor = new CzmlColor(c)
+
+    def apply(c: java.awt.Color): CzmlColor = new CzmlColor(c)
   }
 
   /**
@@ -1399,27 +1458,27 @@ package object czmlProtocol {
     *
     * @param values the array of Colors
     */
-  final case class ColorProperty(values: Option[Array[Color]]) {
-    def this(values: Array[Color]) = this(Option(values))
+  final case class ColorProperty(values: Option[Array[CzmlColor]]) {
+    def this(values: Array[CzmlColor]) = this(Option(values))
 
-    def this(color: Color) = this(Option(Array(color)))
+    def this(color: CzmlColor) = this(Option(Array(color)))
 
-    def this(rgba: Rgba) = this(Option(Array(new Color(new RgbaList(rgba)))))
+    def this(rgba: Rgba) = this(Option(Array(new CzmlColor(new RgbaList(rgba)))))
 
-    def this(r: Int, g: Int, b: Int, a: Int) = this(Option(Array(new Color(new RgbaList(new Rgba(r, g, b, a))))))
+    def this(r: Int, g: Int, b: Int, a: Int) = this(Option(Array(new CzmlColor(new RgbaList(new Rgba(r, g, b, a))))))
 
-    def this(rgbaf: Rgbaf) = this(Option(Array(new Color(new RgbafList(rgbaf)))))
+    def this(rgbaf: Rgbaf) = this(Option(Array(new CzmlColor(new RgbafList(rgbaf)))))
 
-    def this(r: Float, g: Float, b: Float, a: Float) = this(Option(Array(new Color(new RgbafList(new Rgbaf(r, g, b, a))))))
+    def this(r: Float, g: Float, b: Float, a: Float) = this(Option(Array(new CzmlColor(new RgbafList(new Rgbaf(r, g, b, a))))))
 
-    def this(r: Double, g: Double, b: Double, a: Double) = this(Option(Array(new Color(new RgbafList(new Rgbaf(r, g, b, a))))))
+    def this(r: Double, g: Double, b: Double, a: Double) = this(Option(Array(new CzmlColor(new RgbafList(new Rgbaf(r, g, b, a))))))
   }
 
   object ColorProperty {
 
-    def apply(values: Array[Color]): ColorProperty = new ColorProperty(values)
+    def apply(values: Array[CzmlColor]): ColorProperty = new ColorProperty(values)
 
-    def apply(color: Color): ColorProperty = new ColorProperty(color)
+    def apply(color: CzmlColor): ColorProperty = new ColorProperty(color)
 
     def apply(rgba: Rgba): ColorProperty = new ColorProperty(rgba)
 
@@ -1434,9 +1493,9 @@ package object czmlProtocol {
 
     val theReads = new Reads[ColorProperty] {
       def reads(js: JsValue): JsResult[ColorProperty] = {
-        JsPath.read[Array[Color]].reads(js).asOpt match {
+        JsPath.read[Array[CzmlColor]].reads(js).asOpt match {
           // have a single property that we wrap in an option array
-          case None => JsSuccess(new ColorProperty(Option(Array(JsPath.read[Color].reads(js).getOrElse(null)))))
+          case None => JsSuccess(new ColorProperty(Option(Array(JsPath.read[CzmlColor].reads(js).getOrElse(null)))))
           // have an array of properties
           case Some(b) => JsSuccess(new ColorProperty(Some(b)))
         }
@@ -1448,7 +1507,7 @@ package object czmlProtocol {
         propList.values match {
           case None => JsNull
           case Some(list) =>
-            if (list.length == 1) Color.fmt.writes(list.head) else Json.toJson(list.asInstanceOf[Array[Color]])
+            if (list.length == 1) CzmlColor.fmt.writes(list.head) else Json.toJson(list.asInstanceOf[Array[CzmlColor]])
         }
       }
     }
@@ -1493,7 +1552,7 @@ package object czmlProtocol {
 
     def this(color: ColorProperty) = this(color = Option(color), show = Option(Show(true)))
 
-    def this(color: Color) = this(color = Option(ColorProperty(color)), show = Option(Show(true)))
+    def this(color: CzmlColor) = this(color = Option(ColorProperty(color)), show = Option(Show(true)))
 
     def this(rgba: Rgba) = this(color = Option(ColorProperty(rgba)), show = Option(Show(true)))
 
@@ -1522,7 +1581,7 @@ package object czmlProtocol {
 
     def apply(color: ColorProperty): Billboard = new Billboard(color)
 
-    def apply(color: Color): Billboard = new Billboard(color)
+    def apply(color: CzmlColor): Billboard = new Billboard(color)
 
     def apply(rgba: Rgba): Billboard = new Billboard(rgba)
 
@@ -1577,7 +1636,7 @@ package object czmlProtocol {
     def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number, pixelSize: Number) =
       this(Option(color), Option(outlineColor), Option(outlineWidth), Option(pixelSize), Option(new Show(true)))
 
-    def this(color: Color, outlineColor: Color, outlineWidth: Double, pixelSize: Double) =
+    def this(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double, pixelSize: Double) =
       this(Option(new ColorProperty(color)), Option(new ColorProperty(outlineColor)),
         Option(new Number(outlineWidth)), Option(new Number(pixelSize)), Option(new Show(true)))
   }
@@ -1588,7 +1647,7 @@ package object czmlProtocol {
     def apply(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number, pixelSize: Number): Point =
       new Point(color, outlineColor, outlineWidth, pixelSize)
 
-    def apply(color: Color, outlineColor: Color, outlineWidth: Double, pixelSize: Double): Point =
+    def apply(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double, pixelSize: Double): Point =
       new Point(color, outlineColor, outlineWidth, pixelSize)
 
   }
@@ -2028,7 +2087,7 @@ package object czmlProtocol {
                           oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
                           repeat: Option[Repeat] = None) {
 
-    def this(orientation: Int, evenColor: Color, oddColor: Color, offset: Double, repeat: Array[Int]) =
+    def this(orientation: Int, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Array[Int]) =
       this(Option(new StripeOrientation(orientation)), Option(new ColorProperty(evenColor)),
         Option(new ColorProperty(oddColor)), Option(new Number(offset)), Option(new Repeat(repeat)))
 
@@ -2037,7 +2096,7 @@ package object czmlProtocol {
   object Stripe {
     implicit val fmt = Json.format[Stripe]
 
-    def apply(orientation: Int, evenColor: Color, oddColor: Color, offset: Double, repeat: Array[Int]): Stripe =
+    def apply(orientation: Int, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Array[Int]): Stripe =
       new Stripe(orientation, evenColor, oddColor, offset, repeat)
   }
 
@@ -2045,7 +2104,7 @@ package object czmlProtocol {
                         lineCount: Option[Repeat] = None, lineThickness: Option[Repeat] = None,
                         lineOffset: Option[Repeat] = None) {
 
-    def this(color: Color, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]) =
+    def this(color: CzmlColor, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]) =
       this(Option(new ColorProperty(color)), Option(new Number(cellAlpha)),
         Option(new Repeat(lineCount)), Option(new Repeat(lineThickness)), Option(new Repeat(lineOffset)))
   }
@@ -2053,20 +2112,20 @@ package object czmlProtocol {
   object Grid {
     implicit val fmt = Json.format[Grid]
 
-    def apply(color: Color, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]): Grid =
+    def apply(color: CzmlColor, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]): Grid =
       new Grid(color, cellAlpha, lineCount, lineThickness, lineOffset)
   }
 
   final case class SolidColor(color: Option[ColorProperty] = None) {
     def this(color: ColorProperty) = this(Option(color))
 
-    def this(color: Color) = this(Option(new ColorProperty(color)))
+    def this(color: CzmlColor) = this(Option(new ColorProperty(color)))
 
-    def this(rgba: Rgba) = this(new Color(new RgbaList(rgba)))
+    def this(rgba: Rgba) = this(new CzmlColor(new RgbaList(rgba)))
 
     def this(r: Int, g: Int, b: Int, a: Int) = this(new Rgba(r, g, b, a))
 
-    def this(rgbaf: Rgbaf) = this(new Color(rgbaf))
+    def this(rgbaf: Rgbaf) = this(new CzmlColor(rgbaf))
 
     def this(r: Float, g: Float, b: Float, a: Float) = this(new Rgbaf(r, g, b, a))
 
@@ -2078,7 +2137,7 @@ package object czmlProtocol {
 
     def apply(color: ColorProperty): SolidColor = new SolidColor(color)
 
-    def apply(color: Color): SolidColor = new SolidColor(color)
+    def apply(color: CzmlColor): SolidColor = new SolidColor(color)
 
     def apply(rgba: Rgba): SolidColor = new SolidColor(rgba)
 
@@ -2098,7 +2157,7 @@ package object czmlProtocol {
 
     def this(solidColor: ColorProperty) = this(solidColor = Option(SolidColor(solidColor)))
 
-    def this(solidColor: Color) = this(solidColor = Option(SolidColor(solidColor)))
+    def this(solidColor: CzmlColor) = this(solidColor = Option(SolidColor(solidColor)))
 
     def this(rgba: Rgba) = this(solidColor = Option(SolidColor(rgba)))
 
@@ -2121,7 +2180,7 @@ package object czmlProtocol {
 
     def apply(color: ColorProperty): Material = new Material(color)
 
-    def apply(color: Color): Material = new Material(color)
+    def apply(color: CzmlColor): Material = new Material(color)
 
     def apply(rgba: Rgba): Material = new Material(rgba)
 
@@ -2142,7 +2201,7 @@ package object czmlProtocol {
   final case class PolylineGlow(color: Option[ColorProperty] = None, glowPower: Option[Number] = None) {
     def this(color: ColorProperty, glowPower: Number) = this(Option(color), Option(glowPower))
 
-    def this(color: Color, glowPower: Double) = this(Option(new ColorProperty(color)), Option(new Number(glowPower)))
+    def this(color: CzmlColor, glowPower: Double) = this(Option(new ColorProperty(color)), Option(new Number(glowPower)))
 
     def this(rgba: Rgba, glowPower: Double) = this(Option(new ColorProperty(rgba)), Option(new Number(glowPower)))
 
@@ -2152,7 +2211,7 @@ package object czmlProtocol {
 
     def this(r: Double, g: Double, b: Double, a: Double, glowPower: Double) = this(Option(new ColorProperty(new Rgbaf(r, g, b, a))), Option(new Number(glowPower)))
 
-    def this(color: Color) = this(Option(new ColorProperty(color)))
+    def this(color: CzmlColor) = this(Option(new ColorProperty(color)))
   }
 
   object PolylineGlow {
@@ -2160,7 +2219,7 @@ package object czmlProtocol {
 
     def apply(color: ColorProperty, glowPower: Number): PolylineGlow = new PolylineGlow(color, glowPower)
 
-    def apply(color: Color, glowPower: Double): PolylineGlow = new PolylineGlow(color, glowPower)
+    def apply(color: CzmlColor, glowPower: Double): PolylineGlow = new PolylineGlow(color, glowPower)
 
     def apply(rgba: Rgba, glowPower: Double): PolylineGlow = new PolylineGlow(rgba, glowPower)
 
@@ -2170,7 +2229,7 @@ package object czmlProtocol {
 
     def apply(r: Double, g: Double, b: Double, a: Double, glowPower: Double): PolylineGlow = new PolylineGlow(r, g, b, a, glowPower)
 
-    def apply(color: Color): PolylineGlow = new PolylineGlow(color)
+    def apply(color: CzmlColor): PolylineGlow = new PolylineGlow(color)
 
   }
 
@@ -2179,7 +2238,7 @@ package object czmlProtocol {
 
     def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number) = this(Option(color), Option(outlineColor), Option(outlineWidth))
 
-    def this(color: Color, outlineColor: Color, outlineWidth: Double) =
+    def this(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double) =
       this(Option(new ColorProperty(color)), Option(new ColorProperty(outlineColor)), Option(new Number(outlineWidth)))
 
     def this(color: Rgba, outlineColor: Rgba, outlineWidth: Double) =
@@ -2188,7 +2247,7 @@ package object czmlProtocol {
     def this(color: Rgbaf, outlineColor: Rgbaf, outlineWidth: Double) =
       this(Option(new ColorProperty(color)), Option(new ColorProperty(outlineColor)), Option(new Number(outlineWidth)))
 
-    def this(color: Color) = this(Option(new ColorProperty(color)))
+    def this(color: CzmlColor) = this(Option(new ColorProperty(color)))
 
   }
 
@@ -2198,7 +2257,7 @@ package object czmlProtocol {
     def apply(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number): PolylineOutline =
       new PolylineOutline(color, outlineColor, outlineWidth)
 
-    def apply(color: Color, outlineColor: Color, outlineWidth: Double): PolylineOutline =
+    def apply(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double): PolylineOutline =
       new PolylineOutline(color, outlineColor, outlineWidth)
 
     def apply(color: Rgba, outlineColor: Rgba, outlineWidth: Double): PolylineOutline =
@@ -2207,7 +2266,7 @@ package object czmlProtocol {
     def apply(color: Rgbaf, outlineColor: Rgbaf, outlineWidth: Double): PolylineOutline =
       new PolylineOutline(color, outlineColor, outlineWidth)
 
-    def apply(color: Color): PolylineOutline = new PolylineOutline(color)
+    def apply(color: CzmlColor): PolylineOutline = new PolylineOutline(color)
   }
 
   /**
@@ -2220,7 +2279,7 @@ package object czmlProtocol {
     def this(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow) =
       this(Option(solidColor), Option(polylineOutline), Option(polylineGlow))
 
-    def this(solidColor: Color, polylineOutline: Color, polylineGlow: Color) =
+    def this(solidColor: CzmlColor, polylineOutline: CzmlColor, polylineGlow: CzmlColor) =
       this(Option(new SolidColor(solidColor)), Option(new PolylineOutline(polylineOutline)), Option(new PolylineGlow(polylineGlow)))
   }
 
@@ -2230,7 +2289,7 @@ package object czmlProtocol {
     def apply(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow): LineMaterial =
       new LineMaterial(solidColor, polylineOutline, polylineGlow)
 
-    def apply(solidColor: Color, polylineOutline: Color, polylineGlow: Color): LineMaterial =
+    def apply(solidColor: CzmlColor, polylineOutline: CzmlColor, polylineGlow: CzmlColor): LineMaterial =
       new LineMaterial(solidColor, polylineOutline, polylineGlow)
 
   }
@@ -2431,7 +2490,7 @@ package object czmlProtocol {
 
     def this(semiMajorAxis: Double, semiMinorAxis: Double, rotation: Double,
              material: Material, height: Double, extrudedHeight: Double, granularity: Double,
-             stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: Color, numberOfVerticalLines: Double) =
+             stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: CzmlColor, numberOfVerticalLines: Double) =
       this(Option(Show(true)), Option(Number(semiMajorAxis)), Option(Number(semiMinorAxis)),
         Option(Number(rotation)), Option(material),
         Option(Number(height)), Option(Number(extrudedHeight)),
@@ -2445,7 +2504,7 @@ package object czmlProtocol {
 
     def apply(semiMajorAxis: Double, semiMinorAxis: Double, rotation: Double,
               material: Material, height: Double, extrudedHeight: Double, granularity: Double,
-              stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: Color, numberOfVerticalLines: Double): Ellipse =
+              stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: CzmlColor, numberOfVerticalLines: Double): Ellipse =
       new Ellipse(semiMajorAxis, semiMinorAxis, rotation, material, height, extrudedHeight, granularity,
         stRotation, fill, outline, outlineColor, numberOfVerticalLines)
   }
