@@ -2618,13 +2618,13 @@ package object czmlProtocol {
     def this(id: String, name: String, parent: String, description: String, version: String, propertyList: ListBuffer[CzmlProperty]) =
       this(Option(id), Option(name), Option(parent), Option(description), Option(version), propertyList)
 
-//    def this(id: String, name: String, propertyList: ListBuffer[CzmlProperty]) =
-//      this(Option(id), Option(name), None, None, None, propertyList)
-//
-//    def this(id: String, name: String,  description: String, propertyList: ListBuffer[CzmlProperty]) =
-//      this(Option(id), Option(name), None, Option(description), None, propertyList)
-//
-//    def this(id: String, propertyList: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, propertyList)
+    def this(id: String, name: String, propertyList: ListBuffer[CzmlProperty]) =
+      this(Option(id), Option(name), None, None, None, propertyList)
+
+    def this(id: String, name: String,  description: String, propertyList: ListBuffer[CzmlProperty]) =
+      this(Option(id), Option(name), None, Option(description), None, propertyList)
+
+    def this(id: String, propertyList: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, propertyList)
 
     /**
       * returns an eventSource representation of this packet

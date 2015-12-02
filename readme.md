@@ -51,12 +51,12 @@ See the references, in particular reference 2.
       val jsonDoc = Source.fromFile("/Users/...../czml-protocol/test4.czml").mkString
       // create a czml object from the json document
      val czml = CZML(jsonDoc)
-     // create one position property
+     // create a position property
      val pos = CzmlPositions(9.3, 8.2, 7.1)
      // create a billboard property
       val bb = Billboard("http://localhost/img.png",  0.7)
      // create a czml packet
-     val packet = new CZMLPacket(id = Some("test packet"), version = Some("1.0"), propertyList = ListBuffer(pos, bb))
+     val packet = new CZMLPacket("test packet", ListBuffer[CzmlProperty](pos, bb))
      // add the packet to the existing czml object
      czml.add(packet)  // or czml.packets += packet
      // convert the czml object to json
