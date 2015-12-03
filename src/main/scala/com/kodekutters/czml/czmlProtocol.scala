@@ -317,9 +317,14 @@ package object czmlProtocol {
         }
         // have a single coordinate [x,y,z]
         else {
-          JsSuccess(new Cartesian(Seq(
-            ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
-              (JsPath \ 2).read[Double]) (Coordinate.apply(None, _, _, _)).reads(js).get)))
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double]) (Coordinate.apply(None, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[Coordinate] => JsSuccess(new Cartesian(Seq(s.get)))
+            case e: JsError =>
+              println("Error could not read Coordinate values: " + js + " " + JsError.toJson(e).toString())
+              JsError("could not read Coordinate values")
+          }
         }
       }
     }
@@ -384,8 +389,13 @@ package object czmlProtocol {
         }
         // have a single coordinate2D [x,y]
         else {
-          JsSuccess(new Cartesian2D(Seq(
-            ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double]) (Coordinate2D.apply(None, _, _)).reads(js).get)))
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double]) (Coordinate2D.apply(None, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[Coordinate2D] => JsSuccess(new Cartesian2D(Seq(s.get)))
+            case e: JsError =>
+              println("Error could not read Coordinate2D values: " + js + " " + JsError.toJson(e).toString())
+              JsError("could not read Coordinate2D values")
+          }
         }
       }
     }
@@ -479,9 +489,14 @@ package object czmlProtocol {
         }
         // have a single coordinate [lng,lat,alt]
         else {
-          JsSuccess(new Cartographic(Seq(
-            ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
-              (JsPath \ 2).read[Double]) (LngLatAltT.apply(None, _, _, _)).reads(js).get)))
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double]) (LngLatAltT.apply(None, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[LngLatAltT] => JsSuccess(new Cartographic(Seq(s.get)))
+            case e: JsError =>
+              println("Error could not read LngLatAltT values: " + js + " " + JsError.toJson(e).toString())
+              JsError("could not read LngLatAltT values")
+          }
         }
       }
     }
@@ -586,11 +601,16 @@ package object czmlProtocol {
         }
         // have a single velocity [X, Y, Z, vX, vY, vZ]
         else {
-          JsSuccess(new CartesianVelocity(Seq(
-            ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
-              (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double] and
-              (JsPath \ 4).read[Double] and (JsPath \ 5).read[Double]
-              ) (Velocity.apply(None, _, _, _, _, _, _)).reads(js).get)))
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double] and
+            (JsPath \ 4).read[Double] and (JsPath \ 5).read[Double]
+            ) (Velocity.apply(None, _, _, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[Velocity] => JsSuccess(new CartesianVelocity(Seq(s.get)))
+            case e: JsError =>
+              println("Error could not read Velocity values: " + js + " " + JsError.toJson(e).toString())
+              JsError("could not read Velocity values")
+          }
         }
       }
     }
@@ -756,9 +776,14 @@ package object czmlProtocol {
         }
         // have a single color Rgba
         else {
-          JsSuccess(new RgbaList(Seq(
-            ((JsPath \ 0).read[Int] and (JsPath \ 1).read[Int] and
-              (JsPath \ 2).read[Int] and (JsPath \ 3).read[Int]) (Rgba.apply(None, _, _, _, _)).reads(js).get)))
+          val result = ((JsPath \ 0).read[Int] and (JsPath \ 1).read[Int] and
+            (JsPath \ 2).read[Int] and (JsPath \ 3).read[Int]) (Rgba.apply(None, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[Rgba] => JsSuccess(new RgbaList(Seq(s.get)))
+            case e: JsError =>
+              println("Error could not read rgba values: " + js + " " + JsError.toJson(e).toString())
+              JsError("could not read rgba values")
+          }
         }
       }
     }
@@ -903,9 +928,14 @@ package object czmlProtocol {
         }
         // have a single color Rgbaf
         else {
-          JsSuccess(new RgbafList(Seq(
-            ((JsPath \ 0).read[Float] and (JsPath \ 1).read[Float] and
-              (JsPath \ 2).read[Float] and (JsPath \ 3).read[Float]) (Rgbaf.apply(None, _, _, _, _)).reads(js).get)))
+          val result = ((JsPath \ 0).read[Float] and (JsPath \ 1).read[Float] and
+            (JsPath \ 2).read[Float] and (JsPath \ 3).read[Float]) (Rgbaf.apply(None, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[Rgbaf] => JsSuccess(new RgbafList(Seq(s.get)))
+            case e: JsError =>
+              println("Error could not read rgbaf values: " + js + " " + JsError.toJson(e).toString())
+              JsError("could not read rgbaf values")
+          }
         }
       }
     }
@@ -972,13 +1002,24 @@ package object czmlProtocol {
 
             } else {
               // have a single value in the array with no time component
-              JsSuccess(new TimedNumbers(Seq(
-                (JsPath \ 0).read[Double].map(TimedDouble.apply(None, _)).reads(js).get)))
+              val result =  (JsPath \ 0).read[Double].map(TimedDouble.apply(None, _)).reads(js)
+              result match {
+                case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
+                case e: JsError =>
+                  println("Error could not read TimedNumbers values: " + js + " " + JsError.toJson(e).toString())
+                  JsError("could not read TimedNumbers values")
+              }
             }
 
           // have a single value with no time component
           case Some(n) =>
-            JsSuccess(new TimedNumbers(Seq(JsPath.read[Double].map(TimedDouble.apply(None, _)).reads(js).get)))
+            val result = JsPath.read[Double].map(TimedDouble.apply(None, _)).reads(js)
+            result match {
+              case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
+              case e: JsError =>
+                println("Error could not read TimedNumbers values: " + js + " " + JsError.toJson(e).toString())
+                JsError("could not read TimedNumbers values")
+            }
         }
       }
     }
