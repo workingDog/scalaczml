@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.kodekutters
+package com.kodekutters.czml
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -217,7 +217,7 @@ package object czmlProtocol {
   }
 
   /**
-    * a west south, east north degrees coordinates for a rectangle
+    * an array of west south, east north degrees coordinates for a rectangle
     */
   final case class WsenDegrees(wsenDegrees: Array[Double]) {
     def this(w: Double, s: Double, e: Double, n: Double) = this(Array(w, s, e, n))
@@ -1360,7 +1360,7 @@ package object czmlProtocol {
       def reads(js: JsValue): JsResult[Number] = {
         JsPath.read[Array[CzmlNumber]].reads(js).asOpt match {
           // have a single property that we wrap in an option array
-          case None => JsSuccess(new Number(Option(Array(JsPath.read[CzmlNumber].reads(js).getOrElse(null)))))
+          case None => JsSuccess(new Number(Option(Array(JsPath.read[CzmlNumber].reads(js).getOrElse(CzmlNumber(None))))))
           // have an array of properties
           case Some(b) => JsSuccess(new Number(Some(b)))
         }
@@ -1495,7 +1495,7 @@ package object czmlProtocol {
       def reads(js: JsValue): JsResult[ColorProperty] = {
         JsPath.read[Array[CzmlColor]].reads(js).asOpt match {
           // have a single property that we wrap in an option array
-          case None => JsSuccess(new ColorProperty(Option(Array(JsPath.read[CzmlColor].reads(js).getOrElse(null)))))
+          case None => JsSuccess(new ColorProperty(Option(Array(JsPath.read[CzmlColor].reads(js).getOrElse(CzmlColor(None))))))
           // have an array of properties
           case Some(b) => JsSuccess(new ColorProperty(Some(b)))
         }
@@ -1924,7 +1924,7 @@ package object czmlProtocol {
       def reads(js: JsValue): JsResult[CzmlPositions] = {
         JsPath.read[Array[CzmlPosition]].reads(js).asOpt match {
           // have a single property that we wrap in an option array
-          case None => JsSuccess(new CzmlPositions(Option(Array(JsPath.read[CzmlPosition].reads(js).getOrElse(null)))))
+          case None => JsSuccess(new CzmlPositions(Option(Array(JsPath.read[CzmlPosition].reads(js).getOrElse(CzmlPosition(None))))))
           // have an array of properties
           case Some(b) => JsSuccess(new CzmlPositions(Some(b)))
         }
@@ -2026,7 +2026,7 @@ package object czmlProtocol {
       def reads(js: JsValue): JsResult[Positions] = {
         JsPath.read[Array[Position]].reads(js).asOpt match {
           // have a single property that we wrap in an option array
-          case None => JsSuccess(new Positions(Option(Array(JsPath.read[Position].reads(js).getOrElse(null)))))
+          case None => JsSuccess(new Positions(Option(Array(JsPath.read[Position].reads(js).getOrElse(Position(None))))))
           // have an array of properties
           case Some(b) => JsSuccess(new Positions(Some(b)))
         }
@@ -2688,7 +2688,7 @@ package object czmlProtocol {
     /**
       * returns an eventSource representation of this packet
       */
-    def asEventSource() = {
+    def asEventSource(): String = {
       val sb = new mutable.StringBuilder("event: czml \n data: ")
       sb.append(Json.prettyPrint(Json.toJson(this)) + "\n")
       sb.toString()
@@ -2789,7 +2789,7 @@ package object czmlProtocol {
     /**
       * returns the whole CZML document as an array of streamable packets
       */
-    def asStreamData() = {
+    def asStreamData(): String = {
       val sb = new mutable.StringBuilder("[ \n")
       for (packet <- packets) sb.append(packet.asEventSource() + "\n")
       sb.append(" ]")

@@ -1,9 +1,10 @@
 package com.kodekutters.czml
 
-import com.kodekutters.czmlProtocol._
+import com.kodekutters.czml.czmlProtocol._
+
 import play.api.libs.json.Json
 
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 
@@ -20,7 +21,7 @@ object Example1 {
      val czml = CZML(jsonDoc)
      // create a position property
      val pos = CzmlPositions(9.3, 8.2, 7.1)
-     // create a billboard property
+     // create a billboard property with image uri and scale fields
       val bb = Billboard("http://localhost/img.png",  0.7)
      // create a czml packet
      val packet = new CZMLPacket("test packet", ListBuffer[CzmlProperty](pos, bb))
