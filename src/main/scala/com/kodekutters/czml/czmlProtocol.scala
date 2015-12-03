@@ -826,11 +826,11 @@ package object czmlProtocol {
 
     def apply(r: Float, g: Float, b: Float, a: Float): Rgbaf = new Rgbaf(r, g, b, a)
 
-    def apply(c: javafx.scene.paint.Color): Rgbaf  = new Rgbaf(c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+    def apply(c: javafx.scene.paint.Color): Rgbaf = new Rgbaf(c.getRed, c.getGreen, c.getBlue, c.getOpacity)
 
-    def apply(t: String, c: javafx.scene.paint.Color): Rgbaf  = new Rgbaf(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+    def apply(t: String, c: javafx.scene.paint.Color): Rgbaf = new Rgbaf(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
 
-    def apply(t: Double, c: javafx.scene.paint.Color): Rgbaf  = new Rgbaf(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
+    def apply(t: Double, c: javafx.scene.paint.Color): Rgbaf = new Rgbaf(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
   }
 
   /**
@@ -1293,7 +1293,7 @@ package object czmlProtocol {
             case Some(epok) => czmlN.number.map(x => x match {
               case v if v.isInstanceOf[Array[Double]] => Json.toJson(v.asInstanceOf[Array[Double]])
               case v if v.isInstanceOf[Double] => JsNumber(v.asInstanceOf[Double])
-              case _ =>  // nothing
+              case _ => // nothing
             })
           }
 
@@ -1301,7 +1301,7 @@ package object czmlProtocol {
           number match {
             case Some(x) if x.isInstanceOf[JsNumber] => theList += Option("number" -> x.asInstanceOf[JsNumber])
             case Some(x) if x.isInstanceOf[JsArray] => theList += Option("number" -> x.asInstanceOf[JsArray])
-            case _ =>  // nothing
+            case _ => // nothing
           }
 
           JsObject(theList.flatten)
@@ -1313,7 +1313,7 @@ package object czmlProtocol {
           case true =>
             czmlN.number match {
               case Some(x) if x.isInstanceOf[TimedNumbers] => JsNumber(x.asInstanceOf[TimedNumbers].values.head.v)
-              case Some(x) if x.isInstanceOf[Double] => JsNumber(x.asInstanceOf[Double])
+              case Some(x) if x.isInstanceOf[Double] => Json.obj("number" -> JsNumber(x.asInstanceOf[Double]))
               case _ => JsNull
             }
           case false => doFullWrite()
@@ -1374,6 +1374,7 @@ package object czmlProtocol {
           case Some(list) =>
             if (list.length == 1) CzmlNumber.fmt.writes(list.head)
             else Json.toJson(list.asInstanceOf[Array[CzmlNumber]])
+
         }
       }
     }
@@ -2130,6 +2131,10 @@ package object czmlProtocol {
     def this(r: Float, g: Float, b: Float, a: Float) = this(new Rgbaf(r, g, b, a))
 
     def this(r: Double, g: Double, b: Double, a: Double) = this(new Rgbaf(r, g, b, a))
+
+    def this(color: javafx.scene.paint.Color) = this(CzmlColor(color))
+
+    def this(color: java.awt.Color) = this(CzmlColor(color))
   }
 
   object SolidColor {
@@ -2149,6 +2154,9 @@ package object czmlProtocol {
 
     def apply(r: Double, g: Double, b: Double, a: Double): SolidColor = new SolidColor(r, g, b, a)
 
+    def apply(color: javafx.scene.paint.Color): SolidColor = new SolidColor(color)
+
+    def apply(color: java.awt.Color): SolidColor = new SolidColor(color)
   }
 
   final case class Material(solidColor: Option[SolidColor] = None, image: Option[ImageUri] = None,
@@ -2173,6 +2181,10 @@ package object czmlProtocol {
 
     def this(uri: String) = this(image = Option(ImageUri(uri)))
 
+    def this(color: javafx.scene.paint.Color) = this(CzmlColor(color))
+
+    def this(color: java.awt.Color) = this(CzmlColor(color))
+
   }
 
   object Material {
@@ -2195,6 +2207,10 @@ package object czmlProtocol {
     def apply(uri: ImageUri): Material = new Material(uri)
 
     def apply(uri: String): Material = new Material(uri)
+
+    def apply(color: javafx.scene.paint.Color): Material = new Material(color)
+
+    def apply(color: java.awt.Color): Material = new Material(color)
 
   }
 
@@ -2680,7 +2696,7 @@ package object czmlProtocol {
     def this(id: String, name: String, propertyList: ListBuffer[CzmlProperty]) =
       this(Option(id), Option(name), None, None, None, propertyList)
 
-    def this(id: String, name: String,  description: String, propertyList: ListBuffer[CzmlProperty]) =
+    def this(id: String, name: String, description: String, propertyList: ListBuffer[CzmlProperty]) =
       this(Option(id), Option(name), None, Option(description), None, propertyList)
 
     def this(id: String, propertyList: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, propertyList)
@@ -2708,28 +2724,28 @@ package object czmlProtocol {
 
         val propList = new ListBuffer[CzmlProperty]()
 
-        (JsPath \ "availability").read[Availability].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "position").read[CzmlPositions].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "billboard").read[Billboard].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "orientation").read[Orientation].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "point").read[Point].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "label").read[Label].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "path").read[Path].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "polyline").read[Polyline].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "polygon").read[Polygon].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "ellipsoid").read[Ellipsoid].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "viewFrom").read[Radii].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "rectangle").read[Rectangle].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "wall").read[Wall].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "model").read[Model].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "ellipse").read[Ellipse].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "clock").read[Clock].reads(js).asOpt.map(x => propList += x)
+        (JsPath \ "availability").read[Availability].reads(js).asOpt.map(propList += _)
+        (JsPath \ "position").read[CzmlPositions].reads(js).asOpt.map(propList += _)
+        (JsPath \ "billboard").read[Billboard].reads(js).asOpt.map(propList += _)
+        (JsPath \ "orientation").read[Orientation].reads(js).asOpt.map(propList += _)
+        (JsPath \ "point").read[Point].reads(js).asOpt.map(propList += _)
+        (JsPath \ "label").read[Label].reads(js).asOpt.map(propList += _)
+        (JsPath \ "path").read[Path].reads(js).asOpt.map(propList += _)
+        (JsPath \ "polyline").read[Polyline].reads(js).asOpt.map(propList += _)
+        (JsPath \ "polygon").read[Polygon].reads(js).asOpt.map(propList += _)
+        (JsPath \ "ellipsoid").read[Ellipsoid].reads(js).asOpt.map(propList += _)
+        (JsPath \ "viewFrom").read[Radii].reads(js).asOpt.map(propList += _)
+        (JsPath \ "rectangle").read[Rectangle].reads(js).asOpt.map(propList += _)
+        (JsPath \ "wall").read[Wall].reads(js).asOpt.map(propList += _)
+        (JsPath \ "model").read[Model].reads(js).asOpt.map(propList += _)
+        (JsPath \ "ellipse").read[Ellipse].reads(js).asOpt.map(propList += _)
+        (JsPath \ "clock").read[Clock].reads(js).asOpt.map(propList += _)
 
-        (JsPath \ "agi_conicSensor").read[ConicSensor].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "agi_customPatternSensor").read[CustomPatternSensor].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "agi_fan").read[Fan].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js).asOpt.map(x => propList += x)
-        (JsPath \ "agi_vector").read[AgiVector].reads(js).asOpt.map(x => propList += x)
+        (JsPath \ "agi_conicSensor").read[ConicSensor].reads(js).asOpt.map(propList += _)
+        (JsPath \ "agi_customPatternSensor").read[CustomPatternSensor].reads(js).asOpt.map(propList += _)
+        (JsPath \ "agi_fan").read[Fan].reads(js).asOpt.map(propList += _)
+        (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js).asOpt.map(propList += _)
+        (JsPath \ "agi_vector").read[AgiVector].reads(js).asOpt.map(propList += _)
 
         JsSuccess(new CZMLPacket(id, name, parent, description, version, propList))
       }
@@ -2787,7 +2803,7 @@ package object czmlProtocol {
     def remove(packet: CZMLPacket) = packets -= packet
 
     /**
-      * returns the whole CZML document as an array of streamable packets
+      * returns the whole CZML document as string made of an array of streamable packets
       */
     def asStreamData(): String = {
       val sb = new mutable.StringBuilder("[ \n")
