@@ -1284,16 +1284,13 @@ package object czmlProtocol {
           // number could be written as a JsArray or a JsNumber depending on epoch
           val number = czmlN.epoch match {
             // no epoch the number field could be a list of TimedNumbers (which itself can be a single double)
-            case None => czmlN.number.map(x => x match {
-              case tv if tv.isInstanceOf[TimedNumbers] => TimedNumbers.fmt.writes(tv.asInstanceOf[TimedNumbers])
-              case _ => // nothing
-            })
+            case None => czmlN.number.map(x =>
+              if (x.isInstanceOf[TimedNumbers]) TimedNumbers.fmt.writes(x.asInstanceOf[TimedNumbers]))
 
             // with an epoch the number field could be an array of doubles or a single double
             case Some(epok) => czmlN.number.map(x => x match {
               case v if v.isInstanceOf[Array[Double]] => Json.toJson(v.asInstanceOf[Array[Double]])
               case v if v.isInstanceOf[Double] => JsNumber(v.asInstanceOf[Double])
-              case _ => // nothing
             })
           }
 
@@ -1301,7 +1298,6 @@ package object czmlProtocol {
           number match {
             case Some(x) if x.isInstanceOf[JsNumber] => theList += Option("number" -> x.asInstanceOf[JsNumber])
             case Some(x) if x.isInstanceOf[JsArray] => theList += Option("number" -> x.asInstanceOf[JsArray])
-            case _ => // nothing
           }
 
           JsObject(theList.flatten)
