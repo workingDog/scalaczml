@@ -631,7 +631,7 @@ package object czmlProtocol {
   }
 
   /**
-    * describes a boolean interval for use in Show
+    * describes a boolean interval, i.e. an interval and an associated a boolean value
     */
   final case class BooleanInterval(interval: Option[String] = None, boolean: Option[Boolean]) {
     def this(interval: String, boolean: Boolean) = this(Option(interval), Option(boolean))
@@ -644,11 +644,11 @@ package object czmlProtocol {
   }
 
   /**
-    * determines whether an object is shown or not
+    * a generic boolean property that can be a simple boolean or an array of boolean intervals
     *
     * @param value could be a simple boolean or an array of BooleanInterval
     */
-  final case class Show(value: Either[Boolean, Array[BooleanInterval]]) {
+  final case class CzmlBoolean(value: Either[Boolean, Array[BooleanInterval]]) {
     def this(value: Boolean) = this(Left(value))
 
     def this(value: Array[BooleanInterval]) = this(Right(value))
@@ -658,25 +658,25 @@ package object czmlProtocol {
     def this(interval: String, boolean: Boolean) = this(Right(Array(new BooleanInterval(interval, boolean))))
   }
 
-  object Show {
+  object CzmlBoolean {
 
-    def apply(value: Boolean): Show = new Show(value)
+    def apply(value: Boolean): CzmlBoolean = new CzmlBoolean(value)
 
-    def apply(interval: String, boolean: Boolean): Show = new Show(interval, boolean)
+    def apply(interval: String, boolean: Boolean): CzmlBoolean = new CzmlBoolean(interval, boolean)
 
-    val showReads = new Reads[Show] {
-      def reads(js: JsValue): JsResult[Show] = {
+    val showReads = new Reads[CzmlBoolean] {
+      def reads(js: JsValue): JsResult[CzmlBoolean] = {
         // try to read a simple boolean
         val result = JsPath.read[Boolean].reads(js).asOpt match {
           case None => Right(JsPath.read[Array[BooleanInterval]].reads(js).getOrElse(Array[BooleanInterval]()))
           case Some(b) => Left(b)
         }
-        JsSuccess(new Show(result))
+        JsSuccess(new CzmlBoolean(result))
       }
     }
 
-    val showWrites = new Writes[Show] {
-      def writes(shw: Show) = {
+    val showWrites = new Writes[CzmlBoolean] {
+      def writes(shw: CzmlBoolean) = {
         shw.value match {
           case Left(x) => JsBoolean(x)
           case Right(x) => Json.toJson(x)
@@ -684,7 +684,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Show] = Format(showReads, showWrites)
+    implicit val fmt: Format[CzmlBoolean] = Format(showReads, showWrites)
   }
 
   /**
@@ -1586,32 +1586,32 @@ package object czmlProtocol {
                              horizontalOrigin: Option[HorizontalOrigin] = None, image: Option[ImageUri] = None,
                              pixelOffset: Option[PixelOffset] = None, scale: Option[Number] = None,
                              rotation: Option[Number] = None, alignedAxis: Option[AlignedAxis] = None,
-                             show: Option[Show] = None, verticalOrigin: Option[VerticalOrigin] = None) extends CzmlProperty {
+                             show: Option[CzmlBoolean] = None, verticalOrigin: Option[VerticalOrigin] = None) extends CzmlProperty {
 
-    def this(color: ColorProperty) = this(color = Option(color), show = Option(Show(true)))
+    def this(color: ColorProperty) = this(color = Option(color), show = Option(CzmlBoolean(true)))
 
-    def this(color: CzmlColor) = this(color = Option(ColorProperty(color)), show = Option(Show(true)))
+    def this(color: CzmlColor) = this(color = Option(ColorProperty(color)), show = Option(CzmlBoolean(true)))
 
-    def this(rgba: Rgba) = this(color = Option(ColorProperty(rgba)), show = Option(Show(true)))
+    def this(rgba: Rgba) = this(color = Option(ColorProperty(rgba)), show = Option(CzmlBoolean(true)))
 
-    def this(r: Int, g: Int, b: Int, a: Int) = this(Option(ColorProperty(r, g, b, a)), show = Option(Show(true)))
+    def this(r: Int, g: Int, b: Int, a: Int) = this(Option(ColorProperty(r, g, b, a)), show = Option(CzmlBoolean(true)))
 
-    def this(rgbaf: Rgbaf) = this(color = Option(ColorProperty(rgbaf)), show = Option(Show(true)))
+    def this(rgbaf: Rgbaf) = this(color = Option(ColorProperty(rgbaf)), show = Option(CzmlBoolean(true)))
 
-    def this(r: Float, g: Float, b: Float, a: Float) = this(Option(ColorProperty(r, g, b, a)), show = Option(Show(true)))
+    def this(r: Float, g: Float, b: Float, a: Float) = this(Option(ColorProperty(r, g, b, a)), show = Option(CzmlBoolean(true)))
 
-    def this(r: Double, g: Double, b: Double, a: Double) = this(Option(ColorProperty(r, g, b, a)), show = Option(Show(true)))
+    def this(r: Double, g: Double, b: Double, a: Double) = this(Option(ColorProperty(r, g, b, a)), show = Option(CzmlBoolean(true)))
 
-    def this(image: ImageUri) = this(image = Option(image), show = Option(Show(true)))
+    def this(image: ImageUri) = this(image = Option(image), show = Option(CzmlBoolean(true)))
 
-    def this(uri: String) = this(image = Option(ImageUri(uri)), show = Option(Show(true)))
+    def this(uri: String) = this(image = Option(ImageUri(uri)), show = Option(CzmlBoolean(true)))
 
-    def this(uri: String, scale: Double) = this(image = Option(ImageUri(uri)), scale = Option(Number(scale)), show = Option(Show(true)))
+    def this(uri: String, scale: Double) = this(image = Option(ImageUri(uri)), scale = Option(Number(scale)), show = Option(CzmlBoolean(true)))
 
-    def this(image: ImageUri, scale: Double) = this(image = Option(image), scale = Option(Number(scale)), show = Option(Show(true)))
+    def this(image: ImageUri, scale: Double) = this(image = Option(image), scale = Option(Number(scale)), show = Option(CzmlBoolean(true)))
 
     def this(image: ImageUri, scale: Double, rotation: Double) = this(image = Option(image), scale = Option(Number(scale)),
-      rotation = Option(Number(rotation)), show = Option(Show(true)))
+      rotation = Option(Number(rotation)), show = Option(CzmlBoolean(true)))
   }
 
   object Billboard {
@@ -1669,14 +1669,14 @@ package object czmlProtocol {
     */
   final case class Point(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                          outlineWidth: Option[Number] = None, pixelSize: Option[Number] = None,
-                         show: Option[Show] = None) extends CzmlProperty {
+                         show: Option[CzmlBoolean] = None) extends CzmlProperty {
 
     def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number, pixelSize: Number) =
-      this(Option(color), Option(outlineColor), Option(outlineWidth), Option(pixelSize), Option(new Show(true)))
+      this(Option(color), Option(outlineColor), Option(outlineWidth), Option(pixelSize), Option(new CzmlBoolean(true)))
 
     def this(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double, pixelSize: Double) =
       this(Option(new ColorProperty(color)), Option(new ColorProperty(outlineColor)),
-        Option(new Number(outlineWidth)), Option(new Number(pixelSize)), Option(new Show(true)))
+        Option(new Number(outlineWidth)), Option(new Number(pixelSize)), Option(new CzmlBoolean(true)))
   }
 
   object Point {
@@ -1851,12 +1851,12 @@ package object czmlProtocol {
   final case class Label(eyeOffset: Option[EyeOffset] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
                          horizontalOrigin: Option[HorizontalOrigin] = None, outlineColor: Option[ColorProperty] = None,
                          outlineWidth: Option[Number] = None, pixelOffset: Option[PixelOffset] = None,
-                         scale: Option[Number] = None, show: Option[Show] = None, style: Option[Style] = None,
+                         scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[Style] = None,
                          text: Option[Text] = None, verticalOrigin: Option[VerticalOrigin] = None) extends CzmlProperty {
 
-    def this(text: String) = this(text = Option(Text(text)), show = Option(Show(true)))
+    def this(text: String) = this(text = Option(Text(text)), show = Option(CzmlBoolean(true)))
 
-    def this(text: String, font: String) = this(text = Option(Text(text)), font = Option(Font(font)), show = Option(Show(true)))
+    def this(text: String, font: String) = this(text = Option(Text(text)), font = Option(Font(font)), show = Option(CzmlBoolean(true)))
   }
 
   object Label {
@@ -2351,15 +2351,15 @@ package object czmlProtocol {
     * A path, which is a polyline defined by the motion of an object over time.
     * The possible vertices of the path are specified by the position property.
     */
-  final case class Path(show: Option[Show] = None, material: Option[LineMaterial] = None,
+  final case class Path(show: Option[CzmlBoolean] = None, material: Option[LineMaterial] = None,
                         width: Option[Number] = None, resolution: Option[Number] = None,
                         leadTime: Option[Number] = None, trailTime: Option[Number] = None) extends CzmlProperty {
 
     def this(material: LineMaterial, width: Number, resolution: Number) =
-      this(Option(Show(true)), Option(material), Option(width), Option(resolution))
+      this(Option(CzmlBoolean(true)), Option(material), Option(width), Option(resolution))
 
     def this(material: LineMaterial, width: Double, resolution: Double) =
-      this(Option(Show(true)), Option(material), Option(new Number(width)), Option(new Number(resolution)))
+      this(Option(CzmlBoolean(true)), Option(material), Option(new Number(width)), Option(new Number(resolution)))
   }
 
   object Path {
@@ -2374,16 +2374,16 @@ package object czmlProtocol {
   /**
     * A polyline, which is a line in the scene composed of multiple segments.
     */
-  final case class Polyline(positions: Option[Positions] = None, show: Option[Show] = None,
+  final case class Polyline(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                             material: Option[LineMaterial] = None, width: Option[Number] = None,
-                            followSurface: Option[Boolean] = None) extends CzmlProperty {
+                            followSurface: Option[CzmlBoolean] = None) extends CzmlProperty {
 
     def this(positions: Positions, material: LineMaterial, width: Number, followSurface: Boolean) =
-      this(Option(positions), Option(Show(true)), Option(material), Option(width), Option(followSurface))
+      this(Option(positions), Option(CzmlBoolean(true)), Option(material), Option(width), Option(CzmlBoolean(followSurface)))
 
     def this(positions: Position, material: LineMaterial, width: Double, followSurface: Boolean) =
-      this(Option(new Positions(positions)), Option(Show(true)),
-        Option(material), Option(new Number(width)), Option(followSurface))
+      this(Option(new Positions(positions)), Option(CzmlBoolean(true)),
+        Option(material), Option(new Number(width)), Option(CzmlBoolean(followSurface)))
   }
 
   object Polyline {
@@ -2400,14 +2400,14 @@ package object czmlProtocol {
   /**
     * A rectangle
     */
-  final case class Rectangle(coordinates: Option[WsenDegrees] = None, show: Option[Show] = None,
+  final case class Rectangle(coordinates: Option[WsenDegrees] = None, show: Option[CzmlBoolean] = None,
                              material: Option[Material] = None, height: Option[Number] = None,
                              extrudedHeight: Option[Number] = None, granularity: Option[Number] = None,
                              rotation: Option[Number] = None,
-                             stRotation: Option[Number] = None, fill: Option[Boolean] = None,
-                             outline: Option[Boolean] = None, outlineColor: Option[ColorProperty] = None,
+                             stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
+                             outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                              outlineWidth: Option[Number] = None,
-                             closeBottom: Option[Boolean] = None, closeTop: Option[Boolean] = None) extends CzmlProperty
+                             closeBottom: Option[CzmlBoolean] = None, closeTop: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Rectangle {
     implicit val fmt = Json.format[Rectangle]
@@ -2416,13 +2416,13 @@ package object czmlProtocol {
   /**
     * A wall
     */
-  final case class Wall(positions: Option[Positions] = None, show: Option[Show] = None,
+  final case class Wall(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                         material: Option[Material] = None,
                         minimumHeights: Option[Array[Double]] = None,
                         maximumHeights: Option[Array[Double]] = None,
                         granularity: Option[Number] = None,
-                        fill: Option[Boolean] = None,
-                        outline: Option[Boolean] = None, outlineColor: Option[ColorProperty] = None,
+                        fill: Option[CzmlBoolean] = None,
+                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                         outlineWidth: Option[Number] = None) extends CzmlProperty
 
   object Wall {
@@ -2432,18 +2432,18 @@ package object czmlProtocol {
   /**
     * A polygon, which is a closed figure on the surface of the Earth.
     */
-  final case class Polygon(positions: Option[Positions] = None, show: Option[Show] = None,
+  final case class Polygon(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                            material: Option[Material] = None, height: Option[Number] = None,
                            extrudedHeight: Option[Number] = None, granularity: Option[Number] = None,
-                           stRotation: Option[Number] = None, fill: Option[Boolean] = None,
-                           outline: Option[Boolean] = None, outlineColor: Option[ColorProperty] = None,
-                           perPositionHeight: Option[Boolean] = None) extends CzmlProperty {
+                           stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
+                           outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
+                           perPositionHeight: Option[CzmlBoolean] = None) extends CzmlProperty {
 
     def this(positions: Positions, material: Material, height: Double, extrudedHeight: Double) =
-      this(Option(positions), Option(Show(true)), Option(material), Option(Number(height)), Option(Number(extrudedHeight)))
+      this(Option(positions), Option(CzmlBoolean(true)), Option(material), Option(Number(height)), Option(Number(extrudedHeight)))
 
     def this(positions: Position, material: Material, height: Double, extrudedHeight: Double) =
-      this(Option(Positions(positions)), Option(Show(true)), Option(material), Option(Number(height)), Option(Number(extrudedHeight)))
+      this(Option(Positions(positions)), Option(CzmlBoolean(true)), Option(material), Option(Number(height)), Option(Number(extrudedHeight)))
 
   }
 
@@ -2486,16 +2486,16 @@ package object czmlProtocol {
     * An ellipsoid, which is a closed quadric surface that is a three dimensional analogue of an ellipse.
     * The ellipsoid is positioned and oriented using the position and orientation properties.
     */
-  final case class Ellipsoid(show: Option[Show] = None, radii: Option[Radii] = None,
-                             fill: Option[Boolean] = None, material: Option[Material] = None,
-                             outline: Option[Boolean] = None, outlineColor: Option[ColorProperty] = None,
+  final case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[Radii] = None,
+                             fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
+                             outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                              stackPartitions: Option[Number] = None, slicePartitions: Option[Number] = None,
                              subdivisions: Option[Number] = None) extends CzmlProperty {
 
     def this(x: Double, y: Double, z: Double, fill: Boolean, material: Material,
              outline: Boolean, outlineColor: ColorProperty, stackPartitions: Double, slicePartitions: Double,
-             subdivisions: Double) = this(Option(Show(true)), Option(Radii(x, y, z)), Option(fill),
-      Option(material), Option(outline), Option(outlineColor), Option(Number(stackPartitions)),
+             subdivisions: Double) = this(Option(CzmlBoolean(true)), Option(Radii(x, y, z)), Option(CzmlBoolean(fill)),
+      Option(material), Option(CzmlBoolean(outline)), Option(outlineColor), Option(Number(stackPartitions)),
       Option(Number(slicePartitions)), Option(Number(subdivisions)))
 
   }
@@ -2514,11 +2514,11 @@ package object czmlProtocol {
   /**
     * A 3D model. The model is positioned and oriented using the position and orientation properties.
     */
-  final case class Model(show: Option[Show] = None, scale: Option[Number] = None,
+  final case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
                          minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None) extends CzmlProperty {
 
     def this(scale: Double, minimumPixelSize: Double, gltf: String) =
-      this(Option(Show(true)), Option(new Number(scale)),
+      this(Option(CzmlBoolean(true)), Option(new Number(scale)),
         Option(new Number(minimumPixelSize)), Option(new ImageUri(gltf)))
 
   }
@@ -2534,21 +2534,22 @@ package object czmlProtocol {
     * An ellipse, which is a closed curve on the surface of the Earth.
     * The ellipse is positioned using the position property.
     */
-  final case class Ellipse(show: Option[Show] = None, semiMajorAxis: Option[Number] = None, semiMinorAxis: Option[Number] = None,
+  final case class Ellipse(show: Option[CzmlBoolean] = None, semiMajorAxis: Option[Number] = None, semiMinorAxis: Option[Number] = None,
                            rotation: Option[Number] = None, material: Option[Material] = None,
                            height: Option[Number] = None, extrudedHeight: Option[Number] = None,
                            granularity: Option[Number] = None, stRotation: Option[Number] = None,
-                           fill: Option[Boolean] = None, outline: Option[Boolean] = None, outlineColor: Option[ColorProperty] = None,
+                           fill: Option[CzmlBoolean] = None, outline: Option[CzmlBoolean] = None,
+                           outlineColor: Option[ColorProperty] = None,
                            numberOfVerticalLines: Option[Number] = None) extends CzmlProperty {
 
     def this(semiMajorAxis: Double, semiMinorAxis: Double, rotation: Double,
              material: Material, height: Double, extrudedHeight: Double, granularity: Double,
              stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: CzmlColor, numberOfVerticalLines: Double) =
-      this(Option(Show(true)), Option(Number(semiMajorAxis)), Option(Number(semiMinorAxis)),
+      this(Option(CzmlBoolean(true)), Option(Number(semiMajorAxis)), Option(Number(semiMinorAxis)),
         Option(Number(rotation)), Option(material),
         Option(Number(height)), Option(Number(extrudedHeight)),
-        Option(Number(granularity)), Option(Number(stRotation)), Option(fill),
-        Option(outline), Option(ColorProperty(outlineColor)), Option(Number(numberOfVerticalLines)))
+        Option(Number(granularity)), Option(Number(stRotation)), Option(CzmlBoolean(fill)),
+        Option(CzmlBoolean(outline)), Option(ColorProperty(outlineColor)), Option(Number(numberOfVerticalLines)))
 
   }
 
@@ -2606,16 +2607,16 @@ package object czmlProtocol {
   /**
     * A conical sensor volume taking into account occlusion of an ellipsoid, i.e., the globe.
     */
-  final case class ConicSensor(show: Option[Show] = None, innerHalfAngle: Option[Number] = None,
+  final case class ConicSensor(show: Option[CzmlBoolean] = None, innerHalfAngle: Option[Number] = None,
                                outerHalfAngle: Option[Number] = None, minimumClockAngle: Option[Number] = None,
                                maximumClockAngle: Option[Number] = None, radius: Option[Number] = None,
-                               showIntersection: Option[Boolean] = None, intersectionColor: Option[ColorProperty] = None,
-                               intersectionWidth: Option[Number] = None, showLateralSurfaces: Option[Boolean] = None,
-                               lateralSurfaceMaterial: Option[Material] = None, showEllipsoidSurfaces: Option[Boolean] = None,
+                               showIntersection: Option[CzmlBoolean] = None, intersectionColor: Option[ColorProperty] = None,
+                               intersectionWidth: Option[Number] = None, showLateralSurfaces: Option[CzmlBoolean] = None,
+                               lateralSurfaceMaterial: Option[Material] = None, showEllipsoidSurfaces: Option[CzmlBoolean] = None,
                                ellipsoidSurfaceMaterial: Option[Material] = None,
-                               showEllipsoidHorizonSurfaces: Option[Boolean] = None,
+                               showEllipsoidHorizonSurfaces: Option[CzmlBoolean] = None,
                                ellipsoidHorizonSurfaceMaterial: Option[Material] = None,
-                               showDomeSurfaces: Option[Boolean] = None, domeSurfaceMaterial: Option[Material] = None,
+                               showDomeSurfaces: Option[CzmlBoolean] = None, domeSurfaceMaterial: Option[Material] = None,
                                portionToDisplay: Option[PortionToDisplay] = None) extends CzmlProperty
 
   object ConicSensor {
@@ -2635,12 +2636,12 @@ package object czmlProtocol {
   /**
     * A custom sensor volume taking into account occlusion of an ellipsoid, i.e., the globe.
     */
-  final case class CustomPatternSensor(show: Option[Show] = None, directions: Option[Directions] = None,
-                                       radius: Option[Number] = None, showIntersection: Option[Boolean] = None,
+  final case class CustomPatternSensor(show: Option[CzmlBoolean] = None, directions: Option[Directions] = None,
+                                       radius: Option[Number] = None, showIntersection: Option[CzmlBoolean] = None,
                                        intersectionColor: Option[ColorProperty] = None, intersectionWidth: Option[Number] = None,
-                                       showLateralSurfaces: Option[Boolean] = None, lateralSurfaceMaterial: Option[Material] = None,
-                                       showEllipsoidHorizonSurfaces: Option[Boolean] = None, ellipsoidHorizonSurfaceMaterial: Option[Material] = None,
-                                       showDomeSurfaces: Option[Boolean] = None, domeSurfaceMaterial: Option[Material] = None,
+                                       showLateralSurfaces: Option[CzmlBoolean] = None, lateralSurfaceMaterial: Option[Material] = None,
+                                       showEllipsoidHorizonSurfaces: Option[CzmlBoolean] = None, ellipsoidHorizonSurfaceMaterial: Option[Material] = None,
+                                       showDomeSurfaces: Option[CzmlBoolean] = None, domeSurfaceMaterial: Option[Material] = None,
                                        portionToDisplay: Option[PortionToDisplay] = None) extends CzmlProperty
 
   object CustomPatternSensor {
@@ -2651,10 +2652,10 @@ package object czmlProtocol {
     * Defines a fan, which starts at a point or apex and extends in a specified list of directions from the apex.
     * Each pair of directions forms a face of the fan extending to the specified radius.
     */
-  final case class Fan(show: Option[Show] = None,
+  final case class Fan(show: Option[CzmlBoolean] = None,
                        directions: Option[Directions] = None, radius: Option[Number] = None,
-                       perDirectionRadius: Option[Boolean] = None, material: Option[Material] = None,
-                       fill: Option[Boolean] = None, outline: Option[Boolean] = None,
+                       perDirectionRadius: Option[CzmlBoolean] = None, material: Option[Material] = None,
+                       fill: Option[CzmlBoolean] = None, outline: Option[CzmlBoolean] = None,
                        numberOfRings: Option[Number] = None, outlineColor: Option[ColorProperty] = None) extends CzmlProperty
 
   object Fan {
@@ -2664,19 +2665,19 @@ package object czmlProtocol {
   /**
     * A rectangular pyramid sensor volume taking into account occlusion of an ellipsoid, i.e., the globe.
     */
-  final case class RectangularSensor(show: Option[Show] = None, xHalfAngle: Option[Number] = None,
+  final case class RectangularSensor(show: Option[CzmlBoolean] = None, xHalfAngle: Option[Number] = None,
                                      yHalfAngle: Option[Number] = None,
                                      radius: Option[Number] = None,
-                                     showIntersection: Option[Boolean] = None,
+                                     showIntersection: Option[CzmlBoolean] = None,
                                      intersectionColor: Option[ColorProperty] = None,
                                      intersectionWidth: Option[Number] = None,
-                                     showLateralSurfaces: Option[Boolean] = None,
+                                     showLateralSurfaces: Option[CzmlBoolean] = None,
                                      lateralSurfaceMaterial: Option[Material] = None,
-                                     showEllipsoidSurfaces: Option[Boolean] = None,
+                                     showEllipsoidSurfaces: Option[CzmlBoolean] = None,
                                      ellipsoidSurfaceMaterial: Option[Material] = None,
-                                     showEllipsoidHorizonSurfaces: Option[Boolean] = None,
+                                     showEllipsoidHorizonSurfaces: Option[CzmlBoolean] = None,
                                      ellipsoidHorizonSurfaceMaterial: Option[Material] = None,
-                                     showDomeSurfaces: Option[Boolean] = None,
+                                     showDomeSurfaces: Option[CzmlBoolean] = None,
                                      domeSurfaceMaterial: Option[Material] = None,
                                      portionToDisplay: Option[PortionToDisplay] = None) extends CzmlProperty
 
@@ -2688,11 +2689,11 @@ package object czmlProtocol {
     * Defines a graphical vector that originates at the position property and
     * extends in the provided direction for the provided length.
     */
-  final case class AgiVector(show: Option[Show] = None, color: Option[ColorProperty] = None,
+  final case class AgiVector(show: Option[CzmlBoolean] = None, color: Option[ColorProperty] = None,
                              direction: Option[Directions] = None, length: Option[Number] = None,
                              minimumLengthInPixels: Option[Number] = None) extends CzmlProperty {
 
-    def this(show: Show, color: ColorProperty, direction: Directions, length: Number, minimumLengthInPixels: Number) =
+    def this(show: CzmlBoolean, color: ColorProperty, direction: Directions, length: Number, minimumLengthInPixels: Number) =
       this(Option(show), Option(color), Option(direction), Option(length), Option(minimumLengthInPixels))
   }
 
