@@ -57,25 +57,25 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 package object czmlProtocol {
 
 
-  final case class TimeInterval(value: String) {
-
-    import TimeInterval._
-
-    def this(start: String, stop: String) = this(start + "/" + stop)
-
-    def start() = value.split("/").head
-
-    def stop() = value.split("/").last
-
-    def startLocalDateTime() = LocalDateTime.parse(start(), fmter)
-
-    def stopLocalDateTime() = LocalDateTime.parse(stop(), fmter)
-  }
 
   object TimeInterval {
 
-    val fmter = DateTimeFormatter.ISO_DATE_TIME
+    implicit def StringToTimeInterval(value: String): TimeInterval = TimeInterval(value.trim)
 
+    val fmter = DateTimeFormatter.ISO_DATE_TIME
+  }
+
+  final case class TimeInterval(value: String) {
+
+    def this(start: String, stop: String) = this(start + "/" + stop)
+
+    def start() = value.trim.split("/").head
+
+    def stop() = value.trim.split("/").last
+
+    def startLocalDateTime() = LocalDateTime.parse(start(), TimeInterval.fmter)
+
+    def stopLocalDateTime() = LocalDateTime.parse(stop(), TimeInterval.fmter)
   }
 
   //  final case class Duration(days: Int, seconds: Double) {

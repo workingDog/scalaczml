@@ -2,7 +2,7 @@ package com.kodekutters.czml
 
 import java.io.{IOException, File, PrintWriter}
 
-import com.kodekutters.czml.czmlProtocol.CZML
+import com.kodekutters.czml.czmlProtocol.{TimeInterval, CZML}
 import play.api.libs.json.Json
 
 
@@ -10,6 +10,7 @@ import play.api.libs.json.Json
   * basic supporting utilities
   */
 object Util {
+
 
   val COMPLETE = "COMPLETE"
   val BELOW_ELLIPSOID_HORIZON = "BELOW_ELLIPSOID_HORIZON"
@@ -59,5 +60,6 @@ object Util {
       writer.close()
     }
   }
+
 
 }
