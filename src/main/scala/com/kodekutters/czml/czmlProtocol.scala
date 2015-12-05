@@ -57,7 +57,6 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 package object czmlProtocol {
 
 
-
   object TimeInterval {
 
     implicit def StringToTimeInterval(value: String): TimeInterval = TimeInterval(value.trim)
@@ -111,15 +110,8 @@ package object czmlProtocol {
     def apply(values: Array[String]): Availability = new Availability(values)
 
     val aveReads = new Reads[Availability] {
-      def reads(js: JsValue): JsResult[Availability] = {
-        // try to read it as a String
-        val ave = JsPath.read[String].reads(js).asOpt match {
-          // fail to read it as a String, so could be an Array[String]
-          case None => Right(JsPath.read[Array[String]].reads(js).getOrElse(Array[String]()))
-          // is a string
-          case Some(t) => Left(t)
-        }
-        JsSuccess(new Availability(ave))
+      def reads(json: JsValue): JsResult[Availability] = {
+        (JsPath.read[String].map(Availability(_)) | JsPath.read[Array[String]].map(Availability(_))).reads(json)
       }
     }
 
@@ -153,15 +145,8 @@ package object czmlProtocol {
     def apply(value: Double): TimeValue = new TimeValue(value)
 
     val timeValueReads = new Reads[TimeValue] {
-      def reads(js: JsValue): JsResult[TimeValue] = {
-        // try to read it as a String
-        val time = JsPath.read[String].reads(js).asOpt match {
-          // fail to read it as a String, time could be a double
-          case None => Right(JsPath.read[Double].reads(js).getOrElse(0.0))
-          // time is a string
-          case Some(t) => Left(t)
-        }
-        JsSuccess(new TimeValue(time))
+      def reads(json: JsValue): JsResult[TimeValue] = {
+        (JsPath.read[String].map(TimeValue(_)) | JsPath.read[Double].map(TimeValue(_))).reads(json)
       }
     }
 
@@ -665,13 +650,9 @@ package object czmlProtocol {
     def apply(interval: String, boolean: Boolean): CzmlBoolean = new CzmlBoolean(interval, boolean)
 
     val showReads = new Reads[CzmlBoolean] {
-      def reads(js: JsValue): JsResult[CzmlBoolean] = {
-        // try to read a simple boolean
-        val result = JsPath.read[Boolean].reads(js).asOpt match {
-          case None => Right(JsPath.read[Array[BooleanInterval]].reads(js).getOrElse(Array[BooleanInterval]()))
-          case Some(b) => Left(b)
-        }
-        JsSuccess(new CzmlBoolean(result))
+      def reads(json: JsValue): JsResult[CzmlBoolean] = {
+        (JsPath.read[Boolean].map(CzmlBoolean(_)) |
+          JsPath.read[Array[BooleanInterval]].map(new CzmlBoolean(_))).reads(json)
       }
     }
 
@@ -1002,7 +983,7 @@ package object czmlProtocol {
 
             } else {
               // have a single value in the array with no time component
-              val result =  (JsPath \ 0).read[Double].map(TimedDouble.apply(None, _)).reads(js)
+              val result = (JsPath \ 0).read[Double].map(TimedDouble.apply(None, _)).reads(js)
               result match {
                 case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
                 case e: JsError =>
@@ -1749,6 +1730,10 @@ package object czmlProtocol {
     * @param reference a reference property
     */
   final case class Text(string: Either[String, Array[StringInterval]], reference: Option[String] = None) {
+
+    def this(string: String, reference: Option[String]) = this(Left(string), reference)
+
+    def this(string: Array[StringInterval], reference: Option[String]) = this(Right(string), reference)
 
     def this(string: String) = this(Left(string))
 
