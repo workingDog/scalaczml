@@ -1688,12 +1688,16 @@ package object czmlProtocol {
 
     def this(axes: String) = this(Option(axes))
 
+    def this(unitQuaternion: Array[Double]) = this(None, Option(unitQuaternion))
+
   }
 
   object Orientation {
     implicit val fmt = Json.format[Orientation]
 
     def apply(axes: String): Orientation = new Orientation(axes)
+
+    def apply(unitQuaternion: Array[Double]): Orientation = new Orientation(unitQuaternion)
   }
 
   /**
@@ -1924,6 +1928,8 @@ package object czmlProtocol {
 
     def this(x: Double, y: Double, z: Double) = this(None, Option(new Cartesian(x, y, z)))
 
+    def this(cartesian: Cartesian) = this(None, Option(cartesian))
+
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(Option(referenceFrame), Option(new Cartesian(x, y, z)))
 
     def this(cartographicDegrees: Cartographic) = this(cartographicDegrees = Option(cartographicDegrees))
@@ -1939,6 +1945,8 @@ package object czmlProtocol {
     def apply(referenceFrame: String, x: Double, y: Double, z: Double, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z, interval)
 
     def apply(x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(x, y, z)
+
+    def apply(cartesian: Cartesian): CzmlPosition = new CzmlPosition(cartesian)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z)
 
@@ -2546,25 +2554,6 @@ package object czmlProtocol {
   }
 
   /**
-    * A 3D model. The model is positioned and oriented using the position and orientation properties.
-    */
-  final case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
-                         minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None) extends CzmlProperty {
-
-    def this(scale: Double, minimumPixelSize: Double, gltf: String) =
-      this(Option(CzmlBoolean(true)), Option(new Number(scale)),
-        Option(new Number(minimumPixelSize)), Option(new ImageUri(gltf)))
-
-  }
-
-  object Model {
-    implicit val fmt = Json.format[Model]
-
-    def apply(scale: Double, minimumPixelSize: Double, gltf: String): Model = new Model(scale, minimumPixelSize, gltf)
-
-  }
-
-  /**
     * An ellipse, which is a closed curve on the surface of the Earth.
     * The ellipse is positioned using the position property.
     */
@@ -2750,6 +2739,86 @@ package object czmlProtocol {
 
     def apply(currentTime: String, multiplier: Double, range: String, step: String, interval: String): Clock =
       new Clock(currentTime, multiplier, range, step, interval)
+
+  }
+
+  /**
+    * Defines an translational offset which can optionally vary over time
+    */
+  final case class Translation(cartesian: Option[Cartesian] = None, reference: Option[String] = None) {
+    def this(cartesian: Cartesian, reference: String) = this(Option(cartesian), Option(reference))
+  }
+
+  object Translation {
+    implicit val fmt = Json.format[Translation]
+
+    def apply(cartesian: Cartesian, reference: String): Translation = new Translation(cartesian, reference)
+  }
+
+  /**
+    * Transformations to apply to a particular node in a 3D model
+    */
+  final case class NodeTransformation(scale: Option[CzmlPosition] = None, translation: Option[Translation] = None, rotation: Option[Orientation] = None) {
+
+    def this(scale: Cartesian, translation: Translation, rotation: Orientation) =
+      this(Option(CzmlPosition(scale)), Option(translation), Option(rotation))
+  }
+
+  object NodeTransformation {
+    implicit val fmt = Json.format[NodeTransformation]
+
+    def apply(scale: Cartesian, translation: Translation, rotation: Orientation): NodeTransformation =
+      new NodeTransformation(scale, translation, rotation)
+
+  }
+
+  /**
+    * todo
+    * Defines a mapping of node names to node transformations
+    *
+    * @param nodes
+    */
+  final case class NodeTransformations(nodes: mutable.ListMap[String, NodeTransformation])
+
+  object NodeTransformations {
+
+    val theReads = new Reads[NodeTransformations] {
+      def reads(js: JsValue): JsResult[NodeTransformations] = {
+        val theListMap = new mutable.ListMap[String, NodeTransformation]()
+        (JsPath \ "node1").read[NodeTransformation].reads(js).asOpt.map(n => theListMap += ("node1" -> n))
+        (JsPath \ "node2").read[NodeTransformation].reads(js).asOpt.map(n => theListMap += ("node2" -> n))
+        JsSuccess(new NodeTransformations(theListMap))
+      }
+    }
+
+    val theWrites = new Writes[NodeTransformations] {
+      def writes(nodeTrans: NodeTransformations) = {
+        val list = for (n <- nodeTrans.nodes) yield n._1 -> Json.toJson(n._2)
+        JsObject(list)
+      }
+    }
+
+    implicit val fmt: Format[NodeTransformations] = Format(theReads, theWrites)
+  }
+
+  /**
+    * A 3D model. The model is positioned and oriented using the position and orientation properties.
+    */
+  final case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
+                         minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None,
+                         runAnimations: Option[CzmlBoolean] = None,
+                         nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty {
+
+    def this(scale: Double, minimumPixelSize: Double, gltf: String) =
+      this(Option(CzmlBoolean(true)), Option(new Number(scale)),
+        Option(new Number(minimumPixelSize)), Option(new ImageUri(gltf)))
+
+  }
+
+  object Model {
+    implicit val fmt = Json.format[Model]
+
+    def apply(scale: Double, minimumPixelSize: Double, gltf: String): Model = new Model(scale, minimumPixelSize, gltf)
 
   }
 
