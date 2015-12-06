@@ -1,9 +1,7 @@
 package com.kodekutters.czml
 
 import com.kodekutters.czml.czmlProtocol._
-
 import play.api.libs.json.Json
-
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 

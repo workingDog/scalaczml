@@ -33,8 +33,6 @@ package com.kodekutters.czml
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
