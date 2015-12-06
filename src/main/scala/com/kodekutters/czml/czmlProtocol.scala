@@ -33,6 +33,8 @@ package com.kodekutters.czml
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -55,7 +57,6 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
   *
   */
 package object czmlProtocol {
-
 
   object TimeInterval {
 
@@ -1731,9 +1732,9 @@ package object czmlProtocol {
     */
   final case class Text(string: Either[String, Array[StringInterval]], reference: Option[String] = None) {
 
-    def this(string: String, reference: Option[String]) = this(Left(string), reference)
+    def this(string: String, reference: String) = this(Left(string), Option(reference))
 
-    def this(string: Array[StringInterval], reference: Option[String]) = this(Right(string), reference)
+    def this(string: Array[StringInterval], reference: String) = this(Right(string), Option(reference))
 
     def this(string: String) = this(Left(string))
 
@@ -1741,10 +1742,7 @@ package object czmlProtocol {
 
     def this(string: StringInterval) = this(Right(Array(string)))
 
-    def this(string: String, reference: String) = this(Right(Array(new StringInterval(string, reference))))
-
-    def this(string: String, interval: String, reference: String) =
-      this(Right(Array(new StringInterval(interval, string))), Option(reference))
+    def this(string: String, interval: String, reference: String) = this(Right(Array(new StringInterval(interval, string))), Option(reference))
 
   }
 
@@ -1794,6 +1792,7 @@ package object czmlProtocol {
     * @param reference  A reference property
     */
   final case class Style(labelStyle: Option[String] = None, reference: Option[String] = None) {
+
     def this(labelStyle: String) = this(Option(labelStyle))
 
     def this(labelStyle: String, reference: String) = this(Option(labelStyle), Option(reference))
@@ -2415,7 +2414,7 @@ package object czmlProtocol {
   }
 
   /**
-    * A polygon, which is a closed figure on the surface of the Earth.
+    * A polygon, which is a closed shape on the surface of the Earth.
     */
   final case class Polygon(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                            material: Option[Material] = None, height: Option[Number] = None,
@@ -2443,7 +2442,7 @@ package object czmlProtocol {
   }
 
   /**
-    * The dimensions of the ellipsoid. Also describes viewFrom property.
+    * The dimensions of the ellipsoid. Also describes the viewFrom property.
     */
   final case class Radii(cartesian: Option[Cartesian] = None, interval: Option[String] = None,
                          reference: Option[String] = None, epoch: Option[String] = None,
