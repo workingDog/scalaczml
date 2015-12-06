@@ -108,13 +108,13 @@ package object czmlProtocol {
 
     def apply(values: Array[String]): Availability = new Availability(values)
 
-    val aveReads = new Reads[Availability] {
+    val theReads = new Reads[Availability] {
       def reads(json: JsValue): JsResult[Availability] = {
         (JsPath.read[String].map(Availability(_)) | JsPath.read[Array[String]].map(Availability(_))).reads(json)
       }
     }
 
-    val aveWrites = new Writes[Availability] {
+    val theWrites = new Writes[Availability] {
       def writes(time: Availability) = {
         time.value match {
           case Left(x) => JsString(x)
@@ -123,7 +123,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Availability] = Format(aveReads, aveWrites)
+    implicit val fmt: Format[Availability] = Format(theReads, theWrites)
   }
 
   /**
@@ -143,13 +143,13 @@ package object czmlProtocol {
 
     def apply(value: Double): TimeValue = new TimeValue(value)
 
-    val timeValueReads = new Reads[TimeValue] {
+    val theReads = new Reads[TimeValue] {
       def reads(json: JsValue): JsResult[TimeValue] = {
         (JsPath.read[String].map(TimeValue(_)) | JsPath.read[Double].map(TimeValue(_))).reads(json)
       }
     }
 
-    val timeValueWrites = new Writes[TimeValue] {
+    val theWrites = new Writes[TimeValue] {
       def writes(time: TimeValue) = {
         time.value match {
           case Left(x) => JsString(x)
@@ -158,7 +158,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[TimeValue] = Format(timeValueReads, timeValueWrites)
+    implicit val fmt: Format[TimeValue] = Format(theReads, theWrites)
   }
 
   /**
@@ -330,7 +330,7 @@ package object czmlProtocol {
 
     def apply(t: TimeValue, x: Double, y: Double, z: Double): Cartesian = new Cartesian(Coordinate(t, x, y, z))
 
-    val cartesianReads = new Reads[Cartesian] {
+    val theReads = new Reads[Cartesian] {
       def reads(js: JsValue): JsResult[Cartesian] = {
         val jsList = js.as[JsArray].value
         // have a list of timed coordinates, multiple of 4 elements
@@ -354,7 +354,7 @@ package object czmlProtocol {
       }
     }
 
-    val cartesianWrites = new Writes[Cartesian] {
+    val theWrites = new Writes[Cartesian] {
       def writes(cart: Cartesian) = {
         val coordList = for (coord <- cart.coordinates) yield {
           coord.t match {
@@ -366,7 +366,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Cartesian] = Format(cartesianReads, cartesianWrites)
+    implicit val fmt: Format[Cartesian] = Format(theReads, theWrites)
   }
 
   /**
@@ -412,7 +412,7 @@ package object czmlProtocol {
 
     def apply(coordinate: Coordinate2D): Cartesian2D = new Cartesian2D(coordinate)
 
-    val cartesianReads = new Reads[Cartesian2D] {
+    val theReads = new Reads[Cartesian2D] {
       def reads(js: JsValue): JsResult[Cartesian2D] = {
         val jsList = js.as[JsArray].value
         // have a list of timed coordinates, multiple of 3 elements
@@ -436,7 +436,7 @@ package object czmlProtocol {
       }
     }
 
-    val cartesianWrites = new Writes[Cartesian2D] {
+    val theWrites = new Writes[Cartesian2D] {
       def writes(cart: Cartesian2D) = {
         val coordList = for (coord <- cart.coordinates) yield {
           coord.t match {
@@ -448,7 +448,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Cartesian2D] = Format(cartesianReads, cartesianWrites)
+    implicit val fmt: Format[Cartesian2D] = Format(theReads, theWrites)
   }
 
   /**
@@ -512,7 +512,7 @@ package object czmlProtocol {
 
     def apply(t: Double, lng: Double, lat: Double, alt: Double): Cartographic = new Cartographic(TimeValue(t), lng, lat, alt)
 
-    val cartographicReads = new Reads[Cartographic] {
+    val theReads = new Reads[Cartographic] {
       def reads(js: JsValue): JsResult[Cartographic] = {
         val jsList = js.as[JsArray].value
         // have a list of timed coordinates, multiple of 4 elements
@@ -537,7 +537,7 @@ package object czmlProtocol {
       }
     }
 
-    val cartographicWrites = new Writes[Cartographic] {
+    val theWrites = new Writes[Cartographic] {
       def writes(cart: Cartographic) = {
         val coordList = for (coord <- cart.coordinates) yield {
           coord.t match {
@@ -549,7 +549,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Cartographic] = Format(cartographicReads, cartographicWrites)
+    implicit val fmt: Format[Cartographic] = Format(theReads, theWrites)
   }
 
   /**
@@ -623,7 +623,7 @@ package object czmlProtocol {
       new CartesianVelocity(TimeValue(t), x, y, z, vx, vy, vz)
 
 
-    val velocityReads = new Reads[CartesianVelocity] {
+    val theReads = new Reads[CartesianVelocity] {
       def reads(js: JsValue): JsResult[CartesianVelocity] = {
         val jsList = js.as[JsArray].value
         // have a list of timed velocities, multiple of 7 elements
@@ -651,7 +651,7 @@ package object czmlProtocol {
       }
     }
 
-    val velocityWrites = new Writes[CartesianVelocity] {
+    val theWrites = new Writes[CartesianVelocity] {
       def writes(cart: CartesianVelocity) = {
         val coordList = for (coord <- cart.velocities) yield {
           coord.t match {
@@ -663,7 +663,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[CartesianVelocity] = Format(velocityReads, velocityWrites)
+    implicit val fmt: Format[CartesianVelocity] = Format(theReads, theWrites)
   }
 
   /**
@@ -700,14 +700,14 @@ package object czmlProtocol {
 
     def apply(interval: String, boolean: Boolean): CzmlBoolean = new CzmlBoolean(interval, boolean)
 
-    val showReads = new Reads[CzmlBoolean] {
+    val theReads = new Reads[CzmlBoolean] {
       def reads(json: JsValue): JsResult[CzmlBoolean] = {
         (JsPath.read[Boolean].map(CzmlBoolean(_)) |
           JsPath.read[Array[BooleanInterval]].map(new CzmlBoolean(_))).reads(json)
       }
     }
 
-    val showWrites = new Writes[CzmlBoolean] {
+    val theWrites = new Writes[CzmlBoolean] {
       def writes(shw: CzmlBoolean) = {
         shw.value match {
           case Left(x) => JsBoolean(x)
@@ -716,7 +716,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[CzmlBoolean] = Format(showReads, showWrites)
+    implicit val fmt: Format[CzmlBoolean] = Format(theReads, theWrites)
   }
 
   /**
@@ -795,7 +795,7 @@ package object czmlProtocol {
 
     def apply(t: Double, c: java.awt.Color): RgbaList = new RgbaList(t, c.getRed, c.getGreen, c.getBlue, c.getAlpha)
 
-    val rgbaReads = new Reads[RgbaList] {
+    val theReads = new Reads[RgbaList] {
       def reads(js: JsValue): JsResult[RgbaList] = {
         val jsList = js.as[JsArray].value
         // have a list of timed values
@@ -820,7 +820,7 @@ package object czmlProtocol {
       }
     }
 
-    val rgbaWrites = new Writes[RgbaList] {
+    val theWrites = new Writes[RgbaList] {
       def writes(cart: RgbaList) = {
         val theList = for (value <- cart.values) yield {
           value.t match {
@@ -832,7 +832,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[RgbaList] = Format(rgbaReads, rgbaWrites)
+    implicit val fmt: Format[RgbaList] = Format(theReads, theWrites)
   }
 
   /**
@@ -946,7 +946,7 @@ package object czmlProtocol {
     def apply(t: Double, c: javafx.scene.paint.Color): RgbafList = new RgbafList(t, c.getRed, c.getGreen, c.getBlue, c.getOpacity)
 
 
-    val rgbafReads = new Reads[RgbafList] {
+    val theReads = new Reads[RgbafList] {
       def reads(js: JsValue): JsResult[RgbafList] = {
         val jsList = js.as[JsArray].value
         // todo fix this
@@ -972,7 +972,7 @@ package object czmlProtocol {
       }
     }
 
-    val rgbafWrites = new Writes[RgbafList] {
+    val theWrites = new Writes[RgbafList] {
       def writes(cart: RgbafList) = {
         val theList = for (value <- cart.values) yield {
           value.t match {
@@ -984,7 +984,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[RgbafList] = Format(rgbafReads, rgbafWrites)
+    implicit val fmt: Format[RgbafList] = Format(theReads, theWrites)
   }
 
   /**
@@ -1017,7 +1017,7 @@ package object czmlProtocol {
 
     def apply(t: String, v: Double): TimedNumbers = new TimedNumbers(t, v)
 
-    val timedValuesReads = new Reads[TimedNumbers] {
+    val theReads = new Reads[TimedNumbers] {
       def reads(js: JsValue): JsResult[TimedNumbers] = {
 
         // could be an array or a single number
@@ -1056,7 +1056,7 @@ package object czmlProtocol {
       }
     }
 
-    val timedValuesWrites = new Writes[TimedNumbers] {
+    val theWrites = new Writes[TimedNumbers] {
       def writes(cart: TimedNumbers) = {
         val theList = for (value <- cart.values) yield {
           value.t match {
@@ -1068,7 +1068,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[TimedNumbers] = Format(timedValuesReads, timedValuesWrites)
+    implicit val fmt: Format[TimedNumbers] = Format(theReads, theWrites)
   }
 
   /**
@@ -1115,7 +1115,7 @@ package object czmlProtocol {
 
     def apply(horizontalOrigin: String, reference: String): HorizontalOrigin = new HorizontalOrigin(horizontalOrigin, reference)
 
-    val hReads = new Reads[HorizontalOrigin] {
+    val theReads = new Reads[HorizontalOrigin] {
       def reads(js: JsValue): JsResult[HorizontalOrigin] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
@@ -1128,7 +1128,7 @@ package object czmlProtocol {
       }
     }
 
-    val hWrites = new Writes[HorizontalOrigin] {
+    val theWrites = new Writes[HorizontalOrigin] {
       def writes(obj: HorizontalOrigin) = {
         obj.reference match {
           case Some(ref) => Json.obj("horizontalOrigin" -> JsString(obj.horizontalOrigin.getOrElse("")), "reference" -> JsString(ref))
@@ -1137,7 +1137,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[HorizontalOrigin] = Format(hReads, hWrites)
+    implicit val fmt: Format[HorizontalOrigin] = Format(theReads, theWrites)
   }
 
   /**
@@ -1159,7 +1159,7 @@ package object czmlProtocol {
 
     def apply(verticalOrigin: String, reference: String): VerticalOrigin = new VerticalOrigin(verticalOrigin, reference)
 
-    val vReads = new Reads[VerticalOrigin] {
+    val theReads = new Reads[VerticalOrigin] {
       def reads(js: JsValue): JsResult[VerticalOrigin] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
@@ -1172,7 +1172,7 @@ package object czmlProtocol {
       }
     }
 
-    val vWrites = new Writes[VerticalOrigin] {
+    val theWrites = new Writes[VerticalOrigin] {
       def writes(obj: VerticalOrigin) = {
         obj.reference match {
           case Some(ref) => Json.obj("verticalOrigin" -> JsString(obj.verticalOrigin.getOrElse("")), "reference" -> JsString(ref))
@@ -1181,7 +1181,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[VerticalOrigin] = Format(vReads, vWrites)
+    implicit val fmt: Format[VerticalOrigin] = Format(theReads, theWrites)
   }
 
   /**
@@ -1204,7 +1204,7 @@ package object czmlProtocol {
     def apply(uri: String, reference: String): ImageUri = new ImageUri(uri, reference)
 
 
-    val uriReads = new Reads[ImageUri] {
+    val theReads = new Reads[ImageUri] {
       def reads(js: JsValue): JsResult[ImageUri] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
@@ -1216,7 +1216,7 @@ package object czmlProtocol {
       }
     }
 
-    val uriWrites = new Writes[ImageUri] {
+    val theWrites = new Writes[ImageUri] {
       def writes(obj: ImageUri) = {
         obj.reference match {
           case Some(ref) => Json.obj("uri" -> JsString(obj.uri.getOrElse("")), "reference" -> JsString(ref))
@@ -1225,7 +1225,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[ImageUri] = Format(uriReads, uriWrites)
+    implicit val fmt: Format[ImageUri] = Format(theReads, theWrites)
   }
 
   /**
@@ -1300,7 +1300,7 @@ package object czmlProtocol {
 
     def apply(number: Array[Double], epoch: String): CzmlNumber = new CzmlNumber(number, epoch)
 
-    val czmlNumberReads = new Reads[CzmlNumber] {
+    val theReads = new Reads[CzmlNumber] {
       def reads(js: JsValue): JsResult[CzmlNumber] = {
         // read the full set of fields
         def doFullRead(): JsResult[CzmlNumber] = {
@@ -1337,7 +1337,7 @@ package object czmlProtocol {
       }
     }
 
-    val czmlNumberWrites = new Writes[CzmlNumber] {
+    val theWrites = new Writes[CzmlNumber] {
       def writes(czmlN: CzmlNumber) = {
 
         val theList = ListBuffer(
@@ -1391,7 +1391,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[CzmlNumber] = Format(czmlNumberReads, czmlNumberWrites)
+    implicit val fmt: Format[CzmlNumber] = Format(theReads, theWrites)
   }
 
   /**
@@ -1741,7 +1741,7 @@ package object czmlProtocol {
 
     def apply(font: String, reference: String): Font = new Font(font, reference)
 
-    val fReads = new Reads[Font] {
+    val theReads = new Reads[Font] {
       def reads(js: JsValue): JsResult[Font] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
@@ -1753,7 +1753,7 @@ package object czmlProtocol {
       }
     }
 
-    val fWrites = new Writes[Font] {
+    val theWrites = new Writes[Font] {
       def writes(obj: Font) = {
         obj.reference match {
           case Some(ref) => Json.obj("font" -> JsString(obj.font.getOrElse("")), "reference" -> JsString(ref))
@@ -1762,7 +1762,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Font] = Format(fReads, fWrites)
+    implicit val fmt: Format[Font] = Format(theReads, theWrites)
   }
 
   /**
@@ -1806,7 +1806,7 @@ package object czmlProtocol {
 
     def apply(string: String, reference: String): Text = new Text(string, reference)
 
-    val textReads = new Reads[Text] {
+    val theReads = new Reads[Text] {
       def reads(js: JsValue): JsResult[Text] = {
         // try to read the string field
         val result = (JsPath \ "string").read[String].reads(js).asOpt match {
@@ -1823,7 +1823,7 @@ package object czmlProtocol {
       }
     }
 
-    val textWrites = new Writes[Text] {
+    val theWrites = new Writes[Text] {
       def writes(txt: Text) = {
         val theText = txt.string match {
           case Left(x) => JsString(x)
@@ -1836,7 +1836,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Text] = Format(textReads, textWrites)
+    implicit val fmt: Format[Text] = Format(theReads, theWrites)
   }
 
   /**
@@ -1859,7 +1859,7 @@ package object czmlProtocol {
     def apply(labelStyle: String, reference: String): Style = new Style(labelStyle, reference)
 
 
-    val sReads = new Reads[Style] {
+    val theReads = new Reads[Style] {
       def reads(js: JsValue): JsResult[Style] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
@@ -1871,7 +1871,7 @@ package object czmlProtocol {
       }
     }
 
-    val sWrites = new Writes[Style] {
+    val theWrites = new Writes[Style] {
       def writes(obj: Style) = {
         obj.reference match {
           case Some(ref) => Json.obj("labelStyle" -> JsString(obj.labelStyle.getOrElse("")), "reference" -> JsString(ref))
@@ -1880,7 +1880,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[Style] = Format(sReads, sWrites)
+    implicit val fmt: Format[Style] = Format(theReads, theWrites)
   }
 
   /**
@@ -2854,7 +2854,7 @@ package object czmlProtocol {
 
   object CZMLPacket {
 
-    val propReads = new Reads[CZMLPacket] {
+    val theReads = new Reads[CZMLPacket] {
       def reads(js: JsValue): JsResult[CZMLPacket] = {
 
         val id = (JsPath \ "id").read[String].reads(js).asOpt
@@ -2892,7 +2892,7 @@ package object czmlProtocol {
       }
     }
 
-    val propWrites = new Writes[CZMLPacket] {
+    val theWrites = new Writes[CZMLPacket] {
       def writes(packet: CZMLPacket) = {
         val theList = ListBuffer[Option[(String, JsValue)]](
           packet.id.map("id" -> JsString(_)),
@@ -2931,7 +2931,7 @@ package object czmlProtocol {
       }
     }
 
-    implicit val fmt: Format[CZMLPacket] = Format(propReads, propWrites)
+    implicit val fmt: Format[CZMLPacket] = Format(theReads, theWrites)
   }
 
   /**
