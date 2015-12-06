@@ -31,6 +31,10 @@ object Util {
   val SYSTEM_CLOCK = "SYSTEM_CLOCK"
   val SYSTEM_CLOCK_MULTIPLIER = "SYSTEM_CLOCK_MULTIPLIER"
   val TICK_DEPENDENT = "TICK_DEPENDENT"
+  // interpolators
+  val HERMITE = "HERMITE"
+  val LAGRANGE = "LAGRANGE"
+  val LINEAR = "LINEAR"
 
 
   def isEmpty(x: String) = x != null && x.trim.nonEmpty

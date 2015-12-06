@@ -217,6 +217,7 @@ package object czmlProtocol {
     * a 3d cartesian coordinate that can have a time component.
     */
   final case class Coordinate(t: Option[TimeValue] = None, x: Double, y: Double, z: Double) {
+
     def this(x: Double, y: Double, z: Double) = this(None, x, y, z)
 
     def this(t: String, x: Double, y: Double, z: Double) = this(Option(TimeValue(t)), x, y, z)
@@ -224,6 +225,20 @@ package object czmlProtocol {
     def this(t: Double, x: Double, y: Double, z: Double) = this(Option(TimeValue(t)), x, y, z)
 
     def this(t: TimeValue, x: Double, y: Double, z: Double) = this(Option(t), x, y, z)
+
+    def +(c: Coordinate) = new Coordinate(this.x + c.x, this.y + c.y, this.z + c.z)
+
+    def -(c: Coordinate) = new Coordinate(this.x - c.x, this.y - c.y, this.z - c.z)
+
+    def /(s: Double) = new Coordinate(this.x / s, this.y / s, this.z / s)
+
+    def *(s: Double) = new Coordinate(this.x * s, this.y * s, this.z * s)
+
+    def cross(other: Coordinate) = new Coordinate(this.y * other.z - this.z * other.y, this.z * other.x - this.x * other.z, this.x * other.y - this.y * other.x)
+
+    def dot(other: Coordinate): Double = this.x * other.x + this.y * other.y + this.z * other.z
+
+    def invert() = new Coordinate(-this.x, -this.y, -this.z)
   }
 
   object Coordinate {
@@ -247,6 +262,18 @@ package object czmlProtocol {
     def this(t: Double, x: Double, y: Double) = this(Option(TimeValue(t)), x, y)
 
     def this(t: TimeValue, x: Double, y: Double) = this(Option(t), x, y)
+
+    def +(c: Coordinate2D) = new Coordinate2D(this.x + c.x, this.y + c.y)
+
+    def -(c: Coordinate2D) = new Coordinate2D(this.x - c.x, this.y - c.y)
+
+    def /(s: Double) = new Coordinate2D(this.x / s, this.y / s)
+
+    def *(s: Double) = new Coordinate2D(this.x * s, this.y * s)
+
+    def dot(other: Coordinate2D) = this.x * other.x + this.y * other.y
+
+    def invert() = new Coordinate2D(-this.x, -this.y)
   }
 
   object Coordinate2D {
@@ -275,6 +302,20 @@ package object czmlProtocol {
     def this(t: Double, x: Double, y: Double, z: Double) = this(Seq(Coordinate(t, x, y, z)))
 
     def this(t: TimeValue, x: Double, y: Double, z: Double) = this(Seq(Coordinate(t, x, y, z)))
+
+    def +(c: Cartesian) = new Cartesian(this.coordinates.head + c.coordinates.head)
+
+    def -(c: Cartesian) = new Cartesian(this.coordinates.head - c.coordinates.head)
+
+    def /(s: Double) = new Cartesian(this.coordinates.head / s)
+
+    def *(s: Double) = new Cartesian(this.coordinates.head * s)
+
+    def cross(other: Cartesian) = new Cartesian(this.coordinates.head.cross(other.coordinates.head))
+
+    def dot(other: Cartesian): Double = this.coordinates.head.dot(other.coordinates.head)
+
+    def invert() = new Cartesian(this.coordinates.head.invert)
   }
 
   object Cartesian {
@@ -346,6 +387,17 @@ package object czmlProtocol {
 
     def this(t: Double, x: Double, y: Double) = this(Seq(Coordinate2D(t, x, y)))
 
+    def +(c: Cartesian2D) = new Cartesian2D(this.coordinates.head + c.coordinates.head)
+
+    def -(c: Cartesian2D) = new Cartesian2D(this.coordinates.head - c.coordinates.head)
+
+    def /(s: Double) = new Cartesian2D(this.coordinates.head / s)
+
+    def *(s: Double) = new Cartesian2D(this.coordinates.head * s)
+
+    def dot(other: Cartesian2D): Double = this.coordinates.head.dot(other.coordinates.head)
+
+    def invert() = new Cartesian2D(this.coordinates.head.invert)
   }
 
   object Cartesian2D {
@@ -428,12 +480,12 @@ package object czmlProtocol {
   /**
     * A list of geodetic, WGS84 positions using longitude, latitude, and height components.
     * The positions represented as a WGS 84 Cartographic [Longitude, Latitude, Height]
-    * where longitude and latitude are in degrees and height is in meters.
+    * where longitude and latitude are in degrees or radians and height is in meters.
     * If the array has three elements, the position is constant.
     * If it has four or more elements, they are time-tagged samples arranged
     * as [Time, Longitude, Latitude, Height, Time, Longitude, Latitude, Height, ...],
     * where Time is an ISO 8601 date and time string or seconds since "epoch".
-    * Note: the longitudes and latitudes can be in decimal degrees or radians
+    *
     */
   final case class Cartographic(coordinates: Seq[LngLatAltT]) {
 
