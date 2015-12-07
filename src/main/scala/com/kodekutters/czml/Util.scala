@@ -2,7 +2,8 @@ package com.kodekutters.czml
 
 import java.io.{IOException, File, PrintWriter}
 
-import com.kodekutters.czml.czmlProtocol.{TimeInterval, CZML}
+import com.kodekutters.czml.czmlProperties._
+
 import play.api.libs.json.Json
 
 

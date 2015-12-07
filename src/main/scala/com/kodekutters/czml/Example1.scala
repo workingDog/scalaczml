@@ -1,6 +1,9 @@
 package com.kodekutters.czml
 
-import com.kodekutters.czml.czmlProtocol._
+import com.kodekutters.czml.czmlProperties._
+import com.kodekutters.czml.czmlCore._
+import com.kodekutters.czml.Util._
+
 import play.api.libs.json.Json
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
