@@ -588,6 +588,16 @@ package object czmlProperties {
 
   /**
     * The clock settings for the entire data set. Only valid on the document object.
+    *
+    * @param currentTime The current time.
+    * @param multiplier The multiplier, which in TICK_DEPENDENT mode is the number of seconds to advance each tick.
+    *                   In SYSTEM_CLOCK_DEPENDENT mode, it is the multiplier applied to the amount of
+    *                   time elapsed between ticks. This value is ignored in SYSTEM_CLOCK mode.
+    * @param range The behavior of a clock when its current time reaches its start or end points.
+    *              Valid values are 'UNBOUNDED', 'CLAMPED', and 'LOOP_STOP'.
+    * @param step Defines how a clock steps in time. Valid values are 'SYSTEM_CLOCK',
+    *             'SYSTEM_CLOCK_MULTIPLIER', and 'TICK_DEPENDENT'.
+    * @param interval an interval of time.
     */
   final case class Clock(currentTime: Option[String] = None, multiplier: Option[Double] = None,
                          range: Option[String] = None, step: Option[String] = None, interval: Option[String] = None) extends CzmlProperty {
@@ -606,6 +616,13 @@ package object czmlProperties {
 
   /**
     * A 3D model. The model is positioned and oriented using the position and orientation properties.
+    *
+    * @param show Whether or not the model is shown.
+    * @param scale The scale of the model.
+    * @param minimumPixelSize The approximate minimum pixel size of the model regardless of zoom.
+    * @param gltf The URL of a glTF model.
+    * @param runAnimations Whether or not to run animations.
+    * @param nodeTransformations node transformations.
     */
   final case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
                          minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None,
@@ -629,6 +646,16 @@ package object czmlProperties {
     * A CZML packet describes the graphical properties for a single
     * object in the scene, such as a single aircraft.
     *
+    * @param id The ID of the object described by this packet. IDs do not need to be GUIDs,
+    *           but they do need to uniquely identify a single object within a CZML source and
+    *           any other CZML sources loaded into the same scope. If this property is not specified,
+    *           the client will automatically generate a unique one. However, this prevents later packets
+    *           from referring to this object in order to, for example, add more data to it.
+    * @param name The name of the object. It does not have to be unique and is intended for user consumption.
+    * @param parent The ID of the parent object or folder.
+    * @param description An HTML description of the object.
+    * @param version The CZML version being written. Only valid on the document object.
+    * @param propertyList The list of properties of this object
     */
   final case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
                               description: Option[String] = None, version: Option[String] = None,
@@ -739,6 +766,8 @@ package object czmlProperties {
 
   /**
     * a CZML document contains a single JSON array where each object-literal element in the array is a CZML packet.
+    *
+    * @param packets the list CZMLPacket of this document
     */
   final case class CZML(packets: ListBuffer[CZMLPacket]) {
 
@@ -747,7 +776,7 @@ package object czmlProperties {
     def remove(packet: CZMLPacket) = packets -= packet
 
     /**
-      * returns the whole CZML document as string made of an array of streamable packets
+      * returns the whole CZML document as string made of an array of eventSource elements.
       */
     def asStreamData(): String = {
       val sb = new mutable.StringBuilder("[ \n")
