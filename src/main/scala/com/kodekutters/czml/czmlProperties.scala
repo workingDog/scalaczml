@@ -51,18 +51,18 @@ import com.kodekutters.czml.czmlCore._
   * It describes lines, points, billboards (markers), models and
   * other graphical primitives, and specifies how they change with time.
   *
-  * This package implements the CZML object as a list of CzmlPackage,
-  * the CZMLPackage object and all its constituent czml properties.
+  * This package implements the CZML object as a list of CZML Packets,
+  * the CZMLPacket object and all its constituent czml properties.
   */
 package object czmlProperties {
 
   /**
-    * every CzmlPacket constituent properties extend this trait
+    * all CzmlPacket constituent properties extend this trait
     */
   sealed trait CzmlProperty
 
   /**
-    * representing time availability as a String or an array of strings
+    * represents time availability as a String or an array of strings
     *
     * @param value the availability time value(s)
     */
