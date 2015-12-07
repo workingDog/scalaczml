@@ -51,7 +51,7 @@ import com.kodekutters.czml.czmlCore._
   * It describes lines, points, billboards (markers), models and
   * other graphical primitives, and specifies how they change with time.
   *
-  * This package implements the CZML object as a list of CZML Packets,
+  * This package implements the CZML object as a list of CZMLPacket,
   * the CZMLPacket object and all its constituent czml properties.
   */
 package object czmlProperties {

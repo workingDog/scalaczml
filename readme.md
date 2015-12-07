@@ -39,9 +39,8 @@ include in your project. The jar file will be in the directory:
 
 ## Documentation
 
-todo
-
-See the references, in particular reference 2.
+To generate the scalaczml API documentation, type "sbt doc". The documentation will be generated in 
+/target/sbt-0.13/api directory. scalaczml follows closely reference 2 documentation. 
 
 ## Example use
 
@@ -70,5 +69,5 @@ See the references, in particular reference 2.
     
 ## State
 
-work in progress, no testing done
+work in progress
 
