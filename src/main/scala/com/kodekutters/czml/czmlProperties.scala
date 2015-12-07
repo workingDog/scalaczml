@@ -56,12 +56,15 @@ import com.kodekutters.czml.czmlCore._
   */
 package object czmlProperties {
 
+  /**
+    * every CzmlPacket constituent properties extend this trait
+    */
   sealed trait CzmlProperty
 
   /**
     * representing time availability as a String or an array of strings
     *
-    * @param value the availability value(s)
+    * @param value the availability time value(s)
     */
   final case class Availability(value: Either[String, Array[String]]) extends CzmlProperty {
     def this(value: String) = this(Left(value))
@@ -96,6 +99,29 @@ package object czmlProperties {
   /**
     * A billboard, or viewport-aligned image. The billboard is positioned in the scene by the position property.
     * A billboard is sometimes called a marker.
+    *
+    * @param color This color value is multiplied with the values of the billboard's "image" to produce the final color.
+    * @param eyeOffset The eye offset of the billboard, which is the offset in eye coordinates at which
+    *                  to place the billboard relative to the position property. Eye coordinates are
+    *                  a left-handed coordinate system where the X-axis points toward the viewer's right,
+    *                  the Y-axis points up, and the Z-axis points into the screen.
+    * @param horizontalOrigin The horizontal origin of the billboard. It controls whether the billboard
+    *                         image is left-, center-, or right-aligned with the position.
+    * @param image The image displayed on the billboard, expressed as a URL. For broadest client compatibility,
+    *              the URL should be accessible via Cross-Origin Resource Sharing (CORS).
+    *              The URL may also be a data URI.
+    * @param pixelOffset The offset, in viewport pixels, of the billboard origin from the position.
+    *                    A pixel offset is the number of pixels up and to the right to place the billboard,
+    *                    relative to the position.
+    * @param scale The scale of the billboard. The scale is multiplied with the pixel size of the billboard's image.
+    *              For example, if the scale is 2.0, the billboard will be rendered with twice the number of pixels,
+    *              in each direction, of the image.
+    * @param rotation The rotation of the billboard offset from the alignedAxes.
+    * @param alignedAxis The aligned axis is the unit vector, in world coordinates, that the billboard up vector points towards.
+    *                    The default is the zero vector, which means the billboard is aligned to the screen up vector.
+    * @param show whether or not to show this property
+    * @param verticalOrigin The vertical origin of the billboard. It controls whether the billboard image
+    *                       is bottom-, center-, or top-aligned with the position.
     */
   final case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[EyeOffset] = None,
                              horizontalOrigin: Option[HorizontalOrigin] = None, image: Option[ImageUri] = None,
@@ -159,6 +185,23 @@ package object czmlProperties {
   /**
     * The orientation of the object in the world. The orientation has no direct visual representation,
     * but it is used to orient models, cones, and pyramids attached to the object.
+    *
+    * @param axes
+    * @param unitQuaternion
+    * @param reference A reference property.
+    * @param epoch Specifies the epoch to use for times specifies as seconds since an epoch.
+    * @param nextTime The time of the next sample within this interval, specified as either an ISO 8601 date and time string
+    *                 or as seconds since epoch. This property is used to determine if there is a gap between
+    *                 samples specified in different packets.
+    * @param previousTime The time of the previous sample within this interval, specified as either an
+    *                     ISO 8601 date and time string or as seconds since epoch.
+    *                     This property is used to determine if there is a gap between samples specified in different packets.
+    * @param interpolationAlgorithm specifies the algorithm to use to interpolate a value at a different time from the provided data
+    * @param interpolationDegree specifies the degree of the polynomial to use for interpolation
+    * @param forwardExtrapolationType the type of extrapolation to perform when a value is requested at a time after any available samples.
+    * @param forwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
+    * @param backwardExtrapolationType the type of extrapolation to perform when a value is requested at a time before any available samples.
+    * @param backwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
     */
   final case class Orientation(axes: Option[String] = None, unitQuaternion: Option[Array[Double]] = None,
                                reference: Option[String] = None, epoch: Option[String] = None,
@@ -185,6 +228,12 @@ package object czmlProperties {
 
   /**
     * A point, or viewport-aligned circle. The point is positioned in the scene by the position property.
+    *
+    * @param color of the point.
+    * @param outlineColor The color of the outline of the point.
+    * @param outlineWidth The width of the outline of the point.
+    * @param pixelSize The size of the point, in pixels.
+    * @param show whether or not to show this property
     */
   final case class Point(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                          outlineWidth: Option[Number] = None, pixelSize: Option[Number] = None,
@@ -211,6 +260,27 @@ package object czmlProperties {
 
   /**
     * A string of text. The label is positioned in the scene by the position property.
+    *
+    * @param eyeOffset The eye offset of the label, which is the offset in eye coordinates at which to place
+    *                  the label relative to the position property. Eye coordinates are a
+    *                  left-handed coordinate system where the X-axis points toward the viewer's right,
+    *                  the Y-axis points up, and the Z-axis points into the screen.
+    * @param fillColor The fill color of the label.
+    * @param font The font to use for the label.
+    * @param horizontalOrigin The horizontal origin of the label.
+    *                         It controls whether the label is left-, center-, or right-aligned with the position.
+    * @param outlineColor The outline color of the label.
+    * @param outlineWidth The outline width of the label.
+    * @param pixelOffset The offset, in viewport pixels, of the label origin from the position. A pixel offset is
+    *                    the number of pixels up and to the right to place the label, relative to the position.
+    * @param scale The scale of the label. The scale is multiplied with the pixel size of the label's text. For example,
+    *              if the scale is 2.0, the label will be rendered with twice the number of pixels,
+    *              in each direction, of the text.
+    * @param show whether or not to show this property
+    * @param style The style of the label.
+    * @param text The text displayed by the label.
+    * @param verticalOrigin The vertical origin of the label. It controls whether the label image is bottom-, center-,
+    *                       or top-aligned with the position.
     */
   final case class Label(eyeOffset: Option[EyeOffset] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
                          horizontalOrigin: Option[HorizontalOrigin] = None, outlineColor: Option[ColorProperty] = None,
@@ -305,6 +375,15 @@ package object czmlProperties {
   /**
     * A path, which is a polyline defined by the motion of an object over time.
     * The possible vertices of the path are specified by the position property.
+    *
+    * @param show whether or not to show this property
+    * @param material The material to use to draw the path.
+    * @param width The width of the path line.
+    * @param resolution The maximum step-size, in seconds, used to sample the path. If the position property
+    *                   has data points farther apart than resolution specfies, additional steps will be taken,
+    *                   creating a smoother path.
+    * @param leadTime The time ahead of the animation time, in seconds, to show the path.
+    * @param trailTime The time behind the animation time, in seconds, to show the path.
     */
   final case class Path(show: Option[CzmlBoolean] = None, material: Option[LineMaterial] = None,
                         width: Option[Number] = None, resolution: Option[Number] = None,
@@ -328,6 +407,12 @@ package object czmlProperties {
 
   /**
     * A polyline, which is a line in the scene composed of multiple segments.
+    *
+    * @param positions The array of positions defining the polyline as a line strip.
+    * @param show whether or not to show this property
+    * @param material The material to use to draw the polyline.
+    * @param width The width of the polyline.
+    * @param followSurface Whether or not the positions are connected as great arcs (the default) or as straight lines.
     */
   final case class Polyline(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                             material: Option[LineMaterial] = None, width: Option[Number] = None,
@@ -354,6 +439,21 @@ package object czmlProperties {
 
   /**
     * A rectangle
+    *
+    * @param coordinates
+    * @param show whether or not to show this property
+    * @param material
+    * @param height
+    * @param extrudedHeight
+    * @param granularity
+    * @param rotation
+    * @param stRotation
+    * @param fill
+    * @param outline
+    * @param outlineColor
+    * @param outlineWidth
+    * @param closeBottom
+    * @param closeTop
     */
   final case class Rectangle(coordinates: Option[WsenDegrees] = None, show: Option[CzmlBoolean] = None,
                              material: Option[Material] = None, height: Option[Number] = None,
@@ -370,6 +470,17 @@ package object czmlProperties {
 
   /**
     * A wall
+    *
+    * @param positions
+    * @param show whether or not to show this property
+    * @param material
+    * @param minimumHeights
+    * @param maximumHeights
+    * @param granularity
+    * @param fill
+    * @param outline
+    * @param outlineColor
+    * @param outlineWidth
     */
   final case class Wall(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                         material: Option[Material] = None,
@@ -386,6 +497,18 @@ package object czmlProperties {
 
   /**
     * A polygon, which is a closed shape on the surface of the Earth.
+    *
+    * @param positions The array of positions defining a simple polygon.
+    * @param show whether or not to show this property
+    * @param material The material to use to fill the polygon.
+    * @param height The height of the polygon when perPositionHeight is false.
+    * @param extrudedHeight The extruded height of the polygon.
+    * @param granularity The sampling distance, in radians.
+    * @param stRotation The rotation of any applied texture.
+    * @param fill Whether or not the polygon is filled.
+    * @param outline Whether or not the polygon is outlined.
+    * @param outlineColor The color of the polygon outline.
+    * @param perPositionHeight Whether to use the height of each position to define the polygon or a constant height above the surface.
     */
   final case class Polygon(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                            material: Option[Material] = None, height: Option[Number] = None,
@@ -414,6 +537,25 @@ package object czmlProperties {
 
   /**
     * The dimensions of the ellipsoid. Also describes the viewFrom property.
+    *
+    * @param cartesian The radii as a Cartesian [X, Y, Z] in meters. If the array has three elements, the radii are constant.
+    *                  If it has four or more elements, they are time-tagged samples arranged as
+    *                  [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date and
+    *                  time string or seconds since epoch.
+    * @param interval Time interval
+    * @param reference A reference property.
+    * @param epoch Specifies the epoch to use for times specifies as seconds since an epoch.
+    * @param nextTime The time of the next sample within this interval, specified as either an ISO 8601 date and
+    *                 time string or as seconds since epoch. This property is used to determine if there is a gap between samples specified in different packets.
+    * @param previousTime The time of the previous sample within this interval, specified as either an ISO 8601 date and time string or as seconds since epoch.
+    *                     This property is used to determine if there is a gap between samples specified in different packets.
+    * @param interpolationAlgorithm specifies the algorithm to use to interpolate a value at a different time from the provided data
+    * @param interpolationDegree specifies the degree of the polynomial to use for interpolation
+    * @param forwardExtrapolationType the type of extrapolation to perform when a value is requested at a time after any available samples.
+    * @param forwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
+    * @param backwardExtrapolationType the type of extrapolation to perform when a value is requested at a time before any available samples.
+    * @param backwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
+
     */
   final case class Radii(cartesian: Option[Cartesian] = None, interval: Option[String] = None,
                          reference: Option[String] = None, epoch: Option[String] = None,
@@ -440,6 +582,16 @@ package object czmlProperties {
   /**
     * An ellipsoid, which is a closed quadric surface that is a three dimensional analogue of an ellipse.
     * The ellipsoid is positioned and oriented using the position and orientation properties.
+    *
+    * @param show whether or not to show this property
+    * @param radii The dimensions of the ellipsoid.
+    * @param fill Whether or not the ellipsoid is filled.
+    * @param material The material to display on the surface of the ellipsoid.
+    * @param outline Whether or not the ellipsoid is outlined.
+    * @param outlineColor The color of the ellipsoid outline.
+    * @param stackPartitions The number of times to partition the ellipsoid into stacks.
+    * @param slicePartitions The number of times to partition the ellipsoid into radial slices.
+    * @param subdivisions The number of points per outline line, determining the granularity of the curvature.
     */
   final case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[Radii] = None,
                              fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
@@ -469,6 +621,20 @@ package object czmlProperties {
   /**
     * An ellipse, which is a closed curve on the surface of the Earth.
     * The ellipse is positioned using the position property.
+    *
+    * @param show whether or not to show this property
+    * @param semiMajorAxis The length of the ellipse's semi-major axis in meters.
+    * @param semiMinorAxis The length of the ellipse's semi-minor axis in meters.
+    * @param rotation The angle from north (counter-clockwise) in radians.
+    * @param material The material to use to fill the ellipse.
+    * @param height The height of the ellipse when perPositionHeight is false.
+    * @param extrudedHeight The extruded height of the ellipse.
+    * @param granularity The sampling distance, in radians.
+    * @param stRotation The rotation of any applied texture coordinates.
+    * @param fill Whether or not the ellipse is filled.
+    * @param outline Whether or not the ellipse is outlined.
+    * @param outlineColor The color of the ellipse outline.
+    * @param numberOfVerticalLines The number of vertical lines to use when outlining an extruded ellipse.
     */
   final case class Ellipse(show: Option[CzmlBoolean] = None, semiMajorAxis: Option[Number] = None, semiMinorAxis: Option[Number] = None,
                            rotation: Option[Number] = None, material: Option[Material] = None,
@@ -501,6 +667,25 @@ package object czmlProperties {
 
   /**
     * A conical sensor volume taking into account occlusion of an ellipsoid, i.e., the globe.
+    *
+    * @param show whether or not to show this property
+    * @param innerHalfAngle The inner half angle of the cone.
+    * @param outerHalfAngle The outer half angle of the cone.
+    * @param minimumClockAngle The minimum clock angle limit of the cone.
+    * @param maximumClockAngle The maximum clock angle limit of the cone.
+    * @param radius The radial limit of the cone.
+    * @param showIntersection Whether or not the intersection of the cone with the Earth is shown.
+    * @param intersectionColor The color of the intersection of the cone with the Earth.
+    * @param intersectionWidth The width of the intersection in pixels.
+    * @param showLateralSurfaces Whether or not the intersections of the cone with the earth are shown.
+    * @param lateralSurfaceMaterial Whether or not lateral surfaces are shown.
+    * @param showEllipsoidSurfaces Whether or not ellipsoid surfaces are shown.
+    * @param ellipsoidSurfaceMaterial The material to use for the cone's ellipsoid surface.
+    * @param showEllipsoidHorizonSurfaces Whether or not ellipsoid horizon surfaces are shown.
+    * @param ellipsoidHorizonSurfaceMaterial The material to use for the cone's ellipsoid horizon surface.
+    * @param showDomeSurfaces Whether or not dome surfaces are shown.
+    * @param domeSurfaceMaterial The material to use for the cone's dome.
+    * @param portionToDisplay Indicates what part of a sensor should be displayed.
     */
   final case class ConicSensor(show: Option[CzmlBoolean] = None, innerHalfAngle: Option[Number] = None,
                                outerHalfAngle: Option[Number] = None, minimumClockAngle: Option[Number] = None,
@@ -520,6 +705,20 @@ package object czmlProperties {
 
   /**
     * A custom sensor volume taking into account occlusion of an ellipsoid, i.e., the globe.
+    *
+    * @param show whether or not to show this property
+    * @param directions The list of directions defining the pyramid.
+    * @param radius The radial limit of the pyramid.
+    * @param showIntersection Whether or not the intersection of the pyramid with the Earth is shown.
+    * @param intersectionColor The color of the intersection of the pyramid with the Earth.
+    * @param intersectionWidth The width of the intersection in pixels.
+    * @param showLateralSurfaces Whether or not the intersections of the pyramid with the earth are shown.
+    * @param lateralSurfaceMaterial Whether or not lateral surfaces are shown.
+    * @param showEllipsoidHorizonSurfaces Whether or not ellipsoid surfaces are shown.
+    * @param ellipsoidHorizonSurfaceMaterial The material to use for the pyramid's ellipsoid surface.
+    * @param showDomeSurfaces Whether or not ellipsoid horizon surfaces are shown.
+    * @param domeSurfaceMaterial The material to use for the pyramid's dome.
+    * @param portionToDisplay Indicates what part of a sensor should be displayed.
     */
   final case class CustomPatternSensor(show: Option[CzmlBoolean] = None, directions: Option[Directions] = None,
                                        radius: Option[Number] = None, showIntersection: Option[CzmlBoolean] = None,
@@ -536,6 +735,16 @@ package object czmlProperties {
   /**
     * Defines a fan, which starts at a point or apex and extends in a specified list of directions from the apex.
     * Each pair of directions forms a face of the fan extending to the specified radius.
+    *
+    * @param show whether or not to show this property
+    * @param directions The list of directions defining the fan.
+    * @param radius The radial limit of the fan.
+    * @param perDirectionRadius  When true, the magnitude of each direction is used instead of a constant radius.
+    * @param material The material to display on the surface of the fan.
+    * @param fill Whether or not the fan is filled.
+    * @param outline Whether or not the fan is outlined.
+    * @param numberOfRings The number of outline rings to draw, starting from the outer edge and equidistantly spaced towards the center.
+    * @param outlineColor The color of the fan outline.
     */
   final case class Fan(show: Option[CzmlBoolean] = None,
                        directions: Option[Directions] = None, radius: Option[Number] = None,
@@ -549,6 +758,23 @@ package object czmlProperties {
 
   /**
     * A rectangular pyramid sensor volume taking into account occlusion of an ellipsoid, i.e., the globe.
+    *
+    * @param show whether or not to show this property
+    * @param xHalfAngle The X half angle.
+    * @param yHalfAngle The Y half angle.
+    * @param radius The radial limit of the pyramid.
+    * @param showIntersection Whether or not the intersection of the pyramid with the Earth is shown.
+    * @param intersectionColor The color of the intersection of the pyramid with the Earth.
+    * @param intersectionWidth The width of the intersection in pixels.
+    * @param showLateralSurfaces Whether or not the intersections of the pyramid with the earth are shown.
+    * @param lateralSurfaceMaterial the lateral Surface Material
+    * @param showEllipsoidSurfaces Whether or not ellipsoid surfaces are shown.
+    * @param ellipsoidSurfaceMaterial The material to use for the pyramid's ellipsoid surface.
+    * @param showEllipsoidHorizonSurfaces Whether or not ellipsoid horizon surfaces are shown.
+    * @param ellipsoidHorizonSurfaceMaterial The material to use for the pyramid's ellipsoid horizon surface.
+    * @param showDomeSurfaces Whether or not dome surfaces are shown.
+    * @param domeSurfaceMaterial The material to use for the pyramid's dome.
+    * @param portionToDisplay Indicates what part of a sensor should be displayed.
     */
   final case class RectangularSensor(show: Option[CzmlBoolean] = None, xHalfAngle: Option[Number] = None,
                                      yHalfAngle: Option[Number] = None,
@@ -573,6 +799,12 @@ package object czmlProperties {
   /**
     * Defines a graphical vector that originates at the position property and
     * extends in the provided direction for the provided length.
+    *
+    * @param show whether or not to show this property
+    * @param color of this property
+    * @param direction The direction of the vector.
+    * @param length The graphical length of the vector.
+    * @param minimumLengthInPixels The minimum graphical length of the vector in pixels.
     */
   final case class AgiVector(show: Option[CzmlBoolean] = None, color: Option[ColorProperty] = None,
                              direction: Option[Directions] = None, length: Option[Number] = None,
@@ -617,8 +849,8 @@ package object czmlProperties {
   /**
     * A 3D model. The model is positioned and oriented using the position and orientation properties.
     *
-    * @param show Whether or not the model is shown.
-    * @param scale The scale of the model.
+    * @param show whether or not to show this property
+    * @param scale The scale of the property.
     * @param minimumPixelSize The approximate minimum pixel size of the model regardless of zoom.
     * @param gltf The URL of a glTF model.
     * @param runAnimations Whether or not to run animations.
