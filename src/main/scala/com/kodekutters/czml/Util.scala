@@ -12,7 +12,6 @@ import play.api.libs.json.Json
   */
 object Util {
 
-
   val COMPLETE = "COMPLETE"
   val BELOW_ELLIPSOID_HORIZON = "BELOW_ELLIPSOID_HORIZON"
   val ABOVE_ELLIPSOID_HORIZON = "ABOVE_ELLIPSOID_HORIZON"
