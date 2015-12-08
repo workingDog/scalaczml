@@ -42,7 +42,7 @@ object Util {
 
   def isAllDigits(x: String) = x forall Character.isDigit
 
-  def writeToFile(outFile: String = "", czml: CZML) = {
+  def writeToFile(outFile: String = "", czml: CZML[CZMLPacket]) = {
     val writer = if (outFile.trim.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile))
     try {
       writer.write(Json.prettyPrint(Json.toJson(czml)))

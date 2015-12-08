@@ -65,7 +65,7 @@ package object czmlCore {
     val fmter = DateTimeFormatter.ISO_DATE_TIME
   }
 
-  final case class TimeInterval(value: String) {
+  case class TimeInterval(value: String) {
 
     def this(start: String, stop: String) = this(start + "/" + stop)
 
@@ -78,7 +78,7 @@ package object czmlCore {
     def stopLocalDateTime() = LocalDateTime.parse(stop(), TimeInterval.fmter)
   }
 
-  //  final case class Duration(days: Int, seconds: Double) {
+  //  case class Duration(days: Int, seconds: Double) {
   //    def this(days: Int, hours: Int, minutes: Int, seconds: Double) = this(days, Duration.toSeconds(hours, minutes, seconds))
   //  }
   //  object Duration {
@@ -86,7 +86,7 @@ package object czmlCore {
   //    implicit val fmt = Jsonx.formatCaseClass[Duration]
   //  }
 
-  //  final case class Description(reference: Option[String] = None, string: Option[String] = None)
+  //  case class Description(reference: Option[String] = None, string: Option[String] = None)
   //  object Description {
   //    implicit val fmt = Jsonx.formatCaseClass[Description]
   //  }
@@ -96,7 +96,7 @@ package object czmlCore {
     *
     * @param value the time value
     */
-  final case class TimeValue(value: Either[String, Double]) {
+  case class TimeValue(value: Either[String, Double]) {
     def this(value: String) = this(Left(value))
 
     def this(value: Double) = this(Right(value))
@@ -168,7 +168,7 @@ package object czmlCore {
   /**
     * an array of west south, east north degrees coordinates for a rectangle
     */
-  final case class WsenDegrees(wsenDegrees: Array[Double]) {
+  case class WsenDegrees(wsenDegrees: Array[Double]) {
     def this(w: Double, s: Double, e: Double, n: Double) = this(Array(w, s, e, n))
   }
 
@@ -181,7 +181,7 @@ package object czmlCore {
   /**
     * a 3d cartesian coordinate that can have a time component.
     */
-  final case class Coordinate(t: Option[TimeValue] = None, x: Double, y: Double, z: Double) {
+  case class Coordinate(t: Option[TimeValue] = None, x: Double, y: Double, z: Double) {
 
     def this(x: Double, y: Double, z: Double) = this(None, x, y, z)
 
@@ -219,7 +219,7 @@ package object czmlCore {
   /**
     * a 2d cartesian coordinate that can have a time component.
     */
-  final case class Coordinate2D(t: Option[TimeValue] = None, x: Double, y: Double) {
+  case class Coordinate2D(t: Option[TimeValue] = None, x: Double, y: Double) {
     def this(x: Double, y: Double) = this(None, x, y)
 
     def this(t: String, x: Double, y: Double) = this(Option(TimeValue(t)), x, y)
@@ -257,7 +257,7 @@ package object czmlCore {
     * arranged as [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date
     * and time string or seconds since epoch.
     */
-  final case class Cartesian(coordinates: Seq[Coordinate]) {
+  case class Cartesian(coordinates: Seq[Coordinate]) {
     def this(coordinate: Coordinate) = this(Seq(coordinate))
 
     def this(x: Double, y: Double, z: Double) = this(Seq(Coordinate(x, y, z)))
@@ -341,7 +341,7 @@ package object czmlCore {
     * [Time, X, Y, Time, X, Y, Time, X, Y, ...], where _Time_ is an ISO 8601 date and time string
     * or seconds since epoch.
     */
-  final case class Cartesian2D(coordinates: Seq[Coordinate2D]) {
+  case class Cartesian2D(coordinates: Seq[Coordinate2D]) {
     def this(coordinate2D: Coordinate2D) = this(Seq(coordinate2D))
 
     def this(x: Double, y: Double) = this(Coordinate2D(x, y))
@@ -419,7 +419,7 @@ package object czmlCore {
   /**
     * A timed geodetic (time,long,lat,alt) coordinate. The values can represent either degrees or radians
     */
-  final case class LngLatAltT(t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
+  case class LngLatAltT(t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
 
     def this(lng: Double, lat: Double, alt: Double) = this(None, lng, lat, alt)
 
@@ -452,7 +452,7 @@ package object czmlCore {
     * where Time is an ISO 8601 date and time string or seconds since "epoch".
     *
     */
-  final case class Cartographic(coordinates: Seq[LngLatAltT]) {
+  case class Cartographic(coordinates: Seq[LngLatAltT]) {
 
     def this(lngLatAltT: LngLatAltT) = this(Seq(lngLatAltT))
 
@@ -520,7 +520,7 @@ package object czmlCore {
   /**
     * A timed velocity element.
     */
-  final case class Velocity(t: Option[TimeValue] = None, x: Double, y: Double, z: Double, vx: Double, vy: Double, vz: Double) {
+  case class Velocity(t: Option[TimeValue] = None, x: Double, y: Double, z: Double, vx: Double, vy: Double, vz: Double) {
     def this(x: Double, y: Double, z: Double, vx: Double, vy: Double, vz: Double) = this(None, x, y, z, vx, vy, vz)
 
     def this(t: TimeValue, x: Double, y: Double, z: Double, vx: Double, vy: Double, vz: Double) =
@@ -556,7 +556,7 @@ package object czmlCore {
     * [Time, X, Y, Z, vX, vY, vZ, Time, X, Y, Z, vX, vY, vZ, Time, X, Y, Z, vX, vY, vZ, ...],
     * where Time is an ISO 8601 date and time string or seconds since epoch.
     */
-  final case class CartesianVelocity(velocities: Seq[Velocity]) {
+  case class CartesianVelocity(velocities: Seq[Velocity]) {
     def this(velocity: Velocity) = this(Seq(velocity))
 
     def this(x: Double, y: Double, z: Double, vx: Double, vy: Double, vz: Double) =
@@ -634,7 +634,7 @@ package object czmlCore {
   /**
     * describes a boolean interval, i.e. an interval and an associated a boolean value
     */
-  final case class BooleanInterval(interval: Option[String] = None, boolean: Option[Boolean]) {
+  case class BooleanInterval(interval: Option[String] = None, boolean: Option[Boolean]) {
     def this(interval: String, boolean: Boolean) = this(Option(interval), Option(boolean))
   }
 
@@ -649,7 +649,7 @@ package object czmlCore {
     *
     * @param value could be a simple boolean or an array of BooleanInterval
     */
-  final case class CzmlBoolean(value: Either[Boolean, Array[BooleanInterval]]) {
+  case class CzmlBoolean(value: Either[Boolean, Array[BooleanInterval]]) {
     def this(value: Boolean) = this(Left(value))
 
     def this(value: Array[BooleanInterval]) = this(Right(value))
@@ -688,7 +688,7 @@ package object czmlCore {
     * A color specified as an array of color components [Red, Green, Blue, Alpha]
     * where each component is in the range 0-255.
     */
-  final case class Rgba(t: Option[TimeValue] = None, r: Int, g: Int, b: Int, a: Int) {
+  case class Rgba(t: Option[TimeValue] = None, r: Int, g: Int, b: Int, a: Int) {
     def this(t: TimeValue, r: Int, g: Int, b: Int, a: Int) = this(Option(t), r, g, b, a)
 
     def this(r: Int, g: Int, b: Int, a: Int) = this(None, r, g, b, a)
@@ -725,7 +725,7 @@ package object czmlCore {
   /**
     * A list of Rgba colors.
     */
-  final case class RgbaList(values: Seq[Rgba]) {
+  case class RgbaList(values: Seq[Rgba]) {
     def this(rgba: Rgba) = this(Seq(rgba))
 
     def this(r: Int, g: Int, b: Int, a: Int) = this(Rgba(r, g, b, a))
@@ -804,7 +804,7 @@ package object czmlCore {
     * The color specified as an array of color components [Red, Green, Blue, Alpha]
     * where each component is a float in the range 0.0-1.0.
     */
-  final case class Rgbaf(t: Option[TimeValue] = None, r: Float, g: Float, b: Float, a: Float) {
+  case class Rgbaf(t: Option[TimeValue] = None, r: Float, g: Float, b: Float, a: Float) {
     def this(t: TimeValue, r: Float, g: Float, b: Float, a: Float) = this(Option(t), r, g, b, a)
 
     def this(t: TimeValue, r: Double, g: Double, b: Double, a: Double) = this(t, r.toFloat, g.toFloat, b.toFloat, a.toFloat)
@@ -858,7 +858,7 @@ package object czmlCore {
   /**
     * A list of Rgbaf colors.
     */
-  final case class RgbafList(values: Seq[Rgbaf]) {
+  case class RgbafList(values: Seq[Rgbaf]) {
     def this(rgbaf: Rgbaf) = this(Seq(rgbaf))
 
     def this(r: Double, g: Double, b: Double, a: Double) = this(Rgbaf(r, g, b, a))
@@ -958,7 +958,7 @@ package object czmlCore {
     * @param t the time component
     * @param v the value component
     */
-  final case class TimedDouble(t: Option[String] = None, v: Double) {
+  case class TimedDouble(t: Option[String] = None, v: Double) {
     def this(t: String, v: Double) = this(Option(t), v)
   }
 
@@ -973,7 +973,7 @@ package object czmlCore {
     *
     * @param values a sequence of TimedDouble objects.
     */
-  final case class TimedNumbers(values: Seq[TimedDouble]) {
+  case class TimedNumbers(values: Seq[TimedDouble]) {
 
     def this(t: String, v: Double) = this(Seq(new TimedDouble(t, v)))
   }
@@ -1041,7 +1041,7 @@ package object czmlCore {
     * the billboard or label relative to the position property. Eye coordinates are a left-handed coordinate system
     * where the X-axis points toward the viewer's right, the Y-axis points up, and the Z-axis points into the screen.
     */
-  final case class EyeOffset(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
+  case class EyeOffset(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
                              nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
                              interpolationAlgorithm: Option[String] = None,
                              interpolationDegree: Option[Int] = None,
@@ -1069,7 +1069,7 @@ package object czmlCore {
     * @param horizontalOrigin The horizontal origin. Valid values are "LEFT", "CENTER", and "RIGHT".
     * @param reference        A reference property.
     */
-  final case class HorizontalOrigin(horizontalOrigin: Option[String] = None, reference: Option[String] = None) {
+  case class HorizontalOrigin(horizontalOrigin: Option[String] = None, reference: Option[String] = None) {
     def this(horizontalOrigin: String) = this(Option(horizontalOrigin))
 
     def this(horizontalOrigin: String, reference: String) = this(Option(horizontalOrigin), Option(reference))
@@ -1112,7 +1112,7 @@ package object czmlCore {
     * @param verticalOrigin verticalOrigin = ["BOTTOM", "CENTER", "TOP"]
     * @param reference      A reference property
     */
-  final case class VerticalOrigin(verticalOrigin: Option[String] = None, reference: Option[String] = None) {
+  case class VerticalOrigin(verticalOrigin: Option[String] = None, reference: Option[String] = None) {
     def this(verticalOrigin: String) = this(Option(verticalOrigin))
 
     def this(verticalOrigin: String, reference: String) = this(Option(verticalOrigin), Option(reference))
@@ -1156,7 +1156,7 @@ package object czmlCore {
     * @param uri       A URI value.  The URI can optionally vary with time.  todo ?
     * @param reference A reference property.
     */
-  final case class ImageUri(uri: Option[String] = None, reference: Option[String] = None) {
+  case class ImageUri(uri: Option[String] = None, reference: Option[String] = None) {
     def this(uri: String) = this(Option(uri))
 
     def this(uri: String, reference: String) = this(Option(uri), Option(reference))
@@ -1197,7 +1197,7 @@ package object czmlCore {
     * The offset, in viewport pixels, of the billboard origin from the position. A pixel offset is
     * the number of pixels up and to the right to place the billboard, relative to the position.
     */
-  final case class PixelOffset(cartesian2: Option[Cartesian2D] = None, reference: Option[String] = None, epoch: Option[String] = None,
+  case class PixelOffset(cartesian2: Option[Cartesian2D] = None, reference: Option[String] = None, epoch: Option[String] = None,
                                nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
                                interpolationAlgorithm: Option[String] = None,
                                interpolationDegree: Option[Int] = None,
@@ -1237,7 +1237,7 @@ package object czmlCore {
     * if epoch is not defined, then "number" becomes either an array of timed values (see TimedNumbers) or
     * a single double value.
     */
-  final case class CzmlNumber(number: Option[Any] = None, interval: Option[String] = None,
+  case class CzmlNumber(number: Option[Any] = None, interval: Option[String] = None,
                               reference: Option[String] = None, epoch: Option[String] = None,
                               nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
                               interpolationAlgorithm: Option[String] = None,
@@ -1364,7 +1364,7 @@ package object czmlCore {
     *
     * @param values the list of CzmlNumbers
     */
-  final case class Number(values: Option[Array[CzmlNumber]]) {
+  case class Number(values: Option[Array[CzmlNumber]]) {
     def this(values: Array[CzmlNumber]) = this(Option(values))
 
     def this(number: Double) = this(Option(Array(CzmlNumber(number))))
@@ -1433,7 +1433,7 @@ package object czmlCore {
     *                 where Time is an ISO 8601 date and time string or seconds since epoch.
     * @param interval the interval property
     */
-  final case class CzmlColor(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
+  case class CzmlColor(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
                              interval: Option[String] = None,
                              reference: Option[String] = None, epoch: Option[String] = None,
                              nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
@@ -1493,7 +1493,7 @@ package object czmlCore {
     *
     * @param values the array of Colors
     */
-  final case class ColorProperty(values: Option[Array[CzmlColor]]) {
+  case class ColorProperty(values: Option[Array[CzmlColor]]) {
     def this(values: Array[CzmlColor]) = this(Option(values))
 
     def this(color: CzmlColor) = this(Option(Array(color)))
@@ -1554,7 +1554,7 @@ package object czmlCore {
     * The aligned axis is the unit vector, in world coordinates, that the billboard up vector points towards.
     * The default is the zero vector, which means the billboard is aligned to the screen up vector.
     */
-  final case class AlignedAxis(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
+  case class AlignedAxis(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
                                nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
                                interpolationAlgorithm: Option[String] = None,
                                interpolationDegree: Option[Int] = None,
@@ -1578,7 +1578,7 @@ package object czmlCore {
   /**
     * a font
     */
-  final case class Font(font: Option[String] = None, reference: Option[String] = None) {
+  case class Font(font: Option[String] = None, reference: Option[String] = None) {
     def this(font: String) = this(Option(font))
 
     def this(font: String, reference: String) = this(Option(font), Option(reference))
@@ -1617,7 +1617,7 @@ package object czmlCore {
   /**
     * describes a string value with an interval for use in Text
     */
-  final case class StringInterval(interval: Option[String] = None, string: Option[String]) {
+  case class StringInterval(interval: Option[String] = None, string: Option[String]) {
     def this(interval: String, string: String) = this(Option(interval), Option(string))
   }
 
@@ -1633,7 +1633,7 @@ package object czmlCore {
     * @param string    either a simple string for the text or an array of (interval,string)
     * @param reference a reference property
     */
-  final case class Text(string: Either[String, Array[StringInterval]], reference: Option[String] = None) {
+  case class Text(string: Either[String, Array[StringInterval]], reference: Option[String] = None) {
 
     def this(string: String, reference: String) = this(Left(string), Option(reference))
 
@@ -1694,7 +1694,7 @@ package object czmlCore {
     * @param labelStyle "FILL", "OUTLINE", and "FILL_AND_OUTLINE"
     * @param reference  A reference property
     */
-  final case class Style(labelStyle: Option[String] = None, reference: Option[String] = None) {
+  case class Style(labelStyle: Option[String] = None, reference: Option[String] = None) {
 
     def this(labelStyle: String) = this(Option(labelStyle))
 
@@ -1736,7 +1736,7 @@ package object czmlCore {
     * The position of the object in the world. The position has no direct visual representation,
     * but it is used to locate billboards, labels, and other primitives attached to the object.
     */
-  final case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
+  case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                                 cartographicRadians: Option[Cartographic] = None,
                                 cartographicDegrees: Option[Cartographic] = None,
                                 cartesianVelocity: Option[CartesianVelocity] = None,
@@ -1784,7 +1784,7 @@ package object czmlCore {
   /**
     * A non-timed value position
     */
-  final case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
+  case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                             cartographicRadians: Option[Array[Double]] = None,
                             cartographicDegrees: Option[Array[Double]] = None,
                             cartesianVelocity: Option[CartesianVelocity] = None,
@@ -1835,7 +1835,7 @@ package object czmlCore {
     *
     * @param values the array of Position
     */
-  final case class Positions(values: Option[Array[Position]]) {
+  case class Positions(values: Option[Array[Position]]) {
     def this(values: Array[Position]) = this(Option(values))
 
     def this(positions: Position) = this(Option(Array(positions)))
@@ -1883,7 +1883,7 @@ package object czmlCore {
     implicit val fmt: Format[Positions] = Format(theReads, theWrites)
   }
 
-  final case class Repeat(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
+  case class Repeat(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
                           nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
                           interpolationAlgorithm: Option[String] = None,
                           interpolationDegree: Option[Int] = None,
@@ -1905,7 +1905,7 @@ package object czmlCore {
   }
 
   //  "HORIZONTAL" or "VERTICAL"
-  final case class StripeOrientation(stripeOrientation: Option[ArrayBuffer[Int]] = None, reference: Option[String] = None) {
+  case class StripeOrientation(stripeOrientation: Option[ArrayBuffer[Int]] = None, reference: Option[String] = None) {
     def this(stripeOrientation: ArrayBuffer[Int]) = this(Option(stripeOrientation))
 
     def this(stripeOrientation: Int) = this(Option(ArrayBuffer[Int](stripeOrientation)))
@@ -1919,7 +1919,7 @@ package object czmlCore {
     def apply(stripeOrientation: Int): StripeOrientation = new StripeOrientation(stripeOrientation)
   }
 
-  final case class Stripe(orientation: Option[StripeOrientation] = None, evenColor: Option[ColorProperty] = None,
+  case class Stripe(orientation: Option[StripeOrientation] = None, evenColor: Option[ColorProperty] = None,
                           oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
                           repeat: Option[Repeat] = None) {
 
@@ -1936,7 +1936,7 @@ package object czmlCore {
       new Stripe(orientation, evenColor, oddColor, offset, repeat)
   }
 
-  final case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
+  case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
                         lineCount: Option[Repeat] = None, lineThickness: Option[Repeat] = None,
                         lineOffset: Option[Repeat] = None) {
 
@@ -1952,7 +1952,7 @@ package object czmlCore {
       new Grid(color, cellAlpha, lineCount, lineThickness, lineOffset)
   }
 
-  final case class SolidColor(color: Option[ColorProperty] = None) {
+  case class SolidColor(color: Option[ColorProperty] = None) {
     def this(color: ColorProperty) = this(Option(color))
 
     def this(color: CzmlColor) = this(Option(new ColorProperty(color)))
@@ -1994,7 +1994,7 @@ package object czmlCore {
     def apply(color: java.awt.Color): SolidColor = new SolidColor(color)
   }
 
-  final case class Material(solidColor: Option[SolidColor] = None, image: Option[ImageUri] = None,
+  case class Material(solidColor: Option[SolidColor] = None, image: Option[ImageUri] = None,
                             repeat: Option[Repeat] = None, grid: Option[Grid] = None,
                             stripe: Option[Stripe] = None) {
 
@@ -2049,7 +2049,7 @@ package object czmlCore {
 
   }
 
-  final case class PolylineGlow(color: Option[ColorProperty] = None, glowPower: Option[Number] = None) {
+  case class PolylineGlow(color: Option[ColorProperty] = None, glowPower: Option[Number] = None) {
     def this(color: ColorProperty, glowPower: Number) = this(Option(color), Option(glowPower))
 
     def this(color: CzmlColor, glowPower: Double) = this(Option(new ColorProperty(color)), Option(new Number(glowPower)))
@@ -2084,7 +2084,7 @@ package object czmlCore {
 
   }
 
-  final case class PolylineOutline(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
+  case class PolylineOutline(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                                    outlineWidth: Option[Number] = None) {
 
     def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number) = this(Option(color), Option(outlineColor), Option(outlineWidth))
@@ -2124,7 +2124,7 @@ package object czmlCore {
     * material used by a line such as a Path or a Polyline
     *
     */
-  final case class LineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
+  case class LineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
                                 polylineGlow: Option[PolylineGlow]) {
 
     def this(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow) =
@@ -2151,7 +2151,7 @@ package object czmlCore {
     * @param portionToDisplay "COMPLETE", "BELOW_ELLIPSOID_HORIZON", "ABOVE_ELLIPSOID_HORIZON"
     * @param reference        A reference property
     */
-  final case class PortionToDisplay(portionToDisplay: Option[String] = None, reference: Option[String] = None) {
+  case class PortionToDisplay(portionToDisplay: Option[String] = None, reference: Option[String] = None) {
     def this(portionToDisplay: String) = this(Option(portionToDisplay))
   }
 
@@ -2189,7 +2189,7 @@ package object czmlCore {
   /**
     * The list of directions defining the pyramid.
     */
-  final case class Directions(spherical: Option[ArrayBuffer[Double]] = None, unitSpherical: Option[ArrayBuffer[Double]] = None,
+  case class Directions(spherical: Option[ArrayBuffer[Double]] = None, unitSpherical: Option[ArrayBuffer[Double]] = None,
                               cartesian: Option[ArrayBuffer[Double]] = None, unitCartesian: Option[ArrayBuffer[Double]] = None)
 
   object Directions {
@@ -2199,7 +2199,7 @@ package object czmlCore {
   /**
     * Defines an translational offset which can optionally vary over time
     */
-  final case class Translation(cartesian: Option[Cartesian] = None, reference: Option[String] = None) {
+  case class Translation(cartesian: Option[Cartesian] = None, reference: Option[String] = None) {
     def this(cartesian: Cartesian, reference: String) = this(Option(cartesian), Option(reference))
   }
 
@@ -2212,7 +2212,7 @@ package object czmlCore {
   /**
     * Transformations to apply to a particular node in a 3D model
     */
-  final case class NodeTransformation(scale: Option[CzmlPosition] = None, translation: Option[Translation] = None, rotation: Option[Orientation] = None) {
+  case class NodeTransformation(scale: Option[CzmlPosition] = None, translation: Option[Translation] = None, rotation: Option[Orientation] = None) {
 
     def this(scale: Cartesian, translation: Translation, rotation: Orientation) =
       this(Option(CzmlPosition(scale)), Option(translation), Option(rotation))
@@ -2232,7 +2232,7 @@ package object czmlCore {
     *
     * @param nodes
     */
-  final case class NodeTransformations(nodes: mutable.ListMap[String, NodeTransformation])
+  case class NodeTransformations(nodes: mutable.ListMap[String, NodeTransformation])
 
   object NodeTransformations {
 

@@ -13,13 +13,11 @@ import scala.io.Source
   * a basic example
   */
 object Example1 {
-
   def main(args: Array[String]) {
-
     // read a CZML document from a file
     val jsonDoc = Source.fromFile("/......./test4.czml").mkString
     // create a czml object from the json document
-    val czml = CZML(jsonDoc)
+    val czml = CZML[CZMLPacket](jsonDoc)
     // create a position property
     val pos = CzmlPositions(9.3, 8.2, 7.1)
     // create a billboard property with image uri and scale fields
@@ -34,6 +32,5 @@ object Example1 {
     Util.writeToFile("", czml)
     // alternatively
     //  Util.writeToFile("", Json.prettyPrint(jsczml))
-
   }
 }
