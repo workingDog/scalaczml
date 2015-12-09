@@ -35,12 +35,12 @@ See also the build.sbt file.
 
 Using [SBT](http://www.scala-sbt.org/), just type "sbt package" to generate a jar file that you can then 
 include in your project. The jar file will be in the directory:
- ".../target/scala-2.11/sbt-0.13/scalaczml-1.0.jar" 
+ ".../target/scala-2.11/scalaczml_2.11-1.0.jar" 
 
 ## Documentation
 
 To generate the ScalaCZML API documentation, type "sbt doc". The documentation will be generated in 
-/target/sbt-0.13/api directory. **ScalaCZML** mostly follows reference 2 documentation. 
+/target/scala-2.11/api directory. **ScalaCZML** mostly follows reference 2 documentation. 
 
 ## Example use
 

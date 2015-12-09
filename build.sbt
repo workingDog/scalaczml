@@ -1,6 +1,3 @@
-enablePlugins(ScalaJSPlugin)
-
-sbtPlugin := true
 
 name := "ScalaCZML"
 
