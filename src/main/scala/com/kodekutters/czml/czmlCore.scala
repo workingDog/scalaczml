@@ -65,6 +65,17 @@ package object czmlCore {
     val fmter = DateTimeFormatter.ISO_DATE_TIME
   }
 
+  /**
+    * a time interval representation consisting of a start and stop components.
+    *
+    * With its implicit conversion, one can use a string as a TimeInterval, e.g.
+    *
+    * "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z".start will return "2012-08-04T16:00:00Z"
+    *
+    * "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z".startLocalDateTime will return 2012-08-04T16:00
+ *
+    * @param value the full time interval as a string
+    */
   case class TimeInterval(value: String) {
 
     def this(start: String, stop: String) = this(start + "/" + stop)
@@ -1168,7 +1179,6 @@ package object czmlCore {
 
     def apply(uri: String, reference: String): ImageUri = new ImageUri(uri, reference)
 
-
     val theReads = new Reads[ImageUri] {
       def reads(js: JsValue): JsResult[ImageUri] = {
         // try to read a simple String
@@ -1883,12 +1893,17 @@ package object czmlCore {
     implicit val fmt: Format[Positions] = Format(theReads, theWrites)
   }
 
-  case class Repeat(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                    nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                    interpolationAlgorithm: Option[String] = None,
-                    interpolationDegree: Option[Int] = None,
-                    forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                    backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+  /**
+    * represents a number (Int) along each 2d cartesian axis. Used in Grid
+ *
+    * @param cartesian2 an array of Int values, e.g. [2,3]
+    */
+  case class AxisNumber(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
+                        nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                        interpolationAlgorithm: Option[String] = None,
+                        interpolationDegree: Option[Int] = None,
+                        forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                        backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(cartesian2: Array[Int]) = this(Option(cartesian2))
 
@@ -1896,12 +1911,12 @@ package object czmlCore {
 
   }
 
-  object Repeat {
-    implicit val fmt = Json.format[Repeat]
+  object AxisNumber {
+    implicit val fmt = Json.format[AxisNumber]
 
-    def apply(cartesian2: Array[Int]): Repeat = new Repeat(cartesian2)
+    def apply(cartesian2: Array[Int]): AxisNumber = new AxisNumber(cartesian2)
 
-    def apply(rx: Int, ry: Int): Repeat = new Repeat(rx, ry)
+    def apply(rx: Int, ry: Int): AxisNumber = new AxisNumber(rx, ry)
   }
 
   //  "HORIZONTAL" or "VERTICAL"
@@ -1960,12 +1975,12 @@ package object czmlCore {
   }
 
   case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
-                  lineCount: Option[Repeat] = None, lineThickness: Option[Repeat] = None,
-                  lineOffset: Option[Repeat] = None) {
+                  lineCount: Option[AxisNumber] = None, lineThickness: Option[AxisNumber] = None,
+                  lineOffset: Option[AxisNumber] = None) {
 
     def this(color: CzmlColor, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]) =
       this(Option(new ColorProperty(color)), Option(new Number(cellAlpha)),
-        Option(new Repeat(lineCount)), Option(new Repeat(lineThickness)), Option(new Repeat(lineOffset)))
+        Option(new AxisNumber(lineCount)), Option(new AxisNumber(lineThickness)), Option(new AxisNumber(lineOffset)))
   }
 
   object Grid {
@@ -2147,7 +2162,7 @@ package object czmlCore {
     *
     */
   case class LineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
-                          polylineGlow: Option[PolylineGlow]) {
+                          polylineGlow: Option[PolylineGlow] = None) {
 
     def this(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow) =
       this(Option(solidColor), Option(polylineOutline), Option(polylineGlow))
@@ -2257,12 +2272,15 @@ package object czmlCore {
   case class NodeTransformations(nodes: mutable.ListMap[String, NodeTransformation])
 
   object NodeTransformations {
+    val MAX_NODES = 100
 
     val theReads = new Reads[NodeTransformations] {
       def reads(js: JsValue): JsResult[NodeTransformations] = {
         val theListMap = new mutable.ListMap[String, NodeTransformation]()
-        (JsPath \ "node1").read[NodeTransformation].reads(js).asOpt.map(n => theListMap += ("node1" -> n))
-        (JsPath \ "node2").read[NodeTransformation].reads(js).asOpt.map(n => theListMap += ("node2" -> n))
+        for(n <- 1 to MAX_NODES) {
+          val nodeName = s"node$n"
+          (JsPath \ `nodeName`).read[NodeTransformation].reads(js).asOpt.map(n => theListMap += (`nodeName` -> n))
+        }
         JsSuccess(new NodeTransformations(theListMap))
       }
     }
