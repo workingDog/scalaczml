@@ -515,6 +515,7 @@ package object czmlProperties {
                      extrudedHeight: Option[Number] = None, granularity: Option[Number] = None,
                      stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
                      outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
+                     outlineWidth: Option[Number] = None,
                      perPositionHeight: Option[CzmlBoolean] = None) extends CzmlProperty {
 
     def this(positions: Positions, material: Material, height: Double, extrudedHeight: Double) =
