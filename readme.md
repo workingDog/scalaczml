@@ -1,6 +1,6 @@
-# scalaczml a CZML library in scala 
+# ScalaCZML a CZML library in scala 
 
-This library **scalaczml** reads and writes 
+This library **ScalaCZML** reads and writes 
 [CZML JSON](https://github.com/AnalyticalGraphicsInc/cesium/wiki/CZML-Guide) entities and 
 presents them as [Scala](http://www.scala-lang.org/) objects.
 
@@ -13,7 +13,7 @@ describing a time-dynamic graphical scene, primarily for display in a web browse
 It describes lines, points, billboards (markers), models and
 other graphical primitives, and specifies how they change with time.
 
-**scalaczml** makes the CZML JSON entities available as Scala (hence [Scala.js](http://www.scala-js.org/)) objects. 
+**ScalaCZML** makes the CZML JSON entities available as Scala (hence [Scala.js](http://www.scala-js.org/)) objects. 
 The library follows the specification of reference 1, but also include additional objects such as Rectangle and Wall.
 
 ## References
@@ -35,12 +35,12 @@ See also the build.sbt file.
 
 Using [SBT](http://www.scala-sbt.org/), just type "sbt package" to generate a jar file that you can then 
 include in your project. The jar file will be in the directory:
- ".../target/scala-2.11/scalaczml_2.11-1.0.jar" 
+ ".../target/scala-2.11/sbt-0.13/scalaczml-1.0.jar" 
 
 ## Documentation
 
-To generate the scalaczml API documentation, type "sbt doc". The documentation will be generated in 
-/target/sbt-0.13/api directory. scalaczml follows closely reference 2 documentation. 
+To generate the ScalaCZML API documentation, type "sbt doc". The documentation will be generated in 
+/target/sbt-0.13/api directory. **ScalaCZML** mostly follows reference 2 documentation. 
 
 ## Example use
 
