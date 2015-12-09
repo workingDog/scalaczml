@@ -35,7 +35,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 import com.kodekutters.czml.czmlCore._
 
@@ -1008,7 +1008,7 @@ package object czmlProperties {
     *
     * @param packets the list CZMLPacket of this document
     */
-  case class CZML[T <: Packet](packets: ListBuffer[T]) {
+  case class CZML[T <: Packet](packets: ArrayBuffer[T]) {
 
     def add(packet: T) = packets += packet
 
@@ -1030,25 +1030,25 @@ package object czmlProperties {
     def apply[T <: Packet](doc: String)(implicit fmt: Reads[T]): CZML[T] = {
       Json.parse(doc).asOpt[JsArray] match {
         case Some(jsonArray) => CZML(jsonArray)
-        case None => new CZML[T](ListBuffer[T]()) // todo log some error
+        case None => new CZML[T](ArrayBuffer[T]()) // todo log some error
       }
     }
 
     def apply[T <: Packet](jsonArray: JsArray)(implicit fmt: Reads[T]): CZML[T] = {
       val packetList = for (pckt <- jsonArray.value) yield Json.fromJson(pckt)(fmt).asOpt
-      new CZML[T](packetList.flatten.asInstanceOf[ListBuffer[T]])
+      new CZML[T](packetList.flatten.toBuffer.asInstanceOf[ArrayBuffer[T]])
     }
 
-    def apply[T <: Packet](): CZML[T] = new CZML(ListBuffer[T]())
+    def apply[T <: Packet](): CZML[T] = new CZML(ArrayBuffer[T]())
 
     implicit def CZMLReads[T <: Packet](implicit fmt: Reads[T]) = new Reads[CZML[T]] {
       def reads(js: JsValue): JsResult[CZML[T]] = {
         js match {
           case JsArray(list) =>
-            val listBuf = ListBuffer.empty ++= (for (p <- list) yield Json.fromJson(p)(fmt).asOpt)
+            val listBuf = ArrayBuffer.empty ++= (for (p <- list) yield Json.fromJson(p)(fmt).asOpt)
             JsSuccess(new CZML[T](listBuf.flatten))
 
-          case _ => JsSuccess(new CZML[T](ListBuffer[T]())) // todo log some error
+          case _ => JsSuccess(new CZML[T](ArrayBuffer[T]())) // todo log some error
         }
       }
     }
@@ -1056,6 +1056,7 @@ package object czmlProperties {
     implicit def CZMLWrites[T <: Packet](implicit fmt: Writes[T]) = new Writes[CZML[T]] {
       def writes(czml: CZML[T]) = Json.toJson(czml.packets)
     }
+
   }
 
 }

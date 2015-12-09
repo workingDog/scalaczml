@@ -1042,12 +1042,12 @@ package object czmlCore {
     * where the X-axis points toward the viewer's right, the Y-axis points up, and the Z-axis points into the screen.
     */
   case class EyeOffset(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                             nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                             interpolationAlgorithm: Option[String] = None,
-                             interpolationDegree: Option[Int] = None,
-                             forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                             backwardExtrapolationType: Option[String] = None,
-                             backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                       nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                       interpolationAlgorithm: Option[String] = None,
+                       interpolationDegree: Option[Int] = None,
+                       forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                       backwardExtrapolationType: Option[String] = None,
+                       backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(cartesian: Cartesian) = this(Option(cartesian))
 
@@ -1198,12 +1198,12 @@ package object czmlCore {
     * the number of pixels up and to the right to place the billboard, relative to the position.
     */
   case class PixelOffset(cartesian2: Option[Cartesian2D] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                               nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                               interpolationAlgorithm: Option[String] = None,
-                               interpolationDegree: Option[Int] = None,
-                               forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                               backwardExtrapolationType: Option[String] = None,
-                               backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                         nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                         interpolationAlgorithm: Option[String] = None,
+                         interpolationDegree: Option[Int] = None,
+                         forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                         backwardExtrapolationType: Option[String] = None,
+                         backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(cartesian2: Cartesian2D) = this(Option(cartesian2))
 
@@ -1238,13 +1238,13 @@ package object czmlCore {
     * a single double value.
     */
   case class CzmlNumber(number: Option[Any] = None, interval: Option[String] = None,
-                              reference: Option[String] = None, epoch: Option[String] = None,
-                              nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                              interpolationAlgorithm: Option[String] = None,
-                              interpolationDegree: Option[Int] = None,
-                              forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                              backwardExtrapolationType: Option[String] = None,
-                              backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                        reference: Option[String] = None, epoch: Option[String] = None,
+                        nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                        interpolationAlgorithm: Option[String] = None,
+                        interpolationDegree: Option[Int] = None,
+                        forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                        backwardExtrapolationType: Option[String] = None,
+                        backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(number: Double) = this(Option(number))
 
@@ -1434,13 +1434,13 @@ package object czmlCore {
     * @param interval the interval property
     */
   case class CzmlColor(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
-                             interval: Option[String] = None,
-                             reference: Option[String] = None, epoch: Option[String] = None,
-                             nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                             interpolationAlgorithm: Option[String] = None, interpolationDegree: Option[Int] = None,
-                             forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                             backwardExtrapolationType: Option[String] = None,
-                             backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                       interval: Option[String] = None,
+                       reference: Option[String] = None, epoch: Option[String] = None,
+                       nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                       interpolationAlgorithm: Option[String] = None, interpolationDegree: Option[Int] = None,
+                       forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                       backwardExtrapolationType: Option[String] = None,
+                       backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(rgba: RgbaList, interval: String) = this(Option(rgba), None, Option(interval))
 
@@ -1555,12 +1555,12 @@ package object czmlCore {
     * The default is the zero vector, which means the billboard is aligned to the screen up vector.
     */
   case class AlignedAxis(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                               nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                               interpolationAlgorithm: Option[String] = None,
-                               interpolationDegree: Option[Int] = None,
-                               forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                               backwardExtrapolationType: Option[String] = None,
-                               backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                         nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                         interpolationAlgorithm: Option[String] = None,
+                         interpolationDegree: Option[Int] = None,
+                         forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                         backwardExtrapolationType: Option[String] = None,
+                         backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(cartesian: Cartesian) = this(Option(cartesian))
 
@@ -1737,16 +1737,16 @@ package object czmlCore {
     * but it is used to locate billboards, labels, and other primitives attached to the object.
     */
   case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
-                                cartographicRadians: Option[Cartographic] = None,
-                                cartographicDegrees: Option[Cartographic] = None,
-                                cartesianVelocity: Option[CartesianVelocity] = None,
-                                interval: Option[String] = None,
-                                reference: Option[String] = None, epoch: Option[String] = None,
-                                nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                                interpolationAlgorithm: Option[String] = None,
-                                interpolationDegree: Option[Int] = None,
-                                forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                                backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                          cartographicRadians: Option[Cartographic] = None,
+                          cartographicDegrees: Option[Cartographic] = None,
+                          cartesianVelocity: Option[CartesianVelocity] = None,
+                          interval: Option[String] = None,
+                          reference: Option[String] = None, epoch: Option[String] = None,
+                          nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                          interpolationAlgorithm: Option[String] = None,
+                          interpolationDegree: Option[Int] = None,
+                          forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                          backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(referenceFrame: String, cartesian: Cartesian, interval: String) = this(Option(referenceFrame), Option(cartesian), None, None, None, Option(interval))
 
@@ -1785,18 +1785,18 @@ package object czmlCore {
     * A non-timed value position
     */
   case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
-                            cartographicRadians: Option[Array[Double]] = None,
-                            cartographicDegrees: Option[Array[Double]] = None,
-                            cartesianVelocity: Option[CartesianVelocity] = None,
-                            interval: Option[String] = None,
-                            references: Option[Array[String]] = None, epoch: Option[String] = None,
-                            nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                            interpolationAlgorithm: Option[String] = None,
-                            interpolationDegree: Option[Int] = None,
-                            forwardExtrapolationType: Option[String] = None,
-                            forwardExtrapolationDuration: Option[Double] = None,
-                            backwardExtrapolationType: Option[String] = None,
-                            backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                      cartographicRadians: Option[Array[Double]] = None,
+                      cartographicDegrees: Option[Array[Double]] = None,
+                      cartesianVelocity: Option[CartesianVelocity] = None,
+                      interval: Option[String] = None,
+                      references: Option[Array[String]] = None, epoch: Option[String] = None,
+                      nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                      interpolationAlgorithm: Option[String] = None,
+                      interpolationDegree: Option[Int] = None,
+                      forwardExtrapolationType: Option[String] = None,
+                      forwardExtrapolationDuration: Option[Double] = None,
+                      backwardExtrapolationType: Option[String] = None,
+                      backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(cartesian: Cartesian) = this(cartesian = Option(cartesian))
 
@@ -1884,11 +1884,11 @@ package object czmlCore {
   }
 
   case class Repeat(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                          nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                          interpolationAlgorithm: Option[String] = None,
-                          interpolationDegree: Option[Int] = None,
-                          forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                          backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                    nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                    interpolationAlgorithm: Option[String] = None,
+                    interpolationDegree: Option[Int] = None,
+                    forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                    backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
 
     def this(cartesian2: Array[Int]) = this(Option(cartesian2))
 
@@ -1905,40 +1905,63 @@ package object czmlCore {
   }
 
   //  "HORIZONTAL" or "VERTICAL"
-  case class StripeOrientation(stripeOrientation: Option[ArrayBuffer[Int]] = None, reference: Option[String] = None) {
-    def this(stripeOrientation: ArrayBuffer[Int]) = this(Option(stripeOrientation))
+  case class StripeOrientation(stripeOrientation: Option[String] = None, reference: Option[String] = None) {
+    def this(stripeOrientation: String) = this(Option(stripeOrientation))
 
-    def this(stripeOrientation: Int) = this(Option(ArrayBuffer[Int](stripeOrientation)))
+    def this(stripeOrientation: String, reference: String) = this(Option(stripeOrientation), Option(reference))
   }
 
   object StripeOrientation {
-    implicit val fmt = Json.format[StripeOrientation]
 
-    def apply(stripeOrientation: ArrayBuffer[Int]): StripeOrientation = new StripeOrientation(stripeOrientation)
+    def apply(stripeOrientation: String): StripeOrientation = new StripeOrientation(stripeOrientation)
 
-    def apply(stripeOrientation: Int): StripeOrientation = new StripeOrientation(stripeOrientation)
+    def apply(stripeOrientation: String, reference: String): StripeOrientation = new StripeOrientation(stripeOrientation, reference)
+
+    val theReads = new Reads[StripeOrientation] {
+      def reads(js: JsValue): JsResult[StripeOrientation] = {
+        // try to read a simple String
+        JsPath.read[String].reads(js).asOpt match {
+          case None => JsSuccess(
+            new StripeOrientation((JsPath \ "stripeOrientation").read[String].reads(js).asOpt,
+              (JsPath \ "reference").read[String].reads(js).asOpt))
+
+          case Some(hz) => JsSuccess(new StripeOrientation(Some(hz)))
+        }
+      }
+    }
+
+    val theWrites = new Writes[StripeOrientation] {
+      def writes(obj: StripeOrientation) = {
+        obj.reference match {
+          case Some(ref) => Json.obj("stripeOrientation" -> JsString(obj.stripeOrientation.getOrElse("")), "reference" -> JsString(ref))
+          case None => JsString(obj.stripeOrientation.getOrElse(""))
+        }
+      }
+    }
+
+    implicit val fmt: Format[StripeOrientation] = Format(theReads, theWrites)
   }
 
   case class Stripe(orientation: Option[StripeOrientation] = None, evenColor: Option[ColorProperty] = None,
-                          oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
-                          repeat: Option[Repeat] = None) {
+                    oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
+                    repeat: Option[Number] = None) {
 
-    def this(orientation: Int, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Array[Int]) =
+    def this(orientation: String, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Int) =
       this(Option(new StripeOrientation(orientation)), Option(new ColorProperty(evenColor)),
-        Option(new ColorProperty(oddColor)), Option(new Number(offset)), Option(new Repeat(repeat)))
+        Option(new ColorProperty(oddColor)), Option(new Number(offset)), Option(new Number(repeat)))
 
   }
 
   object Stripe {
     implicit val fmt = Json.format[Stripe]
 
-    def apply(orientation: Int, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Array[Int]): Stripe =
+    def apply(orientation: String, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Int): Stripe =
       new Stripe(orientation, evenColor, oddColor, offset, repeat)
   }
 
   case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
-                        lineCount: Option[Repeat] = None, lineThickness: Option[Repeat] = None,
-                        lineOffset: Option[Repeat] = None) {
+                  lineCount: Option[Repeat] = None, lineThickness: Option[Repeat] = None,
+                  lineOffset: Option[Repeat] = None) {
 
     def this(color: CzmlColor, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]) =
       this(Option(new ColorProperty(color)), Option(new Number(cellAlpha)),
@@ -1995,8 +2018,7 @@ package object czmlCore {
   }
 
   case class Material(solidColor: Option[SolidColor] = None, image: Option[ImageUri] = None,
-                            repeat: Option[Repeat] = None, grid: Option[Grid] = None,
-                            stripe: Option[Stripe] = None) {
+                      grid: Option[Grid] = None, stripe: Option[Stripe] = None) {
 
     def this(solidColor: ColorProperty) = this(solidColor = Option(SolidColor(solidColor)))
 
@@ -2085,7 +2107,7 @@ package object czmlCore {
   }
 
   case class PolylineOutline(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
-                                   outlineWidth: Option[Number] = None) {
+                             outlineWidth: Option[Number] = None) {
 
     def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number) = this(Option(color), Option(outlineColor), Option(outlineWidth))
 
@@ -2125,7 +2147,7 @@ package object czmlCore {
     *
     */
   case class LineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
-                                polylineGlow: Option[PolylineGlow]) {
+                          polylineGlow: Option[PolylineGlow]) {
 
     def this(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow) =
       this(Option(solidColor), Option(polylineOutline), Option(polylineGlow))
@@ -2190,7 +2212,7 @@ package object czmlCore {
     * The list of directions defining the pyramid.
     */
   case class Directions(spherical: Option[ArrayBuffer[Double]] = None, unitSpherical: Option[ArrayBuffer[Double]] = None,
-                              cartesian: Option[ArrayBuffer[Double]] = None, unitCartesian: Option[ArrayBuffer[Double]] = None)
+                        cartesian: Option[ArrayBuffer[Double]] = None, unitCartesian: Option[ArrayBuffer[Double]] = None)
 
   object Directions {
     implicit val fmt = Json.format[Directions]
