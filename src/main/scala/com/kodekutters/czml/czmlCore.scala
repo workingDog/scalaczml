@@ -68,7 +68,7 @@ package object czmlCore {
   /**
     * a time interval representation consisting of a start and stop components.
     *
-    * With its implicit conversion, one can use a string as a TimeInterval, e.g.
+    * With its implicit conversion, you can use TimeInterval methods on appropriate Strings, e.g.
     *
     * "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z".start will return "2012-08-04T16:00:00Z"
     *
