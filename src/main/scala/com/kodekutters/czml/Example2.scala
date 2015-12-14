@@ -21,13 +21,12 @@ import scala.io.Source
 case class MyPacket(mydata: Option[Array[Int]], czmlPacket: Option[CZMLPacket]) extends Packet {
   def asEventSource(): String = {
     val sb = new mutable.StringBuilder("event: czml \n data: ")
-    sb.append(Json.prettyPrint(Json.toJson(this)) + "\n")
+    sb.append(Json.prettyPrint(Json.toJson(this)) + "\n\n")
     sb.toString()
   }
 }
 
 object MyPacket {
-
   val theReads = new Reads[MyPacket] {
     def reads(js: JsValue): JsResult[MyPacket] = {
       val mydata = (JsPath \ "mydata").read[Array[Int]].reads(js).asOpt
@@ -46,7 +45,7 @@ object Example2 {
 
   def main(args: Array[String]) {
     // a file with the optional added property in the packets, e.g. "mydata": [1,2,3,4,5]
-    val jsonDoc = Source.fromFile("....../test5.czml").mkString
+    val jsonDoc = Source.fromFile("...../test5.czml").mkString
     // read in the custom json document
     val czml = CZML[MyPacket](jsonDoc)
     println("number of MyPacket: " + czml.packets.length + "\n")

@@ -909,23 +909,26 @@ package object czmlProperties {
                         description: Option[String] = None, version: Option[String] = None,
                         properties: ListBuffer[CzmlProperty] = ListBuffer.empty) extends Packet {
 
-    def this(id: String, name: String, parent: String, description: String, version: String, propertyList: ListBuffer[CzmlProperty]) =
-      this(Option(id), Option(name), Option(parent), Option(description), Option(version), propertyList)
+    // the typical first packet
+    def this(id: String, version: String) = this(Option(id), None, None, None, Option(version))
 
-    def this(id: String, name: String, propertyList: ListBuffer[CzmlProperty]) =
-      this(Option(id), Option(name), None, None, None, propertyList)
+    def this(id: String, name: String, parent: String, description: String, version: String, properties: ListBuffer[CzmlProperty]) =
+      this(Option(id), Option(name), Option(parent), Option(description), Option(version), properties)
 
-    def this(id: String, name: String, description: String, propertyList: ListBuffer[CzmlProperty]) =
-      this(Option(id), Option(name), None, Option(description), None, propertyList)
+    def this(id: String, name: String, properties: ListBuffer[CzmlProperty]) =
+      this(Option(id), Option(name), None, None, None, properties)
 
-    def this(id: String, propertyList: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, propertyList)
+    def this(id: String, name: String, description: String, properties: ListBuffer[CzmlProperty]) =
+      this(Option(id), Option(name), None, Option(description), None, properties)
+
+    def this(id: String, properties: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, properties)
 
     /**
       * returns an eventSource representation of this packet
       */
     def asEventSource(): String = {
       val sb = new mutable.StringBuilder("event: czml \n data: ")
-      sb.append(Json.prettyPrint(Json.toJson(this)) + "\n")
+      sb.append(Json.prettyPrint(Json.toJson(this)) + "\n\n")
       sb.toString()
     }
   }
@@ -1028,7 +1031,7 @@ package object czmlProperties {
       */
     def asStreamData(): String = {
       val sb = new mutable.StringBuilder("[ \n")
-      for (packet <- packets) sb.append(packet.asEventSource() + "\n")
+      for (packet <- packets) sb.append(packet.asEventSource())
       sb.append(" ]")
       sb.toString()
     }
