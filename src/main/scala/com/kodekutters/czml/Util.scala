@@ -49,7 +49,9 @@ object Util {
       case e: IOException => e.printStackTrace()
     }
     finally {
-      writer.close()
+      writer.flush()
+      // close files, not System.out
+      if (outFile.trim.nonEmpty) writer.close()
     }
   }
 
@@ -61,7 +63,9 @@ object Util {
       case e: IOException => e.printStackTrace()
     }
     finally {
-      writer.close()
+      writer.flush()
+      // close files, not System.out
+      if (outFile.trim.nonEmpty) writer.close()
     }
   }
 
