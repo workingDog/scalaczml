@@ -153,6 +153,10 @@ package object czmlProperties {
 
     def this(image: ImageUri, scale: Double, rotation: Double) = this(image = Option(image), scale = Option(Number(scale)),
       rotation = Option(Number(rotation)), show = Option(CzmlBoolean(true)))
+
+    def this(c: javafx.scene.paint.Color) =  this(CzmlColor(c))
+
+    def this(c: java.awt.Color) =  this(CzmlColor(c))
   }
 
   object Billboard {
@@ -179,6 +183,10 @@ package object czmlProperties {
     def apply(uri: String, scale: Double): Billboard = new Billboard(image = ImageUri(uri), scale)
 
     def apply(image: ImageUri, scale: Double, rotation: Double): Billboard = new Billboard(image, scale, rotation)
+
+    def apply(c: javafx.scene.paint.Color) = new Billboard(CzmlColor(c))
+
+    def apply(c: java.awt.Color) = new Billboard(CzmlColor(c))
 
   }
 
@@ -895,11 +903,11 @@ package object czmlProperties {
     * @param parent       The ID of the parent object or folder.
     * @param description  An HTML description of the object.
     * @param version      The CZML version being written. Only valid on the document object.
-    * @param propertyList The list of properties of this object
+    * @param properties The list of properties of this object
     */
   case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
                         description: Option[String] = None, version: Option[String] = None,
-                        propertyList: ListBuffer[CzmlProperty] = ListBuffer.empty) extends Packet {
+                        properties: ListBuffer[CzmlProperty] = ListBuffer.empty) extends Packet {
 
     def this(id: String, name: String, parent: String, description: String, version: String, propertyList: ListBuffer[CzmlProperty]) =
       this(Option(id), Option(name), Option(parent), Option(description), Option(version), propertyList)
@@ -971,7 +979,7 @@ package object czmlProperties {
           packet.description.map("description" -> JsString(_)),
           packet.version.map("version" -> JsString(_)))
 
-        packet.propertyList.foreach({
+        packet.properties.foreach({
           case x: Availability => theList += Availability.fmt.writes(x).asOpt[Availability].map("availability" -> Json.toJson(_))
           case x: CzmlPositions => theList += CzmlPositions.fmt.writes(x).asOpt[CzmlPositions].map("position" -> Json.toJson(_))
           case x: Billboard => theList += Billboard.fmt.writes(x).asOpt[Billboard].map("billboard" -> Json.toJson(_))

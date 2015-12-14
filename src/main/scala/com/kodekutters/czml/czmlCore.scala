@@ -776,16 +776,19 @@ package object czmlCore {
         val jsList = js.as[JsArray].value
         // have a list of timed values
         if (jsList.length >= 5 && (jsList.length % 5) == 0) {
+          // note: to make reading more robust, reading Double then converting to Int
           JsSuccess(new RgbaList(
             (for (i <- jsList.indices by 5) yield ((JsPath \ i).readNullable[TimeValue] and
-              (JsPath \ (i + 1)).read[Int] and (JsPath \ (i + 2)).read[Int] and
-              (JsPath \ (i + 3)).read[Int] and (JsPath \ (i + 4)).read[Int]
+              (JsPath \ (i + 1)).read[Double].map(_.toInt) and (JsPath \ (i + 2)).read[Double].map(_.toInt) and
+              (JsPath \ (i + 3)).read[Double].map(_.toInt) and (JsPath \ (i + 4)).read[Double].map(_.toInt)
               ) (Rgba.apply(_, _, _, _, _)).reads(js).asOpt).flatten))
         }
         // have a single color Rgba
         else {
-          val result = ((JsPath \ 0).read[Int] and (JsPath \ 1).read[Int] and
-            (JsPath \ 2).read[Int] and (JsPath \ 3).read[Int]) (Rgba.apply(None, _, _, _, _)).reads(js)
+          // note: to make reading more robust, reading Double then converting to Int
+          val result = ((JsPath \ 0).read[Double].map(_.toInt)  and (JsPath \ 1).read[Double].map(_.toInt)  and
+            (JsPath \ 2).read[Double].map(_.toInt)  and (JsPath \ 3).read[Double].map(_.toInt)
+            ) (Rgba.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[Rgba] => JsSuccess(new RgbaList(Seq(s.get)))
             case e: JsError =>
@@ -1517,6 +1520,11 @@ package object czmlCore {
     def this(r: Float, g: Float, b: Float, a: Float) = this(Option(Array(new CzmlColor(new RgbafList(new Rgbaf(r, g, b, a))))))
 
     def this(r: Double, g: Double, b: Double, a: Double) = this(Option(Array(new CzmlColor(new RgbafList(new Rgbaf(r, g, b, a))))))
+
+    def this(c: javafx.scene.paint.Color) =  this(CzmlColor(c))
+
+    def this(c: java.awt.Color) =  this(CzmlColor(c))
+
   }
 
   object ColorProperty {
@@ -1535,6 +1543,9 @@ package object czmlCore {
 
     def apply(r: Double, g: Double, b: Double, a: Double): ColorProperty = new ColorProperty(r, g, b, a)
 
+    def apply(c: javafx.scene.paint.Color) = new ColorProperty(CzmlColor(c))
+
+    def apply(c: java.awt.Color) = new ColorProperty(CzmlColor(c))
 
     val theReads = new Reads[ColorProperty] {
       def reads(js: JsValue): JsResult[ColorProperty] = {
