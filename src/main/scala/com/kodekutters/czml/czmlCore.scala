@@ -1339,9 +1339,9 @@ package object czmlCore {
               if (x.isInstanceOf[TimedNumbers]) TimedNumbers.fmt.writes(x.asInstanceOf[TimedNumbers]))
 
             // with an epoch the number field could be an array of doubles or a single double
-            case Some(epok) => czmlN.number.map(x => x match {
-              case v if v.isInstanceOf[Array[Double]] => Json.toJson(v.asInstanceOf[Array[Double]])
-              case v if v.isInstanceOf[Double] => JsNumber(v.asInstanceOf[Double])
+            case Some(epok) => czmlN.number.map({
+              case v: Array[Double] => Json.toJson(v)
+              case v: Double => JsNumber(v)
             })
           }
 
@@ -1420,8 +1420,7 @@ package object czmlCore {
           case None => JsNull
           case Some(list) =>
             if (list.length == 1) CzmlNumber.fmt.writes(list.head)
-            else Json.toJson(list.asInstanceOf[Array[CzmlNumber]])
-
+            else Json.toJson(list)
         }
       }
     }
@@ -1563,7 +1562,8 @@ package object czmlCore {
         propList.values match {
           case None => JsNull
           case Some(list) =>
-            if (list.length == 1) CzmlColor.fmt.writes(list.head) else Json.toJson(list.asInstanceOf[Array[CzmlColor]])
+            if (list.length == 1) CzmlColor.fmt.writes(list.head)
+            else Json.toJson(list)
         }
       }
     }
@@ -1896,7 +1896,7 @@ package object czmlCore {
           case None => JsNull
           case Some(list) =>
             if (list.length == 1) Position.fmt.writes(list.head)
-            else Json.toJson(list.asInstanceOf[Array[Position]])
+            else Json.toJson(list)
         }
       }
     }

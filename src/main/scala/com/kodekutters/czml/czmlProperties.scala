@@ -372,7 +372,7 @@ package object czmlProperties {
           case None => JsNull
           case Some(list) =>
             if (list.length == 1) CzmlPosition.fmt.writes(list.head)
-            else Json.toJson(list.asInstanceOf[Array[CzmlPosition]])
+            else Json.toJson(list)
         }
       }
     }
