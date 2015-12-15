@@ -470,7 +470,11 @@ package object czmlProperties {
                        stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                        outlineWidth: Option[Number] = None,
-                       closeBottom: Option[CzmlBoolean] = None, closeTop: Option[CzmlBoolean] = None) extends CzmlProperty
+                       closeBottom: Option[CzmlBoolean] = None, closeTop: Option[CzmlBoolean] = None) extends CzmlProperty {
+
+    def this(w: Double, s: Double, e: Double, n: Double) = this(Option(WsenDegrees(w, s, e, n)))
+
+  }
 
   object Rectangle {
     implicit val fmt = Json.format[Rectangle]

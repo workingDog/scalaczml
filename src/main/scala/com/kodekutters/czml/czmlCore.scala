@@ -1000,8 +1000,9 @@ package object czmlCore {
       def reads(js: JsValue): JsResult[TimedNumbers] = {
 
         // could be an array or a single number
+        // try to read as a single number
         js.asOpt[JsNumber] match {
-          // have an array
+          // could have an array
           case None =>
             val jsList = js.as[JsArray].value
             if (jsList.length >= 2 && (jsList.length % 2) == 0) {
@@ -1347,8 +1348,9 @@ package object czmlCore {
 
           // add the number to theList
           number match {
-            case Some(x) if x.isInstanceOf[JsNumber] => theList += Option("number" -> x.asInstanceOf[JsNumber])
-            case Some(x) if x.isInstanceOf[JsArray] => theList += Option("number" -> x.asInstanceOf[JsArray])
+            case Some(x: JsNumber) => theList += Option("number" -> x)
+            case Some(x: JsArray) => theList += Option("number" -> x)
+            case _ => JsNull
           }
 
           JsObject(theList.flatten)
@@ -1359,8 +1361,8 @@ package object czmlCore {
           // have a simple number
           case true =>
             czmlN.number match {
-              case Some(x) if x.isInstanceOf[TimedNumbers] => JsNumber(x.asInstanceOf[TimedNumbers].values.head.v)
-              case Some(x) if x.isInstanceOf[Double] => Json.obj("number" -> JsNumber(x.asInstanceOf[Double]))
+              case Some(x: TimedNumbers) => JsNumber(x.values.head.v)
+              case Some(x: Double) => Json.obj("number" -> JsNumber(x))
               case _ => JsNull
             }
           case false => doFullWrite()
