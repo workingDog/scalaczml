@@ -449,22 +449,22 @@ package object czmlProperties {
   }
 
   /**
-    * A rectangle
+    * The rectangle conforms to the curvature of the globe and can be placed on the surface or at altitude and can optionally be extruded into a volume.
     *
     * @param coordinates
-    * @param show whether or not to show this property
-    * @param material
-    * @param height
-    * @param extrudedHeight
-    * @param granularity
-    * @param rotation
-    * @param stRotation
-    * @param fill
-    * @param outline
-    * @param outlineColor
-    * @param outlineWidth
-    * @param closeBottom
-    * @param closeTop
+    * @param show A boolean Property specifying the visibility of the rectangle.
+    * @param material A Property specifying the material used to fill the rectangle.
+    * @param height A numeric Property specifying the altitude of the rectangle.
+    * @param extrudedHeight A numeric Property specifying the altitude of the rectangle extrusion.
+    * @param granularity A numeric Property specifying the angular distance between points on the rectangle.
+    * @param rotation A numeric property specifying the rotation of the rectangle clockwise from north.
+    * @param stRotation A numeric property specifying the rotation of the rectangle texture counter-clockwise from north.
+    * @param fill A boolean Property specifying whether the rectangle is filled with the provided material.
+    * @param outline A boolean Property specifying whether the rectangle is outlined.
+    * @param outlineColor A Property specifying the Color of the outline.
+    * @param outlineWidth A numeric Property specifying the width of the outline.
+    * @param closeBottom A boolean Property specifying whether the rectangle has a bottom cover when extruded.
+    * @param closeTop A boolean Property specifying whether the rectangle has a top cover when extruded
     */
   case class Rectangle(coordinates: Option[WsenDegrees] = None, show: Option[CzmlBoolean] = None,
                        material: Option[Material] = None, height: Option[Number] = None,
@@ -484,18 +484,19 @@ package object czmlProperties {
   }
 
   /**
-    * A wall
+    * Describes a two dimensional wall defined as a line strip and optional maximum and minimum heights.
+    * The wall conforms to the curvature of the globe and can be placed along the surface or at altitude.
     *
-    * @param positions
-    * @param show whether or not to show this property
-    * @param material
-    * @param minimumHeights
-    * @param maximumHeights
-    * @param granularity
-    * @param fill
-    * @param outline
-    * @param outlineColor
-    * @param outlineWidth
+    * @param positions A Property specifying the array of Cartesian3 positions which define the top of the wall.
+    * @param show A boolean Property specifying the visibility of the wall.
+    * @param material A Property specifying the material used to fill the wall.
+    * @param minimumHeights A Property specifying an array of heights to be used for the bottom of the wall instead of the globe surface.
+    * @param maximumHeights A Property specifying an array of heights to be used for the top of the wall instead of the height of each position.
+    * @param granularity A numeric Property specifying the angular distance between each latitude and longitude point.
+    * @param fill A boolean Property specifying whether the wall is filled with the provided material.
+    * @param outline A boolean Property specifying whether the wall is outlined.
+    * @param outlineColor A Property specifying the Color of the outline.
+    * @param outlineWidth A numeric Property specifying the width of the outline.
     */
   case class Wall(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                   material: Option[Material] = None,
