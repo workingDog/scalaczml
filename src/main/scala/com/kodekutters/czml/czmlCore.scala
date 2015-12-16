@@ -279,19 +279,6 @@ package object czmlCore {
 
     def this(t: TimeValue, x: Double, y: Double, z: Double) = this(Seq(Coordinate(t, x, y, z)))
 
-    def +(c: Cartesian) = new Cartesian(this.coordinates.head + c.coordinates.head)
-
-    def -(c: Cartesian) = new Cartesian(this.coordinates.head - c.coordinates.head)
-
-    def /(s: Double) = new Cartesian(this.coordinates.head / s)
-
-    def *(s: Double) = new Cartesian(this.coordinates.head * s)
-
-    def cross(other: Cartesian) = new Cartesian(this.coordinates.head.cross(other.coordinates.head))
-
-    def dot(other: Cartesian): Double = this.coordinates.head.dot(other.coordinates.head)
-
-    def invert() = new Cartesian(this.coordinates.head.invert)
   }
 
   object Cartesian {
@@ -324,7 +311,7 @@ package object czmlCore {
             case s: JsSuccess[Coordinate] => JsSuccess(new Cartesian(Seq(s.get)))
             case e: JsError =>
               println("Error could not read Coordinate values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read Coordinate values")
+              JsError("could not read Coordinate values: "+js.toString)
           }
         }
       }
@@ -363,17 +350,6 @@ package object czmlCore {
 
     def this(t: Double, x: Double, y: Double) = this(Seq(Coordinate2D(t, x, y)))
 
-    def +(c: Cartesian2D) = new Cartesian2D(this.coordinates.head + c.coordinates.head)
-
-    def -(c: Cartesian2D) = new Cartesian2D(this.coordinates.head - c.coordinates.head)
-
-    def /(s: Double) = new Cartesian2D(this.coordinates.head / s)
-
-    def *(s: Double) = new Cartesian2D(this.coordinates.head * s)
-
-    def dot(other: Cartesian2D): Double = this.coordinates.head.dot(other.coordinates.head)
-
-    def invert() = new Cartesian2D(this.coordinates.head.invert)
   }
 
   object Cartesian2D {
@@ -406,7 +382,7 @@ package object czmlCore {
             case s: JsSuccess[Coordinate2D] => JsSuccess(new Cartesian2D(Seq(s.get)))
             case e: JsError =>
               println("Error could not read Coordinate2D values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read Coordinate2D values")
+              JsError("could not read Coordinate2D values: "+js.toString)
           }
         }
       }
@@ -507,7 +483,7 @@ package object czmlCore {
             case s: JsSuccess[LngLatAltT] => JsSuccess(new Cartographic(Seq(s.get)))
             case e: JsError =>
               println("Error could not read LngLatAltT values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read LngLatAltT values")
+              JsError("could not read LngLatAltT values: "+js.toString)
           }
         }
       }
@@ -621,7 +597,7 @@ package object czmlCore {
             case s: JsSuccess[Velocity] => JsSuccess(new CartesianVelocity(Seq(s.get)))
             case e: JsError =>
               println("Error could not read Velocity values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read Velocity values")
+              JsError("could not read Velocity values: "+js.toString)
           }
         }
       }
@@ -793,7 +769,7 @@ package object czmlCore {
             case s: JsSuccess[Rgba] => JsSuccess(new RgbaList(Seq(s.get)))
             case e: JsError =>
               println("Error could not read rgba values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read rgba values")
+              JsError("could not read rgba values: "+js.toString)
           }
         }
       }
@@ -945,7 +921,7 @@ package object czmlCore {
             case s: JsSuccess[Rgbaf] => JsSuccess(new RgbafList(Seq(s.get)))
             case e: JsError =>
               println("Error could not read rgbaf values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read rgbaf values")
+              JsError("could not read rgbaf values: "+js.toString)
           }
         }
       }
@@ -1019,7 +995,7 @@ package object czmlCore {
                 case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
                 case e: JsError =>
                   println("Error could not read TimedNumbers values: " + js + " " + JsError.toJson(e).toString())
-                  JsError("could not read TimedNumbers values")
+                  JsError("could not read TimedNumbers values: "+js.toString)
               }
             }
 
@@ -1030,7 +1006,7 @@ package object czmlCore {
               case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
               case e: JsError =>
                 println("Error could not read TimedNumbers values: " + js + " " + JsError.toJson(e).toString())
-                JsError("could not read TimedNumbers values")
+                JsError("could not read TimedNumbers values: "+js.toString)
             }
         }
       }

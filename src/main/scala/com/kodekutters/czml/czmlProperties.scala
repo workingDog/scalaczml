@@ -892,7 +892,7 @@ package object czmlProperties {
   }
 
   /**
-    * a trait that characterises a packet in the CZML document.
+    * Characterises a packet in the CZML document.
     */
   trait Packet {
     def asEventSource(): String
