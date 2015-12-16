@@ -643,7 +643,7 @@ package object czmlCore {
   }
 
   /**
-    * describes a boolean interval, i.e. an interval and an associated a boolean value
+    * describes a boolean interval, i.e. a time interval and an associated boolean value
     */
   case class BooleanInterval(interval: Option[String] = None, boolean: Option[Boolean]) {
     def this(interval: String, boolean: Boolean) = this(Option(interval), Option(boolean))

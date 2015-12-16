@@ -397,6 +397,9 @@ package object czmlProperties {
                   width: Option[Number] = None, resolution: Option[Number] = None,
                   leadTime: Option[Number] = None, trailTime: Option[Number] = None) extends CzmlProperty {
 
+    def this(show: CzmlBoolean, material: LineMaterial, width: Number, resolution: Number, leadTime: Number, trailTime: Number) =
+      this(Option(show), Option(material), Option(width), Option(resolution), Option(leadTime), Option(trailTime))
+
     def this(material: LineMaterial, width: Number, resolution: Number) =
       this(Option(CzmlBoolean(true)), Option(material), Option(width), Option(resolution))
 
@@ -1022,7 +1025,7 @@ package object czmlProperties {
   /**
     * a CZML document contains a single JSON array where each object-literal element in the array is a CZML packet.
     *
-    * @param packets the list CZMLPacket of this document
+    * @param packets the list Packet of this document
     */
   case class CZML[T <: Packet](packets: ArrayBuffer[T]) {
 
@@ -1031,7 +1034,7 @@ package object czmlProperties {
     def remove(packet: T) = packets -= packet
 
     /**
-      * returns the whole CZML document as string made of an array of eventSource elements.
+      * returns the whole CZML document as a string consisting of an array of eventSource elements.
       */
     def asStreamData(): String = {
       val sb = new mutable.StringBuilder("[ \n")
