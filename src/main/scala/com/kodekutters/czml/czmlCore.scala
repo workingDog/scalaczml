@@ -73,7 +73,7 @@ package object czmlCore {
     * "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z".start will return "2012-08-04T16:00:00Z"
     *
     * "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z".startLocalDateTime will return 2012-08-04T16:00
- *
+    *
     * @param value the full time interval as a string
     */
   case class TimeInterval(value: String) {
@@ -786,8 +786,8 @@ package object czmlCore {
         // have a single color Rgba
         else {
           // note: to make reading more robust, reading Double then converting to Int
-          val result = ((JsPath \ 0).read[Double].map(_.toInt)  and (JsPath \ 1).read[Double].map(_.toInt)  and
-            (JsPath \ 2).read[Double].map(_.toInt)  and (JsPath \ 3).read[Double].map(_.toInt)
+          val result = ((JsPath \ 0).read[Double].map(_.toInt) and (JsPath \ 1).read[Double].map(_.toInt) and
+            (JsPath \ 2).read[Double].map(_.toInt) and (JsPath \ 3).read[Double].map(_.toInt)
             ) (Rgba.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[Rgba] => JsSuccess(new RgbaList(Seq(s.get)))
@@ -1522,9 +1522,9 @@ package object czmlCore {
 
     def this(r: Double, g: Double, b: Double, a: Double) = this(Option(Array(new CzmlColor(new RgbafList(new Rgbaf(r, g, b, a))))))
 
-    def this(c: javafx.scene.paint.Color) =  this(CzmlColor(c))
+    def this(c: javafx.scene.paint.Color) = this(CzmlColor(c))
 
-    def this(c: java.awt.Color) =  this(CzmlColor(c))
+    def this(c: java.awt.Color) = this(CzmlColor(c))
 
   }
 
@@ -1908,7 +1908,7 @@ package object czmlCore {
 
   /**
     * represents a number (Int) along each 2d cartesian axis. Used in Grid
- *
+    *
     * @param cartesian2 an array of Int values, e.g. [2,3]
     */
   case class AxisNumber(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
@@ -2277,7 +2277,6 @@ package object czmlCore {
   }
 
   /**
-    * todo
     * Defines a mapping of node names to node transformations
     *
     * @param nodes
@@ -2285,16 +2284,18 @@ package object czmlCore {
   case class NodeTransformations(nodes: mutable.ListMap[String, NodeTransformation])
 
   object NodeTransformations {
-    val MAX_NODES = 100
 
     val theReads = new Reads[NodeTransformations] {
-      def reads(js: JsValue): JsResult[NodeTransformations] = {
-        val theListMap = new mutable.ListMap[String, NodeTransformation]()
-        for(n <- 1 to MAX_NODES) {
-          val nodeName = s"node$n"
-          (JsPath \ `nodeName`).read[NodeTransformation].reads(js).asOpt.map(n => theListMap += (`nodeName` -> n))
+      def reads(json: JsValue): JsResult[NodeTransformations] = {
+        json match {
+          case js: JsObject =>
+            val theListMap = mutable.ListMap.empty ++= js.fields.collect {
+              case (key, JsObject(value)) => key -> NodeTransformation.fmt.reads(JsObject(value)).getOrElse(NodeTransformation())
+            }
+            JsSuccess(new NodeTransformations(theListMap))
+
+          case x => JsError(s"Could not read NodeTransformations : $x")
         }
-        JsSuccess(new NodeTransformations(theListMap))
       }
     }
 
