@@ -2256,6 +2256,8 @@ package object czmlCore {
   object Translation {
     implicit val fmt = Json.format[Translation]
 
+    def apply(x: Double, y: Double, z: Double, reference: String): Translation = new Translation(new Cartesian(x, y, z), reference)
+
     def apply(cartesian: Cartesian, reference: String): Translation = new Translation(cartesian, reference)
   }
 
@@ -2264,12 +2266,18 @@ package object czmlCore {
     */
   case class NodeTransformation(scale: Option[CzmlPosition] = None, translation: Option[Translation] = None, rotation: Option[Orientation] = None) {
 
+    def this(x: Double, y: Double, z: Double, translation: Translation, rotation: Orientation) =
+      this(Option(new CzmlPosition(x, y, z)), Option(translation), Option(rotation))
+
     def this(scale: Cartesian, translation: Translation, rotation: Orientation) =
       this(Option(CzmlPosition(scale)), Option(translation), Option(rotation))
   }
 
   object NodeTransformation {
     implicit val fmt = Json.format[NodeTransformation]
+
+    def apply(x: Double, y: Double, z: Double, translation: Translation, rotation: Orientation): NodeTransformation =
+      new NodeTransformation(x, y, z, translation, rotation)
 
     def apply(scale: Cartesian, translation: Translation, rotation: Orientation): NodeTransformation =
       new NodeTransformation(scale, translation, rotation)
@@ -2279,7 +2287,7 @@ package object czmlCore {
   /**
     * Defines a mapping of node names to node transformations
     *
-    * @param nodes
+    * @param nodes the map of node names and node transformations
     */
   case class NodeTransformations(nodes: mutable.ListMap[String, NodeTransformation])
 
@@ -2290,7 +2298,7 @@ package object czmlCore {
         json match {
           case js: JsObject =>
             val theListMap = mutable.ListMap.empty ++= js.fields.collect {
-              case (key, JsObject(value)) => key -> NodeTransformation.fmt.reads(JsObject(value)).getOrElse(NodeTransformation())
+              case (key, JsObject(value)) => key -> NodeTransformation.fmt.reads(JsObject(value)).getOrElse(new NodeTransformation())
             }
             JsSuccess(new NodeTransformations(theListMap))
 

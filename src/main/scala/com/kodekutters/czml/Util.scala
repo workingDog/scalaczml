@@ -41,6 +41,11 @@ object Util {
 
   def isAllDigits(x: String) = x forall Character.isDigit
 
+  /**
+    * write the czml document to a file.
+    * @param outFile the file name to write to, if empty or missing output will be to System.out
+    * @param czml the CZML document, i.e. the list of CZML packets
+    */
   def writeToFile(outFile: String = "", czml: CZML[CZMLPacket]) = {
     val writer = if (outFile.trim.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile))
     try {
@@ -55,6 +60,11 @@ object Util {
     }
   }
 
+  /**
+    * write the (json) string representation of a czml document to a file.
+    * @param outFile the file name to write to, if empty or missing output will be to System.out
+    * @param czmljs the CZML document as a (json) string
+    */
   def writeToFile(outFile: String, czmljs: String) = {
     val writer = if (outFile.trim.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile))
     try {
