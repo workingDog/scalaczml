@@ -39,8 +39,10 @@ import play.api.libs.json._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.reflect.runtime.universe._
 
 import com.kodekutters.czml.czmlProperties._
+
 
 /**
   * The Cesium CZML language as described in the following references:
@@ -190,7 +192,7 @@ package object czmlCore {
   }
 
   /**
-    * a 3d cartesian coordinate that can have a time component.
+    * a 3d cartesian coordinate that can have an optional time component.
     */
   case class Coordinate(t: Option[TimeValue] = None, x: Double, y: Double, z: Double) {
 
@@ -228,7 +230,7 @@ package object czmlCore {
   }
 
   /**
-    * a 2d cartesian coordinate that can have a time component.
+    * a 2d cartesian coordinate that can have an optional time component.
     */
   case class Coordinate2D(t: Option[TimeValue] = None, x: Double, y: Double) {
     def this(x: Double, y: Double) = this(None, x, y)
@@ -311,7 +313,7 @@ package object czmlCore {
             case s: JsSuccess[Coordinate] => JsSuccess(new Cartesian(Seq(s.get)))
             case e: JsError =>
               println("Error could not read Coordinate values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read Coordinate values: "+js.toString)
+              JsError("could not read Coordinate values: " + js.toString)
           }
         }
       }
@@ -382,7 +384,7 @@ package object czmlCore {
             case s: JsSuccess[Coordinate2D] => JsSuccess(new Cartesian2D(Seq(s.get)))
             case e: JsError =>
               println("Error could not read Coordinate2D values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read Coordinate2D values: "+js.toString)
+              JsError("could not read Coordinate2D values: " + js.toString)
           }
         }
       }
@@ -404,9 +406,19 @@ package object czmlCore {
   }
 
   /**
-    * A timed geodetic (time,long,lat,alt) coordinate. The values can represent either degrees or radians
+    * represents the geographic coordinate radians "type"
     */
-  case class LngLatAltT(t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
+  trait RADIANS
+  /**
+    * represents the geographic coordinate degrees "type"
+    */
+  trait DEGREES
+
+  /**
+    * A timed geographic coordinate (time,long,lat,alt) coordinate. The values can represent either
+    * degrees or radians depending on the type parameter[T], either DEGREES or RADIANS.
+    */
+  case class LngLatAlt[T: TypeTag](t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
 
     def this(lng: Double, lat: Double, alt: Double) = this(None, lng, lat, alt)
 
@@ -415,57 +427,65 @@ package object czmlCore {
     def this(t: String, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
 
     def this(t: Double, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
+
+    def isRadian() = typeOf[T] =:= typeOf[RADIANS]
+
+    def isDegree() = typeOf[T] =:= typeOf[DEGREES]
+
   }
 
-  object LngLatAltT {
+  object LngLatAlt {
+    def apply[T: TypeTag](lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat, alt)
 
-    def apply(lng: Double, lat: Double, alt: Double): LngLatAltT = new LngLatAltT(lng, lat, alt)
+    def apply[T: TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](Option(t), lng, lat, alt)
 
-    def apply(t: TimeValue, lng: Double, lat: Double, alt: Double): LngLatAltT = new LngLatAltT(Option(t), lng, lat, alt)
+    def apply[T: TypeTag](t: String, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](TimeValue(t), lng, lat, alt)
 
-    def apply(t: String, lng: Double, lat: Double, alt: Double): LngLatAltT = new LngLatAltT(TimeValue(t), lng, lat, alt)
-
-    def apply(t: Double, lng: Double, lat: Double, alt: Double): LngLatAltT = new LngLatAltT(TimeValue(t), lng, lat, alt)
-
+    def apply[T: TypeTag](t: Double, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](TimeValue(t), lng, lat, alt)
   }
 
   /**
     * A list of geodetic, WGS84 positions using longitude, latitude, and height components.
     * The positions represented as a WGS 84 Cartographic [Longitude, Latitude, Height]
-    * where longitude and latitude are in degrees or radians and height is in meters.
+    * where longitude and latitude are in degrees or radians depending on the type parameter[T] (DEGREES or RADIANS),
+    * and height is in meters.
     * If the array has three elements, the position is constant.
     * If it has four or more elements, they are time-tagged samples arranged
     * as [Time, Longitude, Latitude, Height, Time, Longitude, Latitude, Height, ...],
     * where Time is an ISO 8601 date and time string or seconds since "epoch".
     *
     */
-  case class Cartographic(coordinates: Seq[LngLatAltT]) {
+  case class Cartographic[T: TypeTag](coordinates: Seq[LngLatAlt[T]]) {
 
-    def this(lngLatAltT: LngLatAltT) = this(Seq(lngLatAltT))
+    def this(lngLatAltT: LngLatAlt[T]) = this(Seq(lngLatAltT))
 
-    def this(lng: Double, lat: Double, alt: Double) = this(LngLatAltT(lng, lat, alt))
+    def this(lng: Double, lat: Double, alt: Double) = this(LngLatAlt[T](lng, lat, alt))
 
-    def this(t: TimeValue, lng: Double, lat: Double, alt: Double) = this(LngLatAltT(t, lng, lat, alt))
+    def this(t: TimeValue, lng: Double, lat: Double, alt: Double) = this(LngLatAlt[T](t, lng, lat, alt))
 
     def this(t: String, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
 
     def this(t: Double, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
+
+    def isRadian() = typeOf[T] =:= typeOf[RADIANS]
+
+    def isDegree() = typeOf[T] =:= typeOf[DEGREES]
   }
 
   object Cartographic {
 
-    def apply(lngLatAltT: LngLatAltT): Cartographic = new Cartographic(Seq(lngLatAltT))
+    def apply[T: TypeTag](lngLatAltT: LngLatAlt[T]): Cartographic[T] = new Cartographic[T](Seq(lngLatAltT))
 
-    def apply(lng: Double, lat: Double, alt: Double): Cartographic = new Cartographic(LngLatAltT(lng, lat, alt))
+    def apply[T: TypeTag](lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat, alt))
 
-    def apply(t: TimeValue, lng: Double, lat: Double, alt: Double): Cartographic = new Cartographic(LngLatAltT(t, lng, lat, alt))
+    def apply[T: TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](t, lng, lat, alt))
 
-    def apply(t: String, lng: Double, lat: Double, alt: Double): Cartographic = new Cartographic(TimeValue(t), lng, lat, alt)
+    def apply[T: TypeTag](t: String, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](TimeValue(t), lng, lat, alt)
 
-    def apply(t: Double, lng: Double, lat: Double, alt: Double): Cartographic = new Cartographic(TimeValue(t), lng, lat, alt)
+    def apply[T: TypeTag](t: Double, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](TimeValue(t), lng, lat, alt)
 
-    val theReads = new Reads[Cartographic] {
-      def reads(js: JsValue): JsResult[Cartographic] = {
+    implicit def theReads[T: TypeTag] = new Reads[Cartographic[T]] {
+      def reads(js: JsValue): JsResult[Cartographic[T]] = {
         val jsList = js.as[JsArray].value
         // have a list of timed coordinates, multiple of 4 elements
         if (jsList.length >= 4 && (jsList.length % 4) == 0) {
@@ -473,24 +493,24 @@ package object czmlCore {
             (for (i <- jsList.indices by 4) yield
               ((JsPath \ i).readNullable[TimeValue] and
                 (JsPath \ (i + 1)).read[Double] and (JsPath \ (i + 2)).read[Double] and
-                (JsPath \ (i + 3)).read[Double]) (LngLatAltT.apply(_, _, _, _)).reads(js).asOpt).flatten))
+                (JsPath \ (i + 3)).read[Double]) (LngLatAlt.apply[T](_, _, _, _)).reads(js).asOpt).flatten))
         }
         // have a single coordinate [lng,lat,alt]
         else {
           val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
-            (JsPath \ 2).read[Double]) (LngLatAltT.apply(None, _, _, _)).reads(js)
+            (JsPath \ 2).read[Double]) (LngLatAlt.apply(None, _, _, _)).reads(js)
           result match {
-            case s: JsSuccess[LngLatAltT] => JsSuccess(new Cartographic(Seq(s.get)))
+            case s: JsSuccess[LngLatAlt[T]] => JsSuccess(new Cartographic[T](Seq(s.get)))
             case e: JsError =>
               println("Error could not read LngLatAltT values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read LngLatAltT values: "+js.toString)
+              JsError("could not read LngLatAltT values: " + js.toString)
           }
         }
       }
     }
 
-    val theWrites = new Writes[Cartographic] {
-      def writes(cart: Cartographic) = {
+    implicit def theWrites[T: TypeTag] = new Writes[Cartographic[T]] {
+      def writes(cart: Cartographic[T]) = {
         val coordList = for (coord <- cart.coordinates) yield {
           coord.t match {
             case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(coord.lng), JsNumber(coord.lat), JsNumber(coord.alt))
@@ -501,7 +521,6 @@ package object czmlCore {
       }
     }
 
-    implicit val fmt: Format[Cartographic] = Format(theReads, theWrites)
   }
 
   /**
@@ -597,7 +616,7 @@ package object czmlCore {
             case s: JsSuccess[Velocity] => JsSuccess(new CartesianVelocity(Seq(s.get)))
             case e: JsError =>
               println("Error could not read Velocity values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read Velocity values: "+js.toString)
+              JsError("could not read Velocity values: " + js.toString)
           }
         }
       }
@@ -769,7 +788,7 @@ package object czmlCore {
             case s: JsSuccess[Rgba] => JsSuccess(new RgbaList(Seq(s.get)))
             case e: JsError =>
               println("Error could not read rgba values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read rgba values: "+js.toString)
+              JsError("could not read rgba values: " + js.toString)
           }
         }
       }
@@ -921,7 +940,7 @@ package object czmlCore {
             case s: JsSuccess[Rgbaf] => JsSuccess(new RgbafList(Seq(s.get)))
             case e: JsError =>
               println("Error could not read rgbaf values: " + js + " " + JsError.toJson(e).toString())
-              JsError("could not read rgbaf values: "+js.toString)
+              JsError("could not read rgbaf values: " + js.toString)
           }
         }
       }
@@ -995,7 +1014,7 @@ package object czmlCore {
                 case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
                 case e: JsError =>
                   println("Error could not read TimedNumbers values: " + js + " " + JsError.toJson(e).toString())
-                  JsError("could not read TimedNumbers values: "+js.toString)
+                  JsError("could not read TimedNumbers values: " + js.toString)
               }
             }
 
@@ -1006,7 +1025,7 @@ package object czmlCore {
               case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
               case e: JsError =>
                 println("Error could not read TimedNumbers values: " + js + " " + JsError.toJson(e).toString())
-                JsError("could not read TimedNumbers values: "+js.toString)
+                JsError("could not read TimedNumbers values: " + js.toString)
             }
         }
       }
@@ -1736,8 +1755,8 @@ package object czmlCore {
     * but it is used to locate billboards, labels, and other primitives attached to the object.
     */
   case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
-                          cartographicRadians: Option[Cartographic] = None,
-                          cartographicDegrees: Option[Cartographic] = None,
+                          cartographicRadians: Option[Cartographic[RADIANS]] = None,
+                          cartographicDegrees: Option[Cartographic[DEGREES]] = None,
                           cartesianVelocity: Option[CartesianVelocity] = None,
                           interval: Option[String] = None,
                           reference: Option[String] = None, epoch: Option[String] = None,
@@ -1757,12 +1776,10 @@ package object czmlCore {
 
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(Option(referenceFrame), Option(new Cartesian(x, y, z)))
 
-    def this(cartographicDegrees: Cartographic) = this(cartographicDegrees = Option(cartographicDegrees))
-
-    def this(lngLatAltT: LngLatAltT) = this(cartographicDegrees = Option(Cartographic(lngLatAltT)))
   }
 
   object CzmlPosition {
+
     implicit val fmt = Json.format[CzmlPosition]
 
     def apply(referenceFrame: String, cartesian: Cartesian, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, cartesian, interval)
@@ -1775,9 +1792,6 @@ package object czmlCore {
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z)
 
-    def apply(cartographicDegrees: Cartographic): CzmlPosition = new CzmlPosition(cartographicDegrees)
-
-    def apply(lngLatAltT: LngLatAltT): CzmlPosition = new CzmlPosition(lngLatAltT)
   }
 
   /**
@@ -1808,7 +1822,6 @@ package object czmlCore {
     def this(t: TimeValue, x: Double, y: Double, z: Double) = this(cartesian = Cartesian(t, x, y, z))
 
     def this(cartographicDegrees: Array[Double]) = this(cartographicDegrees = Option(cartographicDegrees))
-
 
   }
 

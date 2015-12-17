@@ -326,14 +326,9 @@ package object czmlProperties {
     def this(referenceFrame: String, x: Double, y: Double, z: Double, interval: String) =
       this(CzmlPosition(referenceFrame, x, y, z, interval))
 
-
     def this(x: Double, y: Double, z: Double) = this(CzmlPosition(x, y, z))
 
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(CzmlPosition(referenceFrame, x, y, z))
-
-    def this(cartographicDegrees: Cartographic) = this(CzmlPosition(cartographicDegrees))
-
-    def this(lngLatAltT: LngLatAltT) = this(CzmlPosition(lngLatAltT))
 
   }
 
@@ -351,9 +346,6 @@ package object czmlProperties {
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPositions = new CzmlPositions(referenceFrame, x, y, z)
 
-    def apply(cartographicDegrees: Cartographic): CzmlPositions = new CzmlPositions(cartographicDegrees)
-
-    def apply(lngLatAltT: LngLatAltT): CzmlPositions = new CzmlPositions(lngLatAltT)
 
     val theReads = new Reads[CzmlPositions] {
       def reads(js: JsValue): JsResult[CzmlPositions] = {
