@@ -927,6 +927,8 @@ package object czmlProperties {
 
     def this(id: String, properties: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, properties)
 
+    def this(packet: CZMLPacket) = this(packet.id, packet.name, packet.parent, packet.description, packet.version, packet.properties)
+
     /**
       * returns an eventSource representation of this packet
       */

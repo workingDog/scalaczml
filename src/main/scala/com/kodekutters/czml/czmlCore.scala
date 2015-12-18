@@ -95,17 +95,20 @@ package object czmlCore {
     def stopLocalDateTime() = LocalDateTime.parse(stop(), TimeInterval.fmter)
   }
 
-  //  case class Duration(days: Int, seconds: Double) {
-  //    def this(days: Int, hours: Int, minutes: Int, seconds: Double) = this(days, Duration.toSeconds(hours, minutes, seconds))
-  //  }
-  //  object Duration {
-  //    def toSeconds(hours: Int, minutes: Int, seconds: Double): Double = hours * 3600.0 + minutes * 60.0 + seconds
-  //    implicit val fmt = Jsonx.formatCaseClass[Duration]
-  //  }
+//    case class Duration(days: Int, seconds: Double) {
+//      def this(days: Int, hours: Int, minutes: Int, seconds: Double) = this(days, Duration.toSeconds(hours, minutes, seconds))
+//    }
+//    object Duration {
+//      def toSeconds(hours: Int, minutes: Int, seconds: Double): Double = hours * 3600.0 + minutes * 60.0 + seconds
+//      implicit val fmt = Json.format[Duration]
+//      implicit def StringToDuration(value: String): Duration = {
+//
+//      }
+//    }
 
   //  case class Description(reference: Option[String] = None, string: Option[String] = None)
   //  object Description {
-  //    implicit val fmt = Jsonx.formatCaseClass[Description]
+  //    implicit val fmt = Json.format[Description]
   //  }
 
   /**
