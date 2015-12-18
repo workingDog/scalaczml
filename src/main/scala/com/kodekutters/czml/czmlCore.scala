@@ -406,17 +406,17 @@ package object czmlCore {
   }
 
   /**
-    * represents the geographic coordinate radians "type"
+    * represents the geographic coordinate radian "type"
     */
-  trait RADIANS
+  trait RADIAN
   /**
-    * represents the geographic coordinate degrees "type"
+    * represents the geographic coordinate degree "type"
     */
-  trait DEGREES
+  trait DEGREE
 
   /**
     * A timed geographic coordinate (time,long,lat,alt) coordinate. The values can represent either
-    * degrees or radians depending on the type parameter[T], either DEGREES or RADIANS.
+    * degrees or radians depending on the type parameter[T], either DEGREE or RADIAN.
     */
   case class LngLatAlt[T: TypeTag](t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
 
@@ -428,9 +428,9 @@ package object czmlCore {
 
     def this(t: Double, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
 
-    def isRadian() = typeOf[T] =:= typeOf[RADIANS]
+    def isRadian() = typeOf[T] =:= typeOf[RADIAN]
 
-    def isDegree() = typeOf[T] =:= typeOf[DEGREES]
+    def isDegree() = typeOf[T] =:= typeOf[DEGREE]
 
   }
 
@@ -447,7 +447,7 @@ package object czmlCore {
   /**
     * A list of geodetic, WGS84 positions using longitude, latitude, and height components.
     * The positions represented as a WGS 84 Cartographic [Longitude, Latitude, Height]
-    * where longitude and latitude are in degrees or radians depending on the type parameter[T] (DEGREES or RADIANS),
+    * where longitude and latitude are in degrees or radians depending on the type parameter[T] (DEGREE or RADIAN),
     * and height is in meters.
     * If the array has three elements, the position is constant.
     * If it has four or more elements, they are time-tagged samples arranged
@@ -467,9 +467,9 @@ package object czmlCore {
 
     def this(t: Double, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
 
-    def isRadian() = typeOf[T] =:= typeOf[RADIANS]
+    def isRadian() = typeOf[T] =:= typeOf[RADIAN]
 
-    def isDegree() = typeOf[T] =:= typeOf[DEGREES]
+    def isDegree() = typeOf[T] =:= typeOf[DEGREE]
   }
 
   object Cartographic {
@@ -1755,8 +1755,8 @@ package object czmlCore {
     * but it is used to locate billboards, labels, and other primitives attached to the object.
     */
   case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
-                          cartographicRadians: Option[Cartographic[RADIANS]] = None,
-                          cartographicDegrees: Option[Cartographic[DEGREES]] = None,
+                          cartographicRadians: Option[Cartographic[RADIAN]] = None,
+                          cartographicDegrees: Option[Cartographic[DEGREE]] = None,
                           cartesianVelocity: Option[CartesianVelocity] = None,
                           interval: Option[String] = None,
                           reference: Option[String] = None, epoch: Option[String] = None,

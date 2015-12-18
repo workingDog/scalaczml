@@ -27,13 +27,9 @@ case class MyPacket(mydata: Option[Array[Int]], czmlPacket: Option[CZMLPacket]) 
 }
 
 object MyPacket {
-  val theReads = new Reads[MyPacket] {
-    def reads(js: JsValue): JsResult[MyPacket] = {
-      val mydata = (JsPath \ "mydata").read[Array[Int]].reads(js).asOpt
-      val czmlPacket = CZMLPacket.fmt.reads(js).asOpt
-      JsSuccess(new MyPacket(mydata, czmlPacket))
-    }
-  }
+
+  val theReads: Reads[MyPacket] =
+    ((JsPath \ "mydata").readNullable[Array[Int]] and CZMLPacket.theReads) ((mydata, czml) => MyPacket(mydata, Option(czml)))
 
   val theWrites: Writes[MyPacket] =
     ((JsPath \ "mydata").writeNullable[Array[Int]] and JsPath.writeNullable[CZMLPacket]) (unlift(MyPacket.unapply))
@@ -45,7 +41,7 @@ object Example2 {
 
   def main(args: Array[String]) {
     // a file with the optional added property in the packets, e.g. "mydata": [1,2,3,4,5]
-    val jsonDoc = Source.fromFile("...../test5.czml").mkString
+    val jsonDoc = Source.fromFile("/....../test.czml").mkString
     // read in the custom json document
     val czml = CZML[MyPacket](jsonDoc)
     println("number of MyPacket: " + czml.packets.length + "\n")
