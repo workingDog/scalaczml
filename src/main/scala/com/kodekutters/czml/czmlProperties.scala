@@ -30,6 +30,8 @@
 
 package com.kodekutters.czml
 
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
@@ -55,6 +57,8 @@ import com.kodekutters.czml.czmlCore._
   * the CZMLPacket object and all its constituent czml properties.
   */
 package object czmlProperties {
+
+  val logger = Logger(LoggerFactory.getLogger("czmlProperties"))
 
   /**
     * all CzmlPacket constituent properties extend this trait
@@ -1042,7 +1046,9 @@ package object czmlProperties {
     def apply[T <: Packet](doc: String)(implicit fmt: Reads[T]): CZML[T] = {
       Json.parse(doc).asOpt[JsArray] match {
         case Some(jsonArray) => CZML(jsonArray)
-        case None => new CZML[T](ArrayBuffer[T]()) // todo log some error
+        case None =>
+          logger.error("could not parse the CZML document")
+          new CZML[T](ArrayBuffer[T]())
       }
     }
 
@@ -1060,7 +1066,9 @@ package object czmlProperties {
             val listBuf = ArrayBuffer.empty ++= (for (p <- list) yield Json.fromJson(p)(fmt).asOpt)
             JsSuccess(new CZML[T](listBuf.flatten))
 
-          case _ => JsSuccess(new CZML[T](ArrayBuffer[T]())) // todo log some error
+          case _ =>
+            logger.error("could not read the CZML document")
+            JsSuccess(new CZML[T](ArrayBuffer[T]()))
         }
       }
     }
