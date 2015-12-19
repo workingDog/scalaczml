@@ -95,16 +95,16 @@ package object czmlCore {
     def stopLocalDateTime() = LocalDateTime.parse(stop(), TimeInterval.fmter)
   }
 
-//    case class Duration(days: Int, seconds: Double) {
-//      def this(days: Int, hours: Int, minutes: Int, seconds: Double) = this(days, Duration.toSeconds(hours, minutes, seconds))
-//    }
-//    object Duration {
-//      def toSeconds(hours: Int, minutes: Int, seconds: Double): Double = hours * 3600.0 + minutes * 60.0 + seconds
-//      implicit val fmt = Json.format[Duration]
-//      implicit def StringToDuration(value: String): Duration = {
-//
-//      }
-//    }
+  //    case class Duration(days: Int, seconds: Double) {
+  //      def this(days: Int, hours: Int, minutes: Int, seconds: Double) = this(days, Duration.toSeconds(hours, minutes, seconds))
+  //    }
+  //    object Duration {
+  //      def toSeconds(hours: Int, minutes: Int, seconds: Double): Double = hours * 3600.0 + minutes * 60.0 + seconds
+  //      implicit val fmt = Json.format[Duration]
+  //      implicit def StringToDuration(value: String): Duration = {
+  //
+  //      }
+  //    }
 
   //  case class Description(reference: Option[String] = None, string: Option[String] = None)
   //  object Description {
@@ -416,6 +416,7 @@ package object czmlCore {
     * represents the geographic coordinate radian "type"
     */
   trait RADIAN
+
   /**
     * represents the geographic coordinate degree "type"
     */
@@ -428,6 +429,8 @@ package object czmlCore {
   case class LngLatAlt[T: TypeTag](t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
 
     def this(lng: Double, lat: Double, alt: Double) = this(None, lng, lat, alt)
+
+    def this(lng: Double, lat: Double) = this(None, lng, lat, 0.0)
 
     def this(t: TimeValue, lng: Double, lat: Double, alt: Double) = this(Option(t), lng, lat, alt)
 
@@ -443,6 +446,8 @@ package object czmlCore {
 
   object LngLatAlt {
     def apply[T: TypeTag](lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat, alt)
+
+    def apply[T: TypeTag](lng: Double, lat: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat)
 
     def apply[T: TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](Option(t), lng, lat, alt)
 
@@ -468,6 +473,8 @@ package object czmlCore {
 
     def this(lng: Double, lat: Double, alt: Double) = this(LngLatAlt[T](lng, lat, alt))
 
+    def this(lng: Double, lat: Double) = this(LngLatAlt[T](lng, lat))
+
     def this(t: TimeValue, lng: Double, lat: Double, alt: Double) = this(LngLatAlt[T](t, lng, lat, alt))
 
     def this(t: String, lng: Double, lat: Double, alt: Double) = this(TimeValue(t), lng, lat, alt)
@@ -484,6 +491,8 @@ package object czmlCore {
     def apply[T: TypeTag](lngLatAltT: LngLatAlt[T]): Cartographic[T] = new Cartographic[T](Seq(lngLatAltT))
 
     def apply[T: TypeTag](lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat, alt))
+
+    def apply[T: TypeTag](lng: Double, lat: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat))
 
     def apply[T: TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](t, lng, lat, alt))
 
@@ -1760,6 +1769,7 @@ package object czmlCore {
   /**
     * The position of the object in the world. The position has no direct visual representation,
     * but it is used to locate billboards, labels, and other primitives attached to the object.
+    * It is also used for the scale of a NodeTransformation
     */
   case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                           cartographicRadians: Option[Cartographic[RADIAN]] = None,
@@ -1802,7 +1812,8 @@ package object czmlCore {
   }
 
   /**
-    * A non-timed value position
+    * A non-timed value position, typically used to define a geometry, such as:
+    * Polyline, Wall and Polygon
     */
   case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                       cartographicRadians: Option[Array[Double]] = None,
@@ -1850,7 +1861,8 @@ package object czmlCore {
   }
 
   /**
-    * A property for an array of Position
+    * A property for an array of Position, typically used to define a geometry, such as:
+    * Polyline, Wall and Polygon
     *
     * @param values the array of Position
     */
@@ -2243,41 +2255,64 @@ package object czmlCore {
   }
 
   /**
-    * Defines an translational offset which can optionally vary over time
+    * A 3d Cartesian which can optionally vary over time. Used in NodeTransformation for scale and translation
     */
-  case class Translation(cartesian: Option[Cartesian] = None, reference: Option[String] = None) {
-    def this(cartesian: Cartesian, reference: String) = this(Option(cartesian), Option(reference))
+  case class TimedCartesian(cartesian: Option[Cartesian] = None, interval: Option[String] = None,
+                            reference: Option[String] = None, epoch: Option[String] = None,
+                            nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
+                            interpolationAlgorithm: Option[String] = None,
+                            interpolationDegree: Option[Int] = None,
+                            forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
+                            backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+
+    def this(cartesian: Cartesian, interval: String) = this(Option(cartesian), Option(interval))
+
+    def this(x: Double, y: Double, z: Double, interval: String) = this(Option(new Cartesian(x, y, z)), Option(interval))
+
+    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
+
+    def this(cartesian: Cartesian) = this(Option(cartesian))
+
   }
 
-  object Translation {
-    implicit val fmt = Json.format[Translation]
+  object TimedCartesian {
 
-    def apply(x: Double, y: Double, z: Double, reference: String): Translation = new Translation(new Cartesian(x, y, z), reference)
+    implicit val fmt = Json.format[TimedCartesian]
 
-    def apply(cartesian: Cartesian, reference: String): Translation = new Translation(cartesian, reference)
+    def apply(cartesian: Cartesian, interval: String): TimedCartesian = new TimedCartesian(cartesian, interval)
+
+    def apply(x: Double, y: Double, z: Double, interval: String): TimedCartesian = new TimedCartesian(x, y, z, interval)
+
+    def apply(x: Double, y: Double, z: Double): TimedCartesian = new TimedCartesian(x, y, z)
+
+    def apply(cartesian: Cartesian): TimedCartesian = new TimedCartesian(cartesian)
+
   }
 
   /**
     * Transformations to apply to a particular node in a 3D model
+    *
+    * @param scale       Defines an scaling factor which can optionally vary over time.
+    * @param translation Defines an translational offset which can optionally vary over time
+    * @param rotation
     */
-  case class NodeTransformation(scale: Option[CzmlPosition] = None, translation: Option[Translation] = None, rotation: Option[Orientation] = None) {
+  case class NodeTransformation(scale: Option[TimedCartesian] = None, translation: Option[TimedCartesian] = None, rotation: Option[Orientation] = None) {
 
-    def this(x: Double, y: Double, z: Double, translation: Translation, rotation: Orientation) =
-      this(Option(new CzmlPosition(x, y, z)), Option(translation), Option(rotation))
+    def this(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Orientation) =
+      this(Option(new TimedCartesian(sx, sy, sz)), Option(new TimedCartesian(tx, ty, tz)), Option(rotation))
 
-    def this(scale: Cartesian, translation: Translation, rotation: Orientation) =
-      this(Option(CzmlPosition(scale)), Option(translation), Option(rotation))
+    def this(scale: Cartesian, translation: Cartesian, rotation: Orientation) =
+      this(Option(TimedCartesian(scale)), Option(TimedCartesian(translation)), Option(rotation))
   }
 
   object NodeTransformation {
     implicit val fmt = Json.format[NodeTransformation]
 
-    def apply(x: Double, y: Double, z: Double, translation: Translation, rotation: Orientation): NodeTransformation =
-      new NodeTransformation(x, y, z, translation, rotation)
+    def apply(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Orientation) =
+      new NodeTransformation(sx, sy, sz, tx, ty, tz, rotation)
 
-    def apply(scale: Cartesian, translation: Translation, rotation: Orientation): NodeTransformation =
+    def apply(scale: Cartesian, translation: Cartesian, rotation: Orientation): NodeTransformation =
       new NodeTransformation(scale, translation, rotation)
-
   }
 
   /**
