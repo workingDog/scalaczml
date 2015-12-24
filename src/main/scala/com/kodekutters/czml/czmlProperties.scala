@@ -127,11 +127,11 @@ package object czmlProperties {
     * @param verticalOrigin   The vertical origin of the billboard. It controls whether the billboard image
     *                         is bottom-, center-, or top-aligned with the position.
     */
-  case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[CartesianProperty] = None,
+  case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[CzmlCartesian] = None,
                        horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[ImageUri] = None,
-                       pixelOffset: Option[PixelOffset] = None, scale: Option[Number] = None,
+                       pixelOffset: Option[CzmlCartesian2] = None, scale: Option[Number] = None,
                        rotation: Option[Number] = None,
-                       alignedAxis: Option[CartesianProperty] = None,
+                       alignedAxis: Option[CzmlCartesian] = None,
                        show: Option[CzmlBoolean] = None,
                        verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty {
 
@@ -295,9 +295,9 @@ package object czmlProperties {
     * @param verticalOrigin   The vertical origin of the label. It controls whether the label image is bottom-, center-,
     *                         or top-aligned with the position.
     */
-  case class Label(eyeOffset: Option[CartesianProperty] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
+  case class Label(eyeOffset: Option[CzmlCartesian] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
                    horizontalOrigin: Option[Origin[HORIZONTAL]] = None, outlineColor: Option[ColorProperty] = None,
-                   outlineWidth: Option[Number] = None, pixelOffset: Option[PixelOffset] = None,
+                   outlineWidth: Option[Number] = None, pixelOffset: Option[CzmlCartesian2] = None,
                    scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[Style] = None,
                    text: Option[Text] = None, verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty {
 
@@ -571,10 +571,10 @@ package object czmlProperties {
     * @param reference A reference property.
     * @param timeFields the time interpolatable part of this property
     */
-  case class CartesianProperty(cartesian: Option[Cartesian] = None,
-                               interval: Option[String] = None,
-                               reference: Option[String] = None,
-                               timeFields: Option[Interpolatable] = None) extends CzmlProperty {
+  case class CzmlCartesian(cartesian: Option[Cartesian] = None,
+                           interval: Option[String] = None,
+                           reference: Option[String] = None,
+                           timeFields: Option[Interpolatable] = None) extends CzmlProperty {
 
     def this(cartesian: Cartesian, interval: String) = this(Option(cartesian), Option(interval))
 
@@ -586,29 +586,29 @@ package object czmlProperties {
 
   }
 
-  object CartesianProperty {
+  object CzmlCartesian {
 
-    def apply(cartesian: Cartesian, interval: String): CartesianProperty = new CartesianProperty(cartesian, interval)
+    def apply(cartesian: Cartesian, interval: String): CzmlCartesian = new CzmlCartesian(cartesian, interval)
 
-    def apply(x: Double, y: Double, z: Double, interval: String): CartesianProperty = new CartesianProperty(x, y, z, interval)
+    def apply(x: Double, y: Double, z: Double, interval: String): CzmlCartesian = new CzmlCartesian(x, y, z, interval)
 
-    def apply(x: Double, y: Double, z: Double): CartesianProperty = new CartesianProperty(x, y, z)
+    def apply(x: Double, y: Double, z: Double): CzmlCartesian = new CzmlCartesian(x, y, z)
 
-    def apply(cartesian: Cartesian): CartesianProperty = new CartesianProperty(cartesian)
+    def apply(cartesian: Cartesian): CzmlCartesian = new CzmlCartesian(cartesian)
 
-    val theReads: Reads[CartesianProperty] =
+    val theReads: Reads[CzmlCartesian] =
       ((JsPath \ "cartesian").readNullable[Cartesian] and
         (JsPath \ "interval").readNullable[String] and
         (JsPath \ "reference").readNullable[String] and
-        Interpolatable.fmt) ((cart, intrv, ref, interpo) => CartesianProperty(cart, intrv, ref, Option(interpo)))
+        Interpolatable.fmt) ((cart, intrv, ref, interpo) => CzmlCartesian(cart, intrv, ref, Option(interpo)))
 
-    val theWrites: Writes[CartesianProperty] =
+    val theWrites: Writes[CzmlCartesian] =
       ((JsPath \ "cartesian").writeNullable[Cartesian] and
         (JsPath \ "interval").writeNullable[String] and
         (JsPath \ "reference").writeNullable[String] and
-        JsPath.writeNullable[Interpolatable]) (unlift(CartesianProperty.unapply))
+        JsPath.writeNullable[Interpolatable]) (unlift(CzmlCartesian.unapply))
 
-    implicit val fmt: Format[CartesianProperty] = Format(theReads, theWrites)
+    implicit val fmt: Format[CzmlCartesian] = Format(theReads, theWrites)
   }
 
 
@@ -626,7 +626,7 @@ package object czmlProperties {
     * @param slicePartitions The number of times to partition the ellipsoid into radial slices.
     * @param subdivisions    The number of points per outline line, determining the granularity of the curvature.
     */
-  case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[CartesianProperty] = None,
+  case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[CzmlCartesian] = None,
                        fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                        stackPartitions: Option[Number] = None, slicePartitions: Option[Number] = None,
@@ -634,7 +634,7 @@ package object czmlProperties {
 
     def this(x: Double, y: Double, z: Double, fill: Boolean, material: Material,
              outline: Boolean, outlineColor: ColorProperty, stackPartitions: Double, slicePartitions: Double,
-             subdivisions: Double) = this(Option(CzmlBoolean(true)), Option(CartesianProperty(x, y, z)), Option(CzmlBoolean(fill)),
+             subdivisions: Double) = this(Option(CzmlBoolean(true)), Option(CzmlCartesian(x, y, z)), Option(CzmlBoolean(fill)),
       Option(material), Option(CzmlBoolean(outline)), Option(outlineColor), Option(Number(stackPartitions)),
       Option(Number(slicePartitions)), Option(Number(subdivisions)))
 
@@ -981,7 +981,7 @@ package object czmlProperties {
         (JsPath \ "polyline").read[Polyline].reads(js).asOpt.map(propList += _)
         (JsPath \ "polygon").read[Polygon].reads(js).asOpt.map(propList += _)
         (JsPath \ "ellipsoid").read[Ellipsoid].reads(js).asOpt.map(propList += _)
-        (JsPath \ "viewFrom").read[CartesianProperty].reads(js).asOpt.map(propList += _)
+        (JsPath \ "viewFrom").read[CzmlCartesian].reads(js).asOpt.map(propList += _)
         (JsPath \ "rectangle").read[Rectangle].reads(js).asOpt.map(propList += _)
         (JsPath \ "wall").read[Wall].reads(js).asOpt.map(propList += _)
         (JsPath \ "model").read[Model].reads(js).asOpt.map(propList += _)
@@ -1018,7 +1018,7 @@ package object czmlProperties {
           case x: Path => theList += Path.fmt.writes(x).asOpt[Path].map("path" -> Json.toJson(_))
           case x: Polygon => theList += Polygon.fmt.writes(x).asOpt[Polygon].map("polygon" -> Json.toJson(_))
           case x: Ellipsoid => theList += Ellipsoid.fmt.writes(x).asOpt[Ellipsoid].map("ellipsoid" -> Json.toJson(_))
-          case x: CartesianProperty => theList += CartesianProperty.fmt.writes(x).asOpt[CartesianProperty].map("viewFrom" -> Json.toJson(_))
+          case x: CzmlCartesian => theList += CzmlCartesian.fmt.writes(x).asOpt[CzmlCartesian].map("viewFrom" -> Json.toJson(_))
           case x: Rectangle => theList += Rectangle.fmt.writes(x).asOpt[Rectangle].map("rectangle" -> Json.toJson(_))
           case x: Wall => theList += Wall.fmt.writes(x).asOpt[Wall].map("wall" -> Json.toJson(_))
           case x: Model => theList += Model.fmt.writes(x).asOpt[Model].map("model" -> Json.toJson(_))

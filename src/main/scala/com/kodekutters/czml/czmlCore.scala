@@ -249,7 +249,10 @@ package object czmlCore {
     * a 2d cartesian coordinate that can have an optional time component.
     */
   case class Coordinate2D(t: Option[TimeValue] = None, x: Double, y: Double) {
+
     def this(x: Double, y: Double) = this(None, x, y)
+
+    def this(x: Int, y: Int) = this(None, x.toDouble, y.toDouble)
 
     def this(t: String, x: Double, y: Double) = this(Option(TimeValue(t)), x, y)
 
@@ -273,11 +276,14 @@ package object czmlCore {
   object Coordinate2D {
     def apply(x: Double, y: Double): Coordinate2D = new Coordinate2D(x, y)
 
+    def apply(x: Int, y: Int): Coordinate2D = new Coordinate2D(x.toDouble, y.toDouble)
+
     def apply(t: String, x: Double, y: Double): Coordinate2D = new Coordinate2D(t, x, y)
 
     def apply(t: Double, x: Double, y: Double): Coordinate2D = new Coordinate2D(t, x, y)
 
     def apply(t: TimeValue, x: Double, y: Double): Coordinate2D = new Coordinate2D(t, x, y)
+
   }
 
   /**
@@ -370,6 +376,8 @@ package object czmlCore {
 
     def this(t: Double, x: Double, y: Double) = this(Seq(Coordinate2D(t, x, y)))
 
+    def this(x: Int, y: Int) = this(Coordinate2D(x, y))
+
   }
 
   object Cartesian2D {
@@ -383,6 +391,8 @@ package object czmlCore {
     def apply(t: Double, x: Double, y: Double): Cartesian2D = new Cartesian2D(t, x, y)
 
     def apply(x: Double, y: Double): Cartesian2D = new Cartesian2D(x, y)
+
+    def apply(x: Int, y: Int): Cartesian2D = new Cartesian2D(x, y)
 
     def apply(coordinate: Coordinate2D): Cartesian2D = new Cartesian2D(coordinate)
 
@@ -1203,49 +1213,57 @@ package object czmlCore {
   }
 
   /**
-    * The offset, in viewport pixels, of the billboard origin from the position. A pixel offset is
-    * the number of pixels up and to the right to place the billboard, relative to the position.
+    * Describes a 2d Cartesian property which can optionally vary over time.
+    * Typically used for pixelOffset of a billboard or grid lineOffset, lineCount and lineThickness
     *
-    * @param cartesian2 the offset as a Cartesian2D
-    * @param reference  a reference property
-    * @param timeFields   the time interpolatable part of this property
+    * @param cartesian2 The Cartesian2D [X, Y] in meters. If the array has two elements, the cartesian is constant.
+    *                  If it has three or more elements, they are time-tagged samples arranged as
+    *                  [Time, X, Y, Time, X, Y, Time, X, Y,  ...], where Time is an ISO 8601 date and
+    *                  time string or seconds since epoch.
+    * @param interval  Time interval
+    * @param reference A reference property.
+    * @param timeFields the time interpolatable part of this property
     */
-  case class PixelOffset(cartesian2: Option[Cartesian2D] = None, reference: Option[String] = None,
-                         timeFields: Option[Interpolatable] = None) {
+  case class CzmlCartesian2(cartesian2: Option[Cartesian2D] = None,
+                            interval: Option[String] = None,
+                            reference: Option[String] = None,
+                            timeFields: Option[Interpolatable] = None) {
+
+    def this(cartesian2: Cartesian2D, interval: String) = this(Option(cartesian2), Option(interval))
+
+    def this(x: Double, y: Double, interval: String) = this(Option(new Cartesian2D(x, y)), Option(interval))
+
+    def this(x: Double, y: Double) = this(Option(new Cartesian2D(x, y)))
+
+    def this(x: Int, y: Int) = this(Option(new Cartesian2D(x, y)))
 
     def this(cartesian2: Cartesian2D) = this(Option(cartesian2))
 
-    def this(x: Double, y: Double) = this(new Cartesian2D(x, y))
-
-    def this(t: TimeValue, x: Double, y: Double) = this(new Cartesian2D(t, x, y))
-
-    def this(t: String, x: Double, y: Double) = this(TimeValue(t), x, y)
-
-    def this(t: Double, x: Double, y: Double) = this(TimeValue(t), x, y)
   }
 
-  object PixelOffset {
-    def apply(cartesian2: Cartesian2D): PixelOffset = new PixelOffset(cartesian2)
+  object CzmlCartesian2 {
 
-    def apply(x: Double, y: Double): PixelOffset = new PixelOffset(x, y)
+    def apply(cartesian2: Cartesian2D, interval: String): CzmlCartesian2 = new CzmlCartesian2(cartesian2, interval)
 
-    def apply(t: TimeValue, x: Double, y: Double): PixelOffset = new PixelOffset(t, x, y)
+    def apply(x: Double, y: Double, interval: String): CzmlCartesian2 = new CzmlCartesian2(x, y, interval)
 
-    def apply(t: String, x: Double, y: Double): PixelOffset = new PixelOffset(TimeValue(t), x, y)
+    def apply(x: Double, y: Double): CzmlCartesian2 = new CzmlCartesian2(x, y)
 
-    def apply(t: Double, x: Double, y: Double): PixelOffset = new PixelOffset(TimeValue(t), x, y)
+    def apply(cartesian2: Cartesian2D): CzmlCartesian2 = new CzmlCartesian2(cartesian2)
 
-    val theReads: Reads[PixelOffset] =
+    val theReads: Reads[CzmlCartesian2] =
       ((JsPath \ "cartesian2").readNullable[Cartesian2D] and
+        (JsPath \ "interval").readNullable[String] and
         (JsPath \ "reference").readNullable[String] and
-        Interpolatable.fmt) ((cartesian2, ref, interpo) => PixelOffset(cartesian2, ref, Option(interpo)))
+        Interpolatable.fmt) ((cart, intrv, ref, interpo) => CzmlCartesian2(cart, intrv, ref, Option(interpo)))
 
-    val theWrites: Writes[PixelOffset] =
+    val theWrites: Writes[CzmlCartesian2] =
       ((JsPath \ "cartesian2").writeNullable[Cartesian2D] and
+        (JsPath \ "interval").writeNullable[String] and
         (JsPath \ "reference").writeNullable[String] and
-        JsPath.writeNullable[Interpolatable]) (unlift(PixelOffset.unapply))
+        JsPath.writeNullable[Interpolatable]) (unlift(CzmlCartesian2.unapply))
 
-    implicit val fmt: Format[PixelOffset] = Format(theReads, theWrites)
+    implicit val fmt: Format[CzmlCartesian2] = Format(theReads, theWrites)
   }
 
   /**
@@ -1908,45 +1926,6 @@ package object czmlCore {
   }
 
   /**
-    * represents a number (Int) along each 2d cartesian axis. Used in Grid
-    *
-    * @param cartesian2 an array of Int values, e.g. [2,3]
-    * @param interval   the interval property
-    * @param reference  a reference property
-    * @param timeFields   the time interpolatable part of this property
-    */
-  case class AxisNumber(cartesian2: Option[Array[Int]] = None, interval: Option[String] = None,
-                        reference: Option[String] = None,
-                        timeFields: Option[Interpolatable] = None) {
-
-    def this(cartesian2: Array[Int]) = this(Option(cartesian2))
-
-    def this(rx: Int, ry: Int) = this(Option(Array(rx, ry)))
-
-  }
-
-  object AxisNumber {
-
-    def apply(cartesian2: Array[Int]): AxisNumber = new AxisNumber(cartesian2)
-
-    def apply(rx: Int, ry: Int): AxisNumber = new AxisNumber(rx, ry)
-
-    val theReads: Reads[AxisNumber] =
-      ((JsPath \ "cartesian2").readNullable[Array[Int]] and
-        (JsPath \ "interval").readNullable[String] and
-        (JsPath \ "reference").readNullable[String] and
-        Interpolatable.fmt) ((cart, intrv, ref, interpo) => AxisNumber(cart, intrv, ref, Option(interpo)))
-
-    val theWrites: Writes[AxisNumber] =
-      ((JsPath \ "cartesian2").writeNullable[Array[Int]] and
-        (JsPath \ "interval").writeNullable[String] and
-        (JsPath \ "reference").writeNullable[String] and
-        JsPath.writeNullable[Interpolatable]) (unlift(AxisNumber.unapply))
-
-    implicit val fmt: Format[AxisNumber] = Format(theReads, theWrites)
-  }
-
-  /**
     * represents the orientation of the stripes, either "HORIZONTAL" or "VERTICAL"
     *
     * @param stripeOrientation "HORIZONTAL" or "VERTICAL"
@@ -2027,18 +2006,19 @@ package object czmlCore {
     * @param lineOffset    The offset of grid lines along each axis, as a percentage from 0 to 1.
     */
   case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
-                  lineCount: Option[AxisNumber] = None, lineThickness: Option[AxisNumber] = None,
-                  lineOffset: Option[AxisNumber] = None) {
+                  lineCount: Option[CzmlCartesian2] = None, lineThickness: Option[CzmlCartesian2] = None,
+                  lineOffset: Option[CzmlCartesian2] = None) {
 
-    def this(color: CzmlColor, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]) =
+    def this(color: CzmlColor, cellAlpha: Double,
+             lineCount: Cartesian2D, lineThickness: Cartesian2D, lineOffset: Cartesian2D) =
       this(Option(new ColorProperty(color)), Option(new Number(cellAlpha)),
-        Option(new AxisNumber(lineCount)), Option(new AxisNumber(lineThickness)), Option(new AxisNumber(lineOffset)))
+        Option(new CzmlCartesian2(lineCount)), Option(new CzmlCartesian2(lineThickness)), Option(new CzmlCartesian2(lineOffset)))
   }
 
   object Grid {
     implicit val fmt = Json.format[Grid]
 
-    def apply(color: CzmlColor, cellAlpha: Double, lineCount: Array[Int], lineThickness: Array[Int], lineOffset: Array[Int]): Grid =
+    def apply(color: CzmlColor, cellAlpha: Double, lineCount: Cartesian2D, lineThickness: Cartesian2D, lineOffset: Cartesian2D): Grid =
       new Grid(color, cellAlpha, lineCount, lineThickness, lineOffset)
   }
 
@@ -2321,13 +2301,13 @@ package object czmlCore {
     * @param translation Defines an translational offset which can optionally vary over time
     * @param rotation
     */
-  case class NodeTransformation(scale: Option[CartesianProperty] = None, translation: Option[CartesianProperty] = None, rotation: Option[Orientation] = None) {
+  case class NodeTransformation(scale: Option[CzmlCartesian] = None, translation: Option[CzmlCartesian] = None, rotation: Option[Orientation] = None) {
 
     def this(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Orientation) =
-      this(Option(new CartesianProperty(sx, sy, sz)), Option(new CartesianProperty(tx, ty, tz)), Option(rotation))
+      this(Option(new CzmlCartesian(sx, sy, sz)), Option(new CzmlCartesian(tx, ty, tz)), Option(rotation))
 
     def this(scale: Cartesian, translation: Cartesian, rotation: Orientation) =
-      this(Option(CartesianProperty(scale)), Option(CartesianProperty(translation)), Option(rotation))
+      this(Option(CzmlCartesian(scale)), Option(CzmlCartesian(translation)), Option(rotation))
   }
 
   object NodeTransformation {
