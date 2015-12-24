@@ -39,7 +39,6 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
-import scala.language.implicitConversions
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.reflect.runtime.universe._
@@ -66,8 +65,6 @@ package object czmlCore {
   val logger = Logger(LoggerFactory.getLogger("czmlCore"))
 
   object TimeInterval {
-
-    implicit def StringToTimeInterval(value: String): TimeInterval = TimeInterval(value.trim)
 
     val fmter = DateTimeFormatter.ISO_DATE_TIME
   }
@@ -1034,6 +1031,7 @@ package object czmlCore {
   }
 
   object TimedNumbers {
+
     def apply(v: Double): TimedNumbers = new TimedNumbers(v)
 
     def apply(t: String, v: Double): TimedNumbers = new TimedNumbers(t, v)
