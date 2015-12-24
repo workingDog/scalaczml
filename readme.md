@@ -69,5 +69,5 @@ To generate the ScalaCZML API documentation, type "sbt doc". The documentation w
     
 ## Status
 
-not formally tested
+work in progress, no formal tests. 
 

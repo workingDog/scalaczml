@@ -39,6 +39,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
+import scala.language.implicitConversions
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.reflect.runtime.universe._
@@ -149,40 +150,47 @@ package object czmlCore {
   /**
     * The base for a property whose value may be determined by
     * interpolating over the provided time-tagged samples.
+    *
+    * @param epoch                         Specifies the epoch to use for times specifies as seconds since an epoch.
+    * @param nextTime                      The time of the next sample within this interval, specified as either
+     an ISO 8601 date and time string or as seconds since epoch.
+     This property is used to determine if there is a gap between samples specified in different packets.
+    * @param previousTime                  The time of the previous sample within this interval, specified as either
+     an ISO 8601 date and time string or as seconds since epoch.
+     This property is used to determine if there is a gap between samples specified in different packets.
+    * @param interpolationAlgorithm        specifies the algorithm to use to interpolate a value at a different time from the provided data
+    * @param interpolationDegree           specifies the degree of the polynomial to use for interpolation
+    * @param forwardExtrapolationType      the type of extrapolation to perform when a value is requested at a time after any available samples.
+    * @param forwardExtrapolationDuration  the amount of time to extrapolate backward before the property becomes undefined.
+     A value of 0 will extrapolate forever.
+    * @param backwardExtrapolationType     the type of extrapolation to perform when a value is requested at a time before any available samples.
+    * @param backwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
+     A value of 0 will extrapolate forever.
     */
-  trait Interpolatable {
-    // Specifies the epoch to use for times specifies as seconds since an epoch.
-    def epoch: Option[String]
+  case class Interpolatable(epoch: Option[String] = None,
+                            nextTime: Option[TimeValue] = None,
+                            previousTime: Option[TimeValue] = None,
+                            interpolationAlgorithm: Option[String] = None,
+                            interpolationDegree: Option[Int] = None,
+                            forwardExtrapolationType: Option[String] = None,
+                            forwardExtrapolationDuration: Option[Double] = None,
+                            backwardExtrapolationType: Option[String] = None,
+                            backwardExtrapolationDuration: Option[Double] = None) {
 
-    // The time of the next sample within this interval, specified as either
-    // an ISO 8601 date and time string or as seconds since epoch.
-    // This property is used to determine if there is a gap between samples specified in different packets.
-    def nextTime: Option[TimeValue]
+    def this(epoch: String) = this(Option(epoch))
 
-    // The time of the previous sample within this interval, specified as either
-    // an ISO 8601 date and time string or as seconds since epoch.
-    // This property is used to determine if there is a gap between samples specified in different packets.
-    def previousTime: Option[TimeValue]
+    def this(epoch: String, interpolationAlgorithm: String, interpolationDegree: Int) =
+      this(Option(epoch), None, None, Option(interpolationAlgorithm), Option(interpolationDegree))
+  }
 
-    // specifies the algorithm to use to interpolate a value at a different time from the provided data
-    def interpolationAlgorithm: Option[String]
+  object Interpolatable {
 
-    // specifies the degree of the polynomial to use for interpolation
-    def interpolationDegree: Option[Int]
+    implicit val fmt = Json.format[Interpolatable]
 
-    // the type of extrapolation to perform when a value is requested at a time after any available samples.
-    def forwardExtrapolationType: Option[String]
+    def apply(epoch: String): Interpolatable = new Interpolatable(epoch)
 
-    // the amount of time to extrapolate backward before the property becomes undefined.
-    // A value of 0 will extrapolate forever.
-    def forwardExtrapolationDuration: Option[Double] // Duration todo
-
-    // the type of extrapolation to perform when a value is requested at a time before any available samples.
-    def backwardExtrapolationType: Option[String]
-
-    // the amount of time to extrapolate backward before the property becomes undefined.
-    // A value of 0 will extrapolate forever.
-    def backwardExtrapolationDuration: Option[Double] // Duration todo
+    def apply(epoch: String, interpolationAlgorithm: String, interpolationDegree: Int): Interpolatable =
+      new Interpolatable(epoch, interpolationAlgorithm, interpolationDegree)
   }
 
   /**
@@ -227,6 +235,7 @@ package object czmlCore {
   }
 
   object Coordinate {
+
     def apply(x: Double, y: Double, z: Double): Coordinate = new Coordinate(x, y, z)
 
     def apply(t: String, x: Double, y: Double, z: Double): Coordinate = new Coordinate(t, x, y, z)
@@ -291,6 +300,8 @@ package object czmlCore {
   }
 
   object Cartesian {
+
+    def ZERO(): Cartesian = new Cartesian(0.0, 0.0, 0.0)
 
     def apply(x: Double, y: Double, z: Double): Cartesian = new Cartesian(x, y, z)
 
@@ -363,6 +374,8 @@ package object czmlCore {
 
   object Cartesian2D {
 
+    def ZERO(): Cartesian2D = new Cartesian2D(0.0, 0.0)
+
     def apply(t: TimeValue, x: Double, y: Double): Cartesian2D = new Cartesian2D(t, x, y)
 
     def apply(t: String, x: Double, y: Double): Cartesian2D = new Cartesian2D(t, x, y)
@@ -415,16 +428,18 @@ package object czmlCore {
   /**
     * represents the geographic coordinate radian "type"
     */
-  trait RADIAN
+  sealed trait RADIAN
 
   /**
     * represents the geographic coordinate degree "type"
     */
-  trait DEGREE
+  sealed trait DEGREE
 
   /**
-    * A timed geographic coordinate (time,long,lat,alt) coordinate. The values can represent either
-    * degrees or radians depending on the type parameter[T], either DEGREE or RADIAN.
+    * A timed geographic coordinate (time,long,lat,alt) coordinate.
+    * The optional time value is either a String or a Double wrapped in a TimeValue object.
+    * The geographic coordinate values can represent either
+    * degrees or radians depending on the type parameter [T], either DEGREE or RADIAN.
     */
   case class LngLatAlt[T: TypeTag](t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
 
@@ -459,7 +474,7 @@ package object czmlCore {
   /**
     * A list of geodetic, WGS84 positions using longitude, latitude, and height components.
     * The positions represented as a WGS 84 Cartographic [Longitude, Latitude, Height]
-    * where longitude and latitude are in degrees or radians depending on the type parameter[T] (DEGREE or RADIAN),
+    * where longitude and latitude are in degrees or radians depending on the type parameter [T] (DEGREE or RADIAN),
     * and height is in meters.
     * If the array has three elements, the position is constant.
     * If it has four or more elements, they are time-tagged samples arranged
@@ -985,10 +1000,14 @@ package object czmlCore {
     */
   case class TimedDouble(t: Option[String] = None, v: Double) {
     def this(t: String, v: Double) = this(Option(t), v)
+
+    def this(v: Double) = this(None, v)
   }
 
   object TimedDouble {
     implicit val fmt = Json.format[TimedDouble]
+
+    def apply(v: Double): TimedDouble = new TimedDouble(v)
 
     def apply(t: String, v: Double): TimedDouble = new TimedDouble(t, v)
   }
@@ -999,11 +1018,13 @@ package object czmlCore {
     * @param values a sequence of TimedDouble objects.
     */
   case class TimedNumbers(values: Seq[TimedDouble]) {
+    def this(v: Double) = this(Seq(new TimedDouble(None, v)))
 
     def this(t: String, v: Double) = this(Seq(new TimedDouble(t, v)))
   }
 
   object TimedNumbers {
+    def apply(v: Double): TimedNumbers = new TimedNumbers(v)
 
     def apply(t: String, v: Double): TimedNumbers = new TimedNumbers(t, v)
 
@@ -1063,116 +1084,79 @@ package object czmlCore {
   }
 
   /**
-    * The eye offset of the billboard or label, which is the offset in eye coordinates at which to place
-    * the billboard or label relative to the position property. Eye coordinates are a left-handed coordinate system
-    * where the X-axis points toward the viewer's right, the Y-axis points up, and the Z-axis points into the screen.
+    * represents the horizontal origin "type"
     */
-  case class EyeOffset(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                       nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                       interpolationAlgorithm: Option[String] = None,
-                       interpolationDegree: Option[Int] = None,
-                       forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                       backwardExtrapolationType: Option[String] = None,
-                       backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
-
-    def this(cartesian: Cartesian) = this(Option(cartesian))
-
-    def this(x: Double, y: Double, z: Double) = this(Cartesian(x, y, z))
-  }
-
-  object EyeOffset {
-    implicit val fmt = Json.format[EyeOffset]
-
-    def apply(cartesian: Cartesian): EyeOffset = new EyeOffset(cartesian)
-
-    def apply(x: Double, y: Double, z: Double): EyeOffset = new EyeOffset(x, y, z)
-  }
+  sealed trait HORIZONTAL
 
   /**
-    * The horizontal origin of the billboard. It controls whether the billboard image
-    * is left-, center-, or right-aligned with the position.
-    *
-    * @param horizontalOrigin The horizontal origin. Valid values are "LEFT", "CENTER", and "RIGHT".
-    * @param reference        A reference property.
+    * represents the vertical origin "type"
     */
-  case class HorizontalOrigin(horizontalOrigin: Option[String] = None, reference: Option[String] = None) {
-    def this(horizontalOrigin: String) = this(Option(horizontalOrigin))
-
-    def this(horizontalOrigin: String, reference: String) = this(Option(horizontalOrigin), Option(reference))
-  }
-
-  object HorizontalOrigin {
-    def apply(horizontalOrigin: String): HorizontalOrigin = new HorizontalOrigin(horizontalOrigin)
-
-    def apply(horizontalOrigin: String, reference: String): HorizontalOrigin = new HorizontalOrigin(horizontalOrigin, reference)
-
-    val theReads = new Reads[HorizontalOrigin] {
-      def reads(js: JsValue): JsResult[HorizontalOrigin] = {
-        // try to read a simple String
-        JsPath.read[String].reads(js).asOpt match {
-          case None => JsSuccess(
-            new HorizontalOrigin((JsPath \ "horizontalOrigin").read[String].reads(js).asOpt,
-              (JsPath \ "reference").read[String].reads(js).asOpt))
-
-          case Some(hz) => JsSuccess(new HorizontalOrigin(Some(hz)))
-        }
-      }
-    }
-
-    val theWrites = new Writes[HorizontalOrigin] {
-      def writes(obj: HorizontalOrigin) = {
-        obj.reference match {
-          case Some(ref) => Json.obj("horizontalOrigin" -> JsString(obj.horizontalOrigin.getOrElse("")), "reference" -> JsString(ref))
-          case None => JsString(obj.horizontalOrigin.getOrElse(""))
-        }
-      }
-    }
-
-    implicit val fmt: Format[HorizontalOrigin] = Format(theReads, theWrites)
-  }
+  sealed trait VERTICAL
 
   /**
-    * The vertical origin of the billboard.
-    * It controls whether the billboard image is bottom-, center-, or top-aligned with the position.
+    * The origin of the billboard or label.
     *
-    * @param verticalOrigin verticalOrigin = ["BOTTOM", "CENTER", "TOP"]
-    * @param reference      A reference property
+    * @param origin    the origin value, one of "LEFT", "CENTER", "RIGHT", "BOTTOM", "TOP"
+    * @param reference a reference property
+    * @tparam T the origin type/direction, either HORIZONTAL or VERTICAL
     */
-  case class VerticalOrigin(verticalOrigin: Option[String] = None, reference: Option[String] = None) {
-    def this(verticalOrigin: String) = this(Option(verticalOrigin))
+  case class Origin[T: TypeTag](origin: Option[String] = None, reference: Option[String] = None) {
+    def this(origin: String) = this(Option(origin))
 
-    def this(verticalOrigin: String, reference: String) = this(Option(verticalOrigin), Option(reference))
+    def this(origin: String, reference: String) = this(Option(origin), Option(reference))
+
+    /**
+      * true if this Origin is of the HORIZONTAL type
+      */
+    def isHorizontal() = typeOf[T] =:= typeOf[HORIZONTAL]
+
+    /**
+      * true if this Origin is of the VERTICAL type
+      */
+    def isVertical() = typeOf[T] =:= typeOf[VERTICAL]
   }
 
-  object VerticalOrigin {
+  object Origin {
+    def apply[T: TypeTag](origin: String): Origin[T] = new Origin[T](origin)
 
-    def apply(verticalOrigin: String): VerticalOrigin = new VerticalOrigin(verticalOrigin)
+    def apply[T: TypeTag](origin: String, reference: String): Origin[T] = new Origin[T](origin, reference)
 
-    def apply(verticalOrigin: String, reference: String): VerticalOrigin = new VerticalOrigin(verticalOrigin, reference)
-
-    val theReads = new Reads[VerticalOrigin] {
-      def reads(js: JsValue): JsResult[VerticalOrigin] = {
+    implicit def theReads[T: TypeTag] = new Reads[Origin[T]] {
+      def reads(js: JsValue): JsResult[Origin[T]] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
-          case None => JsSuccess(
-            new VerticalOrigin((JsPath \ "verticalOrigin").read[String].reads(js).asOpt,
-              (JsPath \ "reference").read[String].reads(js).asOpt))
+          case None =>
+            if (typeOf[T] =:= typeOf[HORIZONTAL]) {
+              JsSuccess(new Origin[T]((JsPath \ "horizontalOrigin").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
+            }
+            else if (typeOf[T] =:= typeOf[VERTICAL]) {
+              JsSuccess(new Origin[T]((JsPath \ "verticalOrigin").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
+            } else {
+              logger.error("could not read the origin: " + js.toString())
+              JsError("could not read the origin ")
+            }
 
-          case Some(v) => JsSuccess(new VerticalOrigin(Some(v)))
+          case Some(hz) => JsSuccess(new Origin[T](Some(hz)))
         }
       }
     }
 
-    val theWrites = new Writes[VerticalOrigin] {
-      def writes(obj: VerticalOrigin) = {
+    implicit def theWrites[T: TypeTag] = new Writes[Origin[T]] {
+      def writes(obj: Origin[T]) = {
         obj.reference match {
-          case Some(ref) => Json.obj("verticalOrigin" -> JsString(obj.verticalOrigin.getOrElse("")), "reference" -> JsString(ref))
-          case None => JsString(obj.verticalOrigin.getOrElse(""))
+          case Some(ref) =>
+            if (obj.isHorizontal()) {
+              Json.obj("horizontalOrigin" -> JsString(obj.origin.getOrElse("")), "reference" -> JsString(ref))
+            }
+            if (obj.isVertical()) {
+              Json.obj("verticalOrigin" -> JsString(obj.origin.getOrElse("")), "reference" -> JsString(ref))
+            } else JsNull
+
+          case None => JsString(obj.origin.getOrElse(""))
         }
       }
     }
 
-    implicit val fmt: Format[VerticalOrigin] = Format(theReads, theWrites)
   }
 
   /**
@@ -1221,14 +1205,13 @@ package object czmlCore {
   /**
     * The offset, in viewport pixels, of the billboard origin from the position. A pixel offset is
     * the number of pixels up and to the right to place the billboard, relative to the position.
+    *
+    * @param cartesian2 the offset as a Cartesian2D
+    * @param reference  a reference property
+    * @param timeFields   the time interpolatable part of this property
     */
-  case class PixelOffset(cartesian2: Option[Cartesian2D] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                         nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                         interpolationAlgorithm: Option[String] = None,
-                         interpolationDegree: Option[Int] = None,
-                         forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                         backwardExtrapolationType: Option[String] = None,
-                         backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+  case class PixelOffset(cartesian2: Option[Cartesian2D] = None, reference: Option[String] = None,
+                         timeFields: Option[Interpolatable] = None) {
 
     def this(cartesian2: Cartesian2D) = this(Option(cartesian2))
 
@@ -1242,8 +1225,6 @@ package object czmlCore {
   }
 
   object PixelOffset {
-    implicit val fmt = Json.format[PixelOffset]
-
     def apply(cartesian2: Cartesian2D): PixelOffset = new PixelOffset(cartesian2)
 
     def apply(x: Double, y: Double): PixelOffset = new PixelOffset(x, y)
@@ -1253,6 +1234,18 @@ package object czmlCore {
     def apply(t: String, x: Double, y: Double): PixelOffset = new PixelOffset(TimeValue(t), x, y)
 
     def apply(t: Double, x: Double, y: Double): PixelOffset = new PixelOffset(TimeValue(t), x, y)
+
+    val theReads: Reads[PixelOffset] =
+      ((JsPath \ "cartesian2").readNullable[Cartesian2D] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((cartesian2, ref, interpo) => PixelOffset(cartesian2, ref, Option(interpo)))
+
+    val theWrites: Writes[PixelOffset] =
+      ((JsPath \ "cartesian2").writeNullable[Cartesian2D] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(PixelOffset.unapply))
+
+    implicit val fmt: Format[PixelOffset] = Format(theReads, theWrites)
   }
 
   /**
@@ -1261,15 +1254,15 @@ package object czmlCore {
     * Note: if epoch is defined "number" becomes an array of doubles.
     * if epoch is not defined, then "number" becomes either an array of timed values (see TimedNumbers) or
     * a single double value.
+    *
+    * @param number    the number that depends on epoch
+    * @param interval  the time interval value
+    * @param reference a reference property
+    * @param timeFields  the time interpolatable part of this property
     */
   case class CzmlNumber(number: Option[Any] = None, interval: Option[String] = None,
-                        reference: Option[String] = None, epoch: Option[String] = None,
-                        nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                        interpolationAlgorithm: Option[String] = None,
-                        interpolationDegree: Option[Int] = None,
-                        forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                        backwardExtrapolationType: Option[String] = None,
-                        backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                        reference: Option[String] = None,
+                        timeFields: Option[Interpolatable] = None) {
 
     def this(number: Double) = this(Option(number))
 
@@ -1293,36 +1286,32 @@ package object czmlCore {
     val theReads = new Reads[CzmlNumber] {
       def reads(js: JsValue): JsResult[CzmlNumber] = {
         // read the full set of fields
-        def doFullRead(): JsResult[CzmlNumber] = {
-          val epoch = (JsPath \ "epoch").read[String].reads(js).asOpt
-          val number = epoch match {
-            // no epoch -> number field could be a list of TimedNumbers
-            case None => (JsPath \ "number").read[TimedNumbers].reads(js).asOpt
-            // with epoch -> number field could be an array of doubles
-            case Some(epok) =>
-              (js \ "number").asOpt[Array[Double]] match {
-                case None => (js \ "number").asOpt[Double]
-                case Some(arr) => Some(arr)
-              }
-          }
+        def doRead(): JsResult[CzmlNumber] = {
           val interv = (JsPath \ "interval").read[String].reads(js).asOpt
           val ref = (JsPath \ "reference").read[String].reads(js).asOpt
-          val nxt = (JsPath \ "nextTime").read[TimeValue].reads(js).asOpt
-          val prev = (JsPath \ "previousTime").read[TimeValue].reads(js).asOpt
-          val algo = (JsPath \ "interpolationAlgorithm").read[String].reads(js).asOpt
-          val deg = (JsPath \ "interpolationDegree").read[Int].reads(js).asOpt
-          val frwExT = (JsPath \ "forwardExtrapolationType").read[String].reads(js).asOpt
-          val frwExD = (JsPath \ "forwardExtrapolationDuration").read[Double].reads(js).asOpt
-          val bkwExT = (JsPath \ "backwardExtrapolationType").read[String].reads(js).asOpt
-          val bkwExD = (JsPath \ "backwardExtrapolationDuration").read[Double].reads(js).asOpt
+          val interpo = Interpolatable.fmt.reads(js).asOpt
+          interpo match {
+            case Some(p) =>
+              val number = p.epoch match {
+                // with epoch -> number field could be an array of doubles
+                case Some(epok) =>
+                  (js \ "number").asOpt[Array[Double]] match {
+                    case None => (js \ "number").asOpt[Double]
+                    case Some(arr) => Some(arr)
+                  }
+                // no epoch -> number field could be a list of TimedNumbers
+                case None => (JsPath \ "number").read[TimedNumbers].reads(js).asOpt
+              }
+              JsSuccess(new CzmlNumber(number, interv, ref, interpo))
 
-          JsSuccess(new CzmlNumber(number, interv, ref, epoch, nxt, prev, algo, deg, frwExT, frwExD, bkwExT, bkwExD))
+            case None => JsSuccess(new CzmlNumber(None, interv, ref, interpo))
+          }
         }
 
         // check that we could have a simple double
         JsPath.read[Double].reads(js).asOpt match {
           case Some(n) => JsSuccess(new CzmlNumber(Some(n)))
-          case None => doFullRead()
+          case None => doRead()
         }
       }
     }
@@ -1330,44 +1319,46 @@ package object czmlCore {
     val theWrites = new Writes[CzmlNumber] {
       def writes(czmlN: CzmlNumber) = {
 
-        val theList = ListBuffer(
+        val theList = ListBuffer[Option[(String, JsValue)]](
           czmlN.reference.map("reference" -> JsString(_)),
-          czmlN.epoch.map("epoch" -> JsString(_)),
-          czmlN.interval.map("interval" -> JsString(_)),
-          czmlN.nextTime.map("nextTime" -> TimeValue.fmt.writes(_)),
-          czmlN.previousTime.map("previousTime" -> TimeValue.fmt.writes(_)),
-          czmlN.interpolationAlgorithm.map("interpolationAlgorithm" -> JsString(_)),
-          czmlN.interpolationDegree.map("interpolationDegree" -> JsNumber(_)),
-          czmlN.forwardExtrapolationType.map("forwardExtrapolationType" -> JsString(_)),
-          czmlN.forwardExtrapolationDuration.map("forwardExtrapolationDuration" -> JsNumber(_)),
-          czmlN.backwardExtrapolationType.map("backwardExtrapolationType" -> JsString(_)),
-          czmlN.backwardExtrapolationDuration.map("backwardExtrapolationDuration" -> JsNumber(_)))
+          czmlN.interval.map("interval" -> JsString(_)))
 
-        def doFullWrite() = {
-          // number could be written as a JsArray or a JsNumber depending on epoch
-          val number = czmlN.epoch match {
-            // no epoch the number field could be a list of TimedNumbers (which itself can be a single double)
-            case None => czmlN.number.map(x =>
-              if (x.isInstanceOf[TimedNumbers]) TimedNumbers.fmt.writes(x.asInstanceOf[TimedNumbers]))
+        czmlN.timeFields.map(p =>
+          theList ++= ListBuffer(
+            p.epoch.map("epoch" -> JsString(_)),
+            p.nextTime.map("nextTime" -> TimeValue.fmt.writes(_)),
+            p.previousTime.map("previousTime" -> TimeValue.fmt.writes(_)),
+            p.interpolationAlgorithm.map("interpolationAlgorithm" -> JsString(_)),
+            p.interpolationDegree.map("interpolationDegree" -> JsNumber(_)),
+            p.forwardExtrapolationType.map("forwardExtrapolationType" -> JsString(_)),
+            p.forwardExtrapolationDuration.map("forwardExtrapolationDuration" -> JsNumber(_)),
+            p.backwardExtrapolationType.map("backwardExtrapolationType" -> JsString(_)),
+            p.backwardExtrapolationDuration.map("backwardExtrapolationDuration" -> JsNumber(_))))
 
-            // with an epoch the number field could be an array of doubles or a single double
-            case Some(epok) => czmlN.number.map({
-              case v: Array[Double] => Json.toJson(v)
-              case v: Double => JsNumber(v)
-            })
-          }
+        def doWrite() = {
+          czmlN.timeFields map (p => {
+            // number could be written as a JsArray or a JsNumber depending on epoch
+            val number = p.epoch match {
+              // no epoch the number field could be a list of TimedNumbers (which itself can be a single double)
+              case None => czmlN.number.map(x =>
+                if (x.isInstanceOf[TimedNumbers]) TimedNumbers.fmt.writes(x.asInstanceOf[TimedNumbers]))
 
-          // add the number to theList
-          number match {
-            case Some(x: JsNumber) => theList += Option("number" -> x)
-            case Some(x: JsArray) => theList += Option("number" -> x)
-            case _ => JsNull
-          }
-
+              // with an epoch the number field could be an array of doubles or a single double
+              case Some(epok) => czmlN.number.map({
+                case v: Array[Double] => Json.toJson(v)
+                case v: Double => JsNumber(v)
+              })
+            }
+            // add the number to theList
+            number match {
+              case Some(x: JsNumber) => theList += Option("number" -> x)
+              case Some(x: JsArray) => theList += Option("number" -> x)
+              case _ => JsNull
+            }
+          })
           JsObject(theList.flatten)
         }
 
-        // write a simple number or a number with the extra fields
         theList.flatten.isEmpty match {
           // have a simple number
           case true =>
@@ -1376,12 +1367,11 @@ package object czmlCore {
               case Some(x: Double) => Json.obj("number" -> JsNumber(x))
               case _ => JsNull
             }
-          case false => doFullWrite()
+          // have complex property
+          case false => doWrite()
         }
-
       }
     }
-
     implicit val fmt: Format[CzmlNumber] = Format(theReads, theWrites)
   }
 
@@ -1445,27 +1435,25 @@ package object czmlCore {
   /**
     * Defines a color property. The color can optionally vary over time.
     *
-    * @param rgba     A color specified as an array of color components [Red, Green, Blue, Alpha]
-    *                 where each component is in the range 0-255. If the array has four elements,
-    *                 the color is constant. If it has five or more elements,
-    *                 they are time-tagged samples arranged as
-    *                 [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
-    *                 where Time is an ISO 8601 date and time string or seconds since epoch.
-    * @param rgbaf    The color specified as an array of color components [Red, Green, Blue, Alpha]
-    *                 where each component is in the range 0.0-1.0. If the array has four elements,
-    *                 the color is constant. If it has five or more elements, they are time-tagged samples
-    *                 arranged as [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
-    *                 where Time is an ISO 8601 date and time string or seconds since epoch.
-    * @param interval the interval property
+    * @param rgba      A color specified as an array of color components [Red, Green, Blue, Alpha]
+    *                  where each component is in the range 0-255. If the array has four elements,
+    *                  the color is constant. If it has five or more elements,
+    *                  they are time-tagged samples arranged as
+    *                  [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
+    *                  where Time is an ISO 8601 date and time string or seconds since epoch.
+    * @param rgbaf     The color specified as an array of color components [Red, Green, Blue, Alpha]
+    *                  where each component is in the range 0.0-1.0. If the array has four elements,
+    *                  the color is constant. If it has five or more elements, they are time-tagged samples
+    *                  arranged as [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
+    *                  where Time is an ISO 8601 date and time string or seconds since epoch.
+    * @param interval  the interval property
+    * @param reference a reference property
+    * @param timeFields  the time interpolatable part of this property
     */
   case class CzmlColor(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
                        interval: Option[String] = None,
-                       reference: Option[String] = None, epoch: Option[String] = None,
-                       nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                       interpolationAlgorithm: Option[String] = None, interpolationDegree: Option[Int] = None,
-                       forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                       backwardExtrapolationType: Option[String] = None,
-                       backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                       reference: Option[String] = None,
+                       timeFields: Option[Interpolatable] = None) {
 
     def this(rgba: RgbaList, interval: String) = this(Option(rgba), None, Option(interval))
 
@@ -1490,7 +1478,6 @@ package object czmlCore {
   }
 
   object CzmlColor {
-    implicit val fmt = Json.format[CzmlColor]
 
     def apply(rgba: RgbaList, interval: String): CzmlColor = new CzmlColor(rgba, interval)
 
@@ -1511,6 +1498,22 @@ package object czmlCore {
     def apply(c: javafx.scene.paint.Color): CzmlColor = new CzmlColor(c)
 
     def apply(c: java.awt.Color): CzmlColor = new CzmlColor(c)
+
+    val theReads: Reads[CzmlColor] =
+      ((JsPath \ "rgba").readNullable[RgbaList] and
+        (JsPath \ "rgbaf").readNullable[RgbafList] and
+        (JsPath \ "interval").readNullable[String] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((rgba, rgbaf, intrv, ref, interpo) => CzmlColor(rgba, rgbaf, intrv, ref, Option(interpo)))
+
+    val theWrites: Writes[CzmlColor] =
+      ((JsPath \ "rgba").writeNullable[RgbaList] and
+        (JsPath \ "rgbaf").writeNullable[RgbafList] and
+        (JsPath \ "interval").writeNullable[String] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(CzmlColor.unapply))
+
+    implicit val fmt: Format[CzmlColor] = Format(theReads, theWrites)
   }
 
   /**
@@ -1585,31 +1588,6 @@ package object czmlCore {
   }
 
   /**
-    * The aligned axis is the unit vector, in world coordinates, that the billboard up vector points towards.
-    * The default is the zero vector, which means the billboard is aligned to the screen up vector.
-    */
-  case class AlignedAxis(cartesian: Option[Cartesian] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                         nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                         interpolationAlgorithm: Option[String] = None,
-                         interpolationDegree: Option[Int] = None,
-                         forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                         backwardExtrapolationType: Option[String] = None,
-                         backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
-
-    def this(cartesian: Cartesian) = this(Option(cartesian))
-
-    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
-  }
-
-  object AlignedAxis {
-    implicit val fmt = Json.format[AlignedAxis]
-
-    def apply(cartesian: Cartesian): AlignedAxis = new AlignedAxis(cartesian)
-
-    def apply(x: Double, y: Double, z: Double): AlignedAxis = new AlignedAxis(x, y, z)
-  }
-
-  /**
     * a font
     */
   case class Font(font: Option[String] = None, reference: Option[String] = None) {
@@ -1649,7 +1627,7 @@ package object czmlCore {
   }
 
   /**
-    * describes a string value with an interval for use in Text
+    * describes a string value with a possible time interval for use in Text
     */
   case class StringInterval(interval: Option[String] = None, string: Option[String]) {
     def this(interval: String, string: String) = this(Option(interval), Option(string))
@@ -1770,18 +1748,23 @@ package object czmlCore {
     * The position of the object in the world. The position has no direct visual representation,
     * but it is used to locate billboards, labels, and other primitives attached to the object.
     * It is also used for the scale of a NodeTransformation
+    *
+    * @param referenceFrame      the reference frame
+    * @param cartesian           the cartesian position
+    * @param cartographicRadians the radian position
+    * @param cartographicDegrees the degree position
+    * @param cartesianVelocity   the cartesian velocity
+    * @param interval            the interval property
+    * @param reference           a reference property
+    * @param timeFields            the time interpolatable part of this property
     */
   case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                           cartographicRadians: Option[Cartographic[RADIAN]] = None,
                           cartographicDegrees: Option[Cartographic[DEGREE]] = None,
                           cartesianVelocity: Option[CartesianVelocity] = None,
                           interval: Option[String] = None,
-                          reference: Option[String] = None, epoch: Option[String] = None,
-                          nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                          interpolationAlgorithm: Option[String] = None,
-                          interpolationDegree: Option[Int] = None,
-                          forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                          backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                          reference: Option[String] = None,
+                          timeFields: Option[Interpolatable] = None) {
 
     def this(referenceFrame: String, cartesian: Cartesian, interval: String) = this(Option(referenceFrame), Option(cartesian), None, None, None, Option(interval))
 
@@ -1797,8 +1780,6 @@ package object czmlCore {
 
   object CzmlPosition {
 
-    implicit val fmt = Json.format[CzmlPosition]
-
     def apply(referenceFrame: String, cartesian: Cartesian, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, cartesian, interval)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z, interval)
@@ -1809,25 +1790,38 @@ package object czmlCore {
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z)
 
+    val theReads: Reads[CzmlPosition] =
+      ((JsPath \ "referenceFrame").readNullable[String] and
+        (JsPath \ "cartesian").readNullable[Cartesian] and
+        (JsPath \ "cartographicRadians").readNullable[Cartographic[RADIAN]] and
+        (JsPath \ "cartographicDegrees").readNullable[Cartographic[DEGREE]] and
+        (JsPath \ "cartesianVelocity").readNullable[CartesianVelocity] and
+        (JsPath \ "interval").readNullable[String] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((reff, cart, rad, deg, v, intrv, ref, interpo) => CzmlPosition(reff, cart, rad, deg, v, intrv, ref, Option(interpo)))
+
+    val theWrites: Writes[CzmlPosition] =
+      ((JsPath \ "referenceFrame").writeNullable[String] and
+        (JsPath \ "cartesian").writeNullable[Cartesian] and
+        (JsPath \ "cartographicRadians").writeNullable[Cartographic[RADIAN]] and
+        (JsPath \ "cartographicDegrees").writeNullable[Cartographic[DEGREE]] and
+        (JsPath \ "cartesianVelocity").writeNullable[CartesianVelocity] and
+        (JsPath \ "interval").writeNullable[String] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(CzmlPosition.unapply))
+
+    implicit val fmt: Format[CzmlPosition] = Format(theReads, theWrites)
   }
 
   /**
-    * A non-timed value position, typically used to define a geometry, such as:
+    * A non-timed/non-interpolatable value position, typically used to define a geometry, such as:
     * Polyline, Wall and Polygon
     */
   case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                       cartographicRadians: Option[Array[Double]] = None,
                       cartographicDegrees: Option[Array[Double]] = None,
-                      cartesianVelocity: Option[CartesianVelocity] = None,
-                      interval: Option[String] = None,
-                      references: Option[Array[String]] = None, epoch: Option[String] = None,
-                      nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                      interpolationAlgorithm: Option[String] = None,
-                      interpolationDegree: Option[Int] = None,
-                      forwardExtrapolationType: Option[String] = None,
-                      forwardExtrapolationDuration: Option[Double] = None,
-                      backwardExtrapolationType: Option[String] = None,
-                      backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+                      references: Option[Array[String]] = None,
+                      interval: Option[String] = None) {
 
     def this(cartesian: Cartesian) = this(cartesian = Option(cartesian))
 
@@ -1844,6 +1838,7 @@ package object czmlCore {
   }
 
   object Position {
+
     implicit val fmt = Json.format[Position]
 
     def apply(cartesian: Cartesian): Position = new Position(cartesian)
@@ -1857,7 +1852,6 @@ package object czmlCore {
     def apply(t: TimeValue, x: Double, y: Double, z: Double): Position = new Position(t, x, y, z)
 
     def apply(cartographicDegrees: Array[Double]): Position = new Position(cartographicDegrees = Option(cartographicDegrees))
-
   }
 
   /**
@@ -1888,7 +1882,6 @@ package object czmlCore {
 
     def apply(cartographicDegrees: Array[Double]): Positions = new Positions(cartographicDegrees)
 
-
     val theReads = new Reads[Positions] {
       def reads(js: JsValue): JsResult[Positions] = {
         JsPath.read[Array[Position]].reads(js).asOpt match {
@@ -1918,13 +1911,13 @@ package object czmlCore {
     * represents a number (Int) along each 2d cartesian axis. Used in Grid
     *
     * @param cartesian2 an array of Int values, e.g. [2,3]
+    * @param interval   the interval property
+    * @param reference  a reference property
+    * @param timeFields   the time interpolatable part of this property
     */
-  case class AxisNumber(cartesian2: Option[Array[Int]] = None, reference: Option[String] = None, epoch: Option[String] = None,
-                        nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                        interpolationAlgorithm: Option[String] = None,
-                        interpolationDegree: Option[Int] = None,
-                        forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                        backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
+  case class AxisNumber(cartesian2: Option[Array[Int]] = None, interval: Option[String] = None,
+                        reference: Option[String] = None,
+                        timeFields: Option[Interpolatable] = None) {
 
     def this(cartesian2: Array[Int]) = this(Option(cartesian2))
 
@@ -1933,14 +1926,32 @@ package object czmlCore {
   }
 
   object AxisNumber {
-    implicit val fmt = Json.format[AxisNumber]
 
     def apply(cartesian2: Array[Int]): AxisNumber = new AxisNumber(cartesian2)
 
     def apply(rx: Int, ry: Int): AxisNumber = new AxisNumber(rx, ry)
+
+    val theReads: Reads[AxisNumber] =
+      ((JsPath \ "cartesian2").readNullable[Array[Int]] and
+        (JsPath \ "interval").readNullable[String] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((cart, intrv, ref, interpo) => AxisNumber(cart, intrv, ref, Option(interpo)))
+
+    val theWrites: Writes[AxisNumber] =
+      ((JsPath \ "cartesian2").writeNullable[Array[Int]] and
+        (JsPath \ "interval").writeNullable[String] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(AxisNumber.unapply))
+
+    implicit val fmt: Format[AxisNumber] = Format(theReads, theWrites)
   }
 
-  //  "HORIZONTAL" or "VERTICAL"
+  /**
+    * represents the orientation of the stripes, either "HORIZONTAL" or "VERTICAL"
+    *
+    * @param stripeOrientation "HORIZONTAL" or "VERTICAL"
+    * @param reference         a reference property
+    */
   case class StripeOrientation(stripeOrientation: Option[String] = None, reference: Option[String] = None) {
     def this(stripeOrientation: String) = this(Option(stripeOrientation))
 
@@ -1978,6 +1989,17 @@ package object czmlCore {
     implicit val fmt: Format[StripeOrientation] = Format(theReads, theWrites)
   }
 
+  /**
+    * to fill a surface with alternating colors.
+    *
+    * @param orientation "HORIZONTAL" or "VERTICAL"
+    * @param evenColor   the even stripe color
+    * @param oddColor    the odd stripe color
+    * @param offset      The value indicating where in the pattern to begin drawing; with 0.0 being the beginning
+    *                    of the even color, 1.0 the beginning of the odd color, 2.0 being the even color again,
+    *                    and any multiple or fractional values being in between.
+    * @param repeat      The number of time the stripes repeat.
+    */
   case class Stripe(orientation: Option[StripeOrientation] = None, evenColor: Option[ColorProperty] = None,
                     oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
                     repeat: Option[Number] = None) {
@@ -1995,6 +2017,15 @@ package object czmlCore {
       new Stripe(orientation, evenColor, oddColor, offset, repeat)
   }
 
+  /**
+    * Fills a surface with a grid.
+    *
+    * @param color         The color of the surface.
+    * @param cellAlpha     Alpha value for the space between grid lines. This will be combined with the color alpha.
+    * @param lineCount     The number of grid lines along each axis.
+    * @param lineThickness The thickness of grid lines along each axis, in pixels.
+    * @param lineOffset    The offset of grid lines along each axis, as a percentage from 0 to 1.
+    */
   case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
                   lineCount: Option[AxisNumber] = None, lineThickness: Option[AxisNumber] = None,
                   lineOffset: Option[AxisNumber] = None) {
@@ -2011,6 +2042,11 @@ package object czmlCore {
       new Grid(color, cellAlpha, lineCount, lineThickness, lineOffset)
   }
 
+  /**
+    * Fills the surface with a solid color, which may be translucent.
+    *
+    * @param color the color to fill the surface with
+    */
   case class SolidColor(color: Option[ColorProperty] = None) {
     def this(color: ColorProperty) = this(Option(color))
 
@@ -2053,6 +2089,14 @@ package object czmlCore {
     def apply(color: java.awt.Color): SolidColor = new SolidColor(color)
   }
 
+  /**
+    * The material to use to fill the ellipse.
+    *
+    * @param solidColor fill the surface with a solid color, which may be translucent.
+    * @param image      fill the surface with an image
+    * @param grid       fill the surface with a gird
+    * @param stripe     fill the surface with a stripe
+    */
   case class Material(solidColor: Option[SolidColor] = None, image: Option[ImageUri] = None,
                       grid: Option[Grid] = None, stripe: Option[Stripe] = None) {
 
@@ -2107,6 +2151,12 @@ package object czmlCore {
 
   }
 
+  /**
+    * Colors the line with a glowing color.
+    *
+    * @param color     the color of glow
+    * @param glowPower the strenght of the glow
+    */
   case class PolylineGlow(color: Option[ColorProperty] = None, glowPower: Option[Number] = None) {
     def this(color: ColorProperty, glowPower: Number) = this(Option(color), Option(glowPower))
 
@@ -2142,6 +2192,13 @@ package object czmlCore {
 
   }
 
+  /**
+    * Colors the line with a color and outline.
+    *
+    * @param color        of the line
+    * @param outlineColor color
+    * @param outlineWidth with of the outline
+    */
   case class PolylineOutline(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                              outlineWidth: Option[Number] = None) {
 
@@ -2181,6 +2238,9 @@ package object czmlCore {
   /**
     * material used by a line such as a Path or a Polyline
     *
+    * @param solidColor      Fills the surface with a solid color, which may be translucent.
+    * @param polylineOutline Colors the line with a color and outline.
+    * @param polylineGlow    Colors the line with a glowing color.
     */
   case class LineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
                           polylineGlow: Option[PolylineGlow] = None) {
@@ -2255,54 +2315,19 @@ package object czmlCore {
   }
 
   /**
-    * A 3d Cartesian which can optionally vary over time. Used in NodeTransformation for scale and translation
-    */
-  case class TimedCartesian(cartesian: Option[Cartesian] = None, interval: Option[String] = None,
-                            reference: Option[String] = None, epoch: Option[String] = None,
-                            nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                            interpolationAlgorithm: Option[String] = None,
-                            interpolationDegree: Option[Int] = None,
-                            forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                            backwardExtrapolationType: Option[String] = None, backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable {
-
-    def this(cartesian: Cartesian, interval: String) = this(Option(cartesian), Option(interval))
-
-    def this(x: Double, y: Double, z: Double, interval: String) = this(Option(new Cartesian(x, y, z)), Option(interval))
-
-    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
-
-    def this(cartesian: Cartesian) = this(Option(cartesian))
-
-  }
-
-  object TimedCartesian {
-
-    implicit val fmt = Json.format[TimedCartesian]
-
-    def apply(cartesian: Cartesian, interval: String): TimedCartesian = new TimedCartesian(cartesian, interval)
-
-    def apply(x: Double, y: Double, z: Double, interval: String): TimedCartesian = new TimedCartesian(x, y, z, interval)
-
-    def apply(x: Double, y: Double, z: Double): TimedCartesian = new TimedCartesian(x, y, z)
-
-    def apply(cartesian: Cartesian): TimedCartesian = new TimedCartesian(cartesian)
-
-  }
-
-  /**
     * Transformations to apply to a particular node in a 3D model
     *
     * @param scale       Defines an scaling factor which can optionally vary over time.
     * @param translation Defines an translational offset which can optionally vary over time
     * @param rotation
     */
-  case class NodeTransformation(scale: Option[TimedCartesian] = None, translation: Option[TimedCartesian] = None, rotation: Option[Orientation] = None) {
+  case class NodeTransformation(scale: Option[CartesianProperty] = None, translation: Option[CartesianProperty] = None, rotation: Option[Orientation] = None) {
 
     def this(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Orientation) =
-      this(Option(new TimedCartesian(sx, sy, sz)), Option(new TimedCartesian(tx, ty, tz)), Option(rotation))
+      this(Option(new CartesianProperty(sx, sy, sz)), Option(new CartesianProperty(tx, ty, tz)), Option(rotation))
 
     def this(scale: Cartesian, translation: Cartesian, rotation: Orientation) =
-      this(Option(TimedCartesian(scale)), Option(TimedCartesian(translation)), Option(rotation))
+      this(Option(CartesianProperty(scale)), Option(CartesianProperty(translation)), Option(rotation))
   }
 
   object NodeTransformation {

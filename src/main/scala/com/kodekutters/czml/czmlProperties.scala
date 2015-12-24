@@ -127,11 +127,13 @@ package object czmlProperties {
     * @param verticalOrigin   The vertical origin of the billboard. It controls whether the billboard image
     *                         is bottom-, center-, or top-aligned with the position.
     */
-  case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[EyeOffset] = None,
-                       horizontalOrigin: Option[HorizontalOrigin] = None, image: Option[ImageUri] = None,
+  case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[CartesianProperty] = None,
+                       horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[ImageUri] = None,
                        pixelOffset: Option[PixelOffset] = None, scale: Option[Number] = None,
-                       rotation: Option[Number] = None, alignedAxis: Option[AlignedAxis] = None,
-                       show: Option[CzmlBoolean] = None, verticalOrigin: Option[VerticalOrigin] = None) extends CzmlProperty {
+                       rotation: Option[Number] = None,
+                       alignedAxis: Option[CartesianProperty] = None,
+                       show: Option[CzmlBoolean] = None,
+                       verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty {
 
     def this(color: ColorProperty) = this(color = Option(color), show = Option(CzmlBoolean(true)))
 
@@ -158,9 +160,9 @@ package object czmlProperties {
     def this(image: ImageUri, scale: Double, rotation: Double) = this(image = Option(image), scale = Option(Number(scale)),
       rotation = Option(Number(rotation)), show = Option(CzmlBoolean(true)))
 
-    def this(c: javafx.scene.paint.Color) =  this(CzmlColor(c))
+    def this(c: javafx.scene.paint.Color) = this(CzmlColor(c))
 
-    def this(c: java.awt.Color) =  this(CzmlColor(c))
+    def this(c: java.awt.Color) = this(CzmlColor(c))
   }
 
   object Billboard {
@@ -200,29 +202,14 @@ package object czmlProperties {
     *
     * @param axes
     * @param unitQuaternion
-    * @param reference                     A reference property.
-    * @param epoch                         Specifies the epoch to use for times specifies as seconds since an epoch.
-    * @param nextTime                      The time of the next sample within this interval, specified as either an ISO 8601 date and time string
-    *                                      or as seconds since epoch. This property is used to determine if there is a gap between
-    *                                      samples specified in different packets.
-    * @param previousTime                  The time of the previous sample within this interval, specified as either an
-    *                                      ISO 8601 date and time string or as seconds since epoch.
-    *                                      This property is used to determine if there is a gap between samples specified in different packets.
-    * @param interpolationAlgorithm        specifies the algorithm to use to interpolate a value at a different time from the provided data
-    * @param interpolationDegree           specifies the degree of the polynomial to use for interpolation
-    * @param forwardExtrapolationType      the type of extrapolation to perform when a value is requested at a time after any available samples.
-    * @param forwardExtrapolationDuration  the amount of time to extrapolate backward before the property becomes undefined.
-    * @param backwardExtrapolationType     the type of extrapolation to perform when a value is requested at a time before any available samples.
-    * @param backwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
+    * @param reference A reference property.
+    * @param interval  an interval
+    * @param timeFields the time interpolatable part of this property
     */
   case class Orientation(axes: Option[String] = None, unitQuaternion: Option[Array[Double]] = None,
-                         reference: Option[String] = None, epoch: Option[String] = None,
-                         nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                         interpolationAlgorithm: Option[String] = None,
-                         interpolationDegree: Option[Int] = None,
-                         forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                         backwardExtrapolationType: Option[String] = None,
-                         backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable with CzmlProperty {
+                         interval: Option[String] = None,
+                         reference: Option[String] = None,
+                         timeFields: Option[Interpolatable] = None) extends CzmlProperty {
 
     def this(axes: String) = this(Option(axes))
 
@@ -231,11 +218,25 @@ package object czmlProperties {
   }
 
   object Orientation {
-    implicit val fmt = Json.format[Orientation]
-
     def apply(axes: String): Orientation = new Orientation(axes)
 
     def apply(unitQuaternion: Array[Double]): Orientation = new Orientation(unitQuaternion)
+
+    val theReads: Reads[Orientation] =
+      ((JsPath \ "axes").readNullable[String] and
+        (JsPath \ "unitQuaternion").readNullable[Array[Double]] and
+        (JsPath \ "interval").readNullable[String] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((ax, uni, intrv, ref, interpo) => Orientation(ax, uni, intrv, ref, Option(interpo)))
+
+    val theWrites: Writes[Orientation] =
+      ((JsPath \ "axes").writeNullable[String] and
+        (JsPath \ "unitQuaternion").writeNullable[Array[Double]] and
+        (JsPath \ "interval").writeNullable[String] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(Orientation.unapply))
+
+    implicit val fmt: Format[Orientation] = Format(theReads, theWrites)
   }
 
   /**
@@ -294,11 +295,11 @@ package object czmlProperties {
     * @param verticalOrigin   The vertical origin of the label. It controls whether the label image is bottom-, center-,
     *                         or top-aligned with the position.
     */
-  case class Label(eyeOffset: Option[EyeOffset] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
-                   horizontalOrigin: Option[HorizontalOrigin] = None, outlineColor: Option[ColorProperty] = None,
+  case class Label(eyeOffset: Option[CartesianProperty] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
+                   horizontalOrigin: Option[Origin[HORIZONTAL]] = None, outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None, pixelOffset: Option[PixelOffset] = None,
                    scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[Style] = None,
-                   text: Option[Text] = None, verticalOrigin: Option[VerticalOrigin] = None) extends CzmlProperty {
+                   text: Option[Text] = None, verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty {
 
     def this(text: String) = this(text = Option(Text(text)), show = Option(CzmlBoolean(true)))
 
@@ -447,29 +448,35 @@ package object czmlProperties {
   /**
     * The rectangle conforms to the curvature of the globe and can be placed on the surface or at altitude and can optionally be extruded into a volume.
     *
-    * @param coordinates
-    * @param show A boolean Property specifying the visibility of the rectangle.
-    * @param material A Property specifying the material used to fill the rectangle.
-    * @param height A numeric Property specifying the altitude of the rectangle.
+    * @param coordinates the coordinate of the rectangle in WsenDegrees
+    * @param show           A boolean Property specifying the visibility of the rectangle.
+    * @param material       A Property specifying the material used to fill the rectangle.
+    * @param height         A numeric Property specifying the altitude of the rectangle.
     * @param extrudedHeight A numeric Property specifying the altitude of the rectangle extrusion.
-    * @param granularity A numeric Property specifying the angular distance between points on the rectangle.
-    * @param rotation A numeric property specifying the rotation of the rectangle clockwise from north.
-    * @param stRotation A numeric property specifying the rotation of the rectangle texture counter-clockwise from north.
-    * @param fill A boolean Property specifying whether the rectangle is filled with the provided material.
-    * @param outline A boolean Property specifying whether the rectangle is outlined.
-    * @param outlineColor A Property specifying the Color of the outline.
-    * @param outlineWidth A numeric Property specifying the width of the outline.
-    * @param closeBottom A boolean Property specifying whether the rectangle has a bottom cover when extruded.
-    * @param closeTop A boolean Property specifying whether the rectangle has a top cover when extruded
+    * @param granularity    A numeric Property specifying the angular distance between points on the rectangle.
+    * @param rotation       A numeric property specifying the rotation of the rectangle clockwise from north.
+    * @param stRotation     A numeric property specifying the rotation of the rectangle texture counter-clockwise from north.
+    * @param fill           A boolean Property specifying whether the rectangle is filled with the provided material.
+    * @param outline        A boolean Property specifying whether the rectangle is outlined.
+    * @param outlineColor   A Property specifying the Color of the outline.
+    * @param outlineWidth   A numeric Property specifying the width of the outline.
+    * @param closeBottom    A boolean Property specifying whether the rectangle has a bottom cover when extruded.
+    * @param closeTop       A boolean Property specifying whether the rectangle has a top cover when extruded
     */
-  case class Rectangle(coordinates: Option[WsenDegrees] = None, show: Option[CzmlBoolean] = None,
-                       material: Option[Material] = None, height: Option[Number] = None,
-                       extrudedHeight: Option[Number] = None, granularity: Option[Number] = None,
+  case class Rectangle(coordinates: Option[WsenDegrees] = None,
+                       show: Option[CzmlBoolean] = None,
+                       material: Option[Material] = None,
+                       height: Option[Number] = None,
+                       extrudedHeight: Option[Number] = None,
+                       granularity: Option[Number] = None,
                        rotation: Option[Number] = None,
-                       stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
-                       outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
+                       stRotation: Option[Number] = None,
+                       fill: Option[CzmlBoolean] = None,
+                       outline: Option[CzmlBoolean] = None,
+                       outlineColor: Option[ColorProperty] = None,
                        outlineWidth: Option[Number] = None,
-                       closeBottom: Option[CzmlBoolean] = None, closeTop: Option[CzmlBoolean] = None) extends CzmlProperty {
+                       closeBottom: Option[CzmlBoolean] = None,
+                       closeTop: Option[CzmlBoolean] = None) extends CzmlProperty {
 
     def this(w: Double, s: Double, e: Double, n: Double) = this(Option(WsenDegrees(w, s, e, n)))
 
@@ -483,24 +490,26 @@ package object czmlProperties {
     * Describes a two dimensional wall defined as a line strip and optional maximum and minimum heights.
     * The wall conforms to the curvature of the globe and can be placed along the surface or at altitude.
     *
-    * @param positions A Property specifying the array of Cartesian3 positions which define the top of the wall.
-    * @param show A boolean Property specifying the visibility of the wall.
-    * @param material A Property specifying the material used to fill the wall.
+    * @param positions      A Property specifying the array of Cartesian3 positions which define the top of the wall.
+    * @param show           A boolean Property specifying the visibility of the wall.
+    * @param material       A Property specifying the material used to fill the wall.
     * @param minimumHeights A Property specifying an array of heights to be used for the bottom of the wall instead of the globe surface.
     * @param maximumHeights A Property specifying an array of heights to be used for the top of the wall instead of the height of each position.
-    * @param granularity A numeric Property specifying the angular distance between each latitude and longitude point.
-    * @param fill A boolean Property specifying whether the wall is filled with the provided material.
-    * @param outline A boolean Property specifying whether the wall is outlined.
-    * @param outlineColor A Property specifying the Color of the outline.
-    * @param outlineWidth A numeric Property specifying the width of the outline.
+    * @param granularity    A numeric Property specifying the angular distance between each latitude and longitude point.
+    * @param fill           A boolean Property specifying whether the wall is filled with the provided material.
+    * @param outline        A boolean Property specifying whether the wall is outlined.
+    * @param outlineColor   A Property specifying the Color of the outline.
+    * @param outlineWidth   A numeric Property specifying the width of the outline.
     */
-  case class Wall(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
+  case class Wall(positions: Option[Positions] = None,
+                  show: Option[CzmlBoolean] = None,
                   material: Option[Material] = None,
                   minimumHeights: Option[Array[Double]] = None,
                   maximumHeights: Option[Array[Double]] = None,
                   granularity: Option[Number] = None,
                   fill: Option[CzmlBoolean] = None,
-                  outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
+                  outline: Option[CzmlBoolean] = None,
+                  outlineColor: Option[ColorProperty] = None,
                   outlineWidth: Option[Number] = None) extends CzmlProperty
 
   object Wall {
@@ -549,48 +558,59 @@ package object czmlProperties {
   }
 
   /**
-    * The dimensions of the ellipsoid. Also describes the viewFrom property.
+    * Describes a 3d Cartesian property which can optionally vary over time.
+    * Can represent the dimensions of the ellipsoid radii.
+    * Also describes the "viewFrom" property.
+    * It is also used in NodeTransformation for scale and translation
     *
-    * @param cartesian                     The radii as a Cartesian [X, Y, Z] in meters. If the array has three elements, the radii are constant.
-    *                                      If it has four or more elements, they are time-tagged samples arranged as
-    *                                      [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date and
-    *                                      time string or seconds since epoch.
-    * @param interval                      Time interval
-    * @param reference                     A reference property.
-    * @param epoch                         Specifies the epoch to use for times specifies as seconds since an epoch.
-    * @param nextTime                      The time of the next sample within this interval, specified as either an ISO 8601 date and
-    *                                      time string or as seconds since epoch. This property is used to determine if there is a gap between samples specified in different packets.
-    * @param previousTime                  The time of the previous sample within this interval, specified as either an ISO 8601 date and time string or as seconds since epoch.
-    *                                      This property is used to determine if there is a gap between samples specified in different packets.
-    * @param interpolationAlgorithm        specifies the algorithm to use to interpolate a value at a different time from the provided data
-    * @param interpolationDegree           specifies the degree of the polynomial to use for interpolation
-    * @param forwardExtrapolationType      the type of extrapolation to perform when a value is requested at a time after any available samples.
-    * @param forwardExtrapolationDuration  the amount of time to extrapolate backward before the property becomes undefined.
-    * @param backwardExtrapolationType     the type of extrapolation to perform when a value is requested at a time before any available samples.
-    * @param backwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
-
+    * @param cartesian The Cartesian [X, Y, Z] in meters. If the array has three elements, the cartesian is constant.
+    *                  If it has four or more elements, they are time-tagged samples arranged as
+    *                  [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date and
+    *                  time string or seconds since epoch.
+    * @param interval  Time interval
+    * @param reference A reference property.
+    * @param timeFields the time interpolatable part of this property
     */
-  case class Radii(cartesian: Option[Cartesian] = None, interval: Option[String] = None,
-                   reference: Option[String] = None, epoch: Option[String] = None,
-                   nextTime: Option[TimeValue] = None, previousTime: Option[TimeValue] = None,
-                   interpolationAlgorithm: Option[String] = None,
-                   interpolationDegree: Option[Int] = None,
-                   forwardExtrapolationType: Option[String] = None, forwardExtrapolationDuration: Option[Double] = None,
-                   backwardExtrapolationType: Option[String] = None,
-                   backwardExtrapolationDuration: Option[Double] = None) extends Interpolatable with CzmlProperty {
+  case class CartesianProperty(cartesian: Option[Cartesian] = None,
+                               interval: Option[String] = None,
+                               reference: Option[String] = None,
+                               timeFields: Option[Interpolatable] = None) extends CzmlProperty {
+
+    def this(cartesian: Cartesian, interval: String) = this(Option(cartesian), Option(interval))
+
+    def this(x: Double, y: Double, z: Double, interval: String) = this(Option(new Cartesian(x, y, z)), Option(interval))
+
+    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
 
     def this(cartesian: Cartesian) = this(Option(cartesian))
 
-    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
   }
 
-  object Radii {
-    implicit val fmt = Json.format[Radii]
+  object CartesianProperty {
 
-    def apply(cartesian: Cartesian): Radii = new Radii(cartesian)
+    def apply(cartesian: Cartesian, interval: String): CartesianProperty = new CartesianProperty(cartesian, interval)
 
-    def apply(x: Double, y: Double, z: Double): Radii = new Radii(x, y, z)
+    def apply(x: Double, y: Double, z: Double, interval: String): CartesianProperty = new CartesianProperty(x, y, z, interval)
+
+    def apply(x: Double, y: Double, z: Double): CartesianProperty = new CartesianProperty(x, y, z)
+
+    def apply(cartesian: Cartesian): CartesianProperty = new CartesianProperty(cartesian)
+
+    val theReads: Reads[CartesianProperty] =
+      ((JsPath \ "cartesian").readNullable[Cartesian] and
+        (JsPath \ "interval").readNullable[String] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((cart, intrv, ref, interpo) => CartesianProperty(cart, intrv, ref, Option(interpo)))
+
+    val theWrites: Writes[CartesianProperty] =
+      ((JsPath \ "cartesian").writeNullable[Cartesian] and
+        (JsPath \ "interval").writeNullable[String] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(CartesianProperty.unapply))
+
+    implicit val fmt: Format[CartesianProperty] = Format(theReads, theWrites)
   }
+
 
   /**
     * An ellipsoid, which is a closed quadric surface that is a three dimensional analogue of an ellipse.
@@ -606,7 +626,7 @@ package object czmlProperties {
     * @param slicePartitions The number of times to partition the ellipsoid into radial slices.
     * @param subdivisions    The number of points per outline line, determining the granularity of the curvature.
     */
-  case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[Radii] = None,
+  case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[CartesianProperty] = None,
                        fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                        stackPartitions: Option[Number] = None, slicePartitions: Option[Number] = None,
@@ -614,7 +634,7 @@ package object czmlProperties {
 
     def this(x: Double, y: Double, z: Double, fill: Boolean, material: Material,
              outline: Boolean, outlineColor: ColorProperty, stackPartitions: Double, slicePartitions: Double,
-             subdivisions: Double) = this(Option(CzmlBoolean(true)), Option(Radii(x, y, z)), Option(CzmlBoolean(fill)),
+             subdivisions: Double) = this(Option(CzmlBoolean(true)), Option(CartesianProperty(x, y, z)), Option(CzmlBoolean(fill)),
       Option(material), Option(CzmlBoolean(outline)), Option(outlineColor), Option(Number(stackPartitions)),
       Option(Number(slicePartitions)), Option(Number(subdivisions)))
 
@@ -627,8 +647,7 @@ package object czmlProperties {
               fill: Boolean, material: Material,
               outline: Boolean, outlineColor: ColorProperty,
               stackPartitions: Double, slicePartitions: Double,
-              subdivisions: Double): Ellipsoid = new Ellipsoid(x, y, z, fill, material, outline, outlineColor,
-      stackPartitions, slicePartitions, subdivisions)
+              subdivisions: Double): Ellipsoid = new Ellipsoid(x, y, z, fill, material, outline, outlineColor, stackPartitions, slicePartitions, subdivisions)
   }
 
   /**
@@ -898,16 +917,16 @@ package object czmlProperties {
     * A CZML packet describes the graphical properties for a single
     * object in the scene, such as a single aircraft.
     *
-    * @param id           The ID of the object described by this packet. IDs do not need to be GUIDs,
-    *                     but they do need to uniquely identify a single object within a CZML source and
-    *                     any other CZML sources loaded into the same scope. If this property is not specified,
-    *                     the client will automatically generate a unique one. However, this prevents later packets
-    *                     from referring to this object in order to, for example, add more data to it.
-    * @param name         The name of the object. It does not have to be unique and is intended for user consumption.
-    * @param parent       The ID of the parent object or folder.
-    * @param description  An HTML description of the object.
-    * @param version      The CZML version being written. Only valid on the document object.
-    * @param properties The list of properties of this object
+    * @param id          The ID of the object described by this packet. IDs do not need to be GUIDs,
+    *                    but they do need to uniquely identify a single object within a CZML source and
+    *                    any other CZML sources loaded into the same scope. If this property is not specified,
+    *                    the client will automatically generate a unique one. However, this prevents later packets
+    *                    from referring to this object in order to, for example, add more data to it.
+    * @param name        The name of the object. It does not have to be unique and is intended for user consumption.
+    * @param parent      The ID of the parent object or folder.
+    * @param description An HTML description of the object.
+    * @param version     The CZML version being written. Only valid on the document object.
+    * @param properties  The list of properties of this object
     */
   case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
                         description: Option[String] = None, version: Option[String] = None,
@@ -962,7 +981,7 @@ package object czmlProperties {
         (JsPath \ "polyline").read[Polyline].reads(js).asOpt.map(propList += _)
         (JsPath \ "polygon").read[Polygon].reads(js).asOpt.map(propList += _)
         (JsPath \ "ellipsoid").read[Ellipsoid].reads(js).asOpt.map(propList += _)
-        (JsPath \ "viewFrom").read[Radii].reads(js).asOpt.map(propList += _)
+        (JsPath \ "viewFrom").read[CartesianProperty].reads(js).asOpt.map(propList += _)
         (JsPath \ "rectangle").read[Rectangle].reads(js).asOpt.map(propList += _)
         (JsPath \ "wall").read[Wall].reads(js).asOpt.map(propList += _)
         (JsPath \ "model").read[Model].reads(js).asOpt.map(propList += _)
@@ -999,7 +1018,7 @@ package object czmlProperties {
           case x: Path => theList += Path.fmt.writes(x).asOpt[Path].map("path" -> Json.toJson(_))
           case x: Polygon => theList += Polygon.fmt.writes(x).asOpt[Polygon].map("polygon" -> Json.toJson(_))
           case x: Ellipsoid => theList += Ellipsoid.fmt.writes(x).asOpt[Ellipsoid].map("ellipsoid" -> Json.toJson(_))
-          case x: Radii => theList += Radii.fmt.writes(x).asOpt[Radii].map("viewFrom" -> Json.toJson(_))
+          case x: CartesianProperty => theList += CartesianProperty.fmt.writes(x).asOpt[CartesianProperty].map("viewFrom" -> Json.toJson(_))
           case x: Rectangle => theList += Rectangle.fmt.writes(x).asOpt[Rectangle].map("rectangle" -> Json.toJson(_))
           case x: Wall => theList += Wall.fmt.writes(x).asOpt[Wall].map("wall" -> Json.toJson(_))
           case x: Model => theList += Model.fmt.writes(x).asOpt[Model].map("model" -> Json.toJson(_))
