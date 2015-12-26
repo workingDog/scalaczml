@@ -7,7 +7,7 @@ import scala.reflect.runtime.universe._
 
 
 /**
-  * a set of implicit conversions for CZML
+  * a set of implicit conversions
   *
   */
 object CzmlImplicits {
@@ -140,7 +140,27 @@ object CzmlImplicits {
 
   implicit def WsenDegreesToWsenDegreesOp(value: WsenDegrees): Option[WsenDegrees] = Option(value)
 
+  // ------------------------------------------------------------------------------------------------------
 
+  implicit def DoubleToNumberOp(value: Double): Option[Number] = Option(Number(value))
+
+  implicit def StringToImageUriOp(value: String): Option[ImageUri] = Option(new ImageUri(value))
+
+  implicit def StringToTextOp(value: String): Option[Text] = Option(new Text(value))
+
+  implicit def StringToFontOp(value: String): Option[Font] = Option(new Font(value))
+
+  implicit def StringToStyleOp(value: String): Option[Style] = Option(new Style(value))
+
+  implicit def ColorToSolidColorOp(value: java.awt.Color): Option[SolidColor] = Option(new SolidColor(value))
+
+  implicit def ColorToCzmlColorOp(value: java.awt.Color): Option[CzmlColor] = Option(new CzmlColor(value))
+
+  implicit def ColorToColorPropertyOp(value: java.awt.Color): Option[ColorProperty] = Option(new ColorProperty(value))
+
+  implicit def StringToPortionToDisplayOp(value: String): Option[PortionToDisplay] = Option(PortionToDisplay(value))
+
+  implicit def StringToStripeOrientationOp(value: String): Option[StripeOrientation] = Option(new StripeOrientation(value))
 
   // ------------------------------------------------------------------------------------------------------
 
