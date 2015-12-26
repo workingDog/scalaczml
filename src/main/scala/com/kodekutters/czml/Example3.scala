@@ -15,18 +15,18 @@ import scala.collection.mutable.ListBuffer
   */
 object Example3 {
   def main(args: Array[String]) {
-    // create a czml object
+    // create an empty czml object
     val czml = CZML[CZMLPacket]()
-    // add the typical first packet
-    czml.packets += new CZMLPacket("document", "1.0")
-    // create a position property
+    // add a typical first packet
+    czml.packets += new CZMLPacket(id = "document", version = "1.0")
+    // create a positions property
     val pos = new CzmlPositions(new CzmlPosition(cartographicDegrees = Cartographic[DEGREE](151.12, -33.52, 123.0)))
     // create a billboard property
-    val bb = new Billboard(image = "https://upload.wikimedia.org/wikipedia/commons/c/c4/PM5544_with_non-PAL_signals.png", color = Color.red, show = true, scale = 0.8)
+    val bb = new Billboard(image = "https://upload.wikimedia.org/wikipedia/commons/c/c4/PM5544_with_non-PAL_signals.png", color = Color.red, show = true, scale = 0.2)
     // create a label with some text
-    val label = new Label(text = "something here", font = "11pt Lucida Console", outlineColor = Color.orange)
+    val label = new Label(eyeOffset = CzmlCartesian(5, 6, 7), text = "some text here", font = "11pt Lucida Console", outlineColor = Color.orange)
     // create some positions for the polygon
-    val polyPos = Array(Position(1,2,3), Position(4,5,6), Position(7,8,9))
+    val polyPos = Array(Position(1, 2, 3), Position(4, 5, 6), Position(7, 8, 9))
     // create a polygon
     val poly = new Polygon(positions = polyPos, material = Material(Color.blue))
     // create a czml packet with all the czml properties
@@ -38,6 +38,6 @@ object Example3 {
     // print the json representation
     println(Json.prettyPrint(jsczml))
     // alternatively, write the czml (as json) directly to file (here to System.out)
-  //  Util.writeToFile("", czml)
+    //  Util.writeToFile("", czml)
   }
 }
