@@ -166,5 +166,6 @@ object CzmlImplicits {
 
   implicit def CzmlCartesianToCzmlCartesianOp(value: CzmlCartesian): Option[CzmlCartesian] = Option(value)
 
+  implicit def ArrayOfPositionToPositionsOp(value: Array[com.kodekutters.czml.czmlCore.Position]): Option[Positions] = Option(new Positions(value))
 
 }
