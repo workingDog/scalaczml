@@ -7,7 +7,7 @@ import com.kodekutters.czml.czmlCore._
 import com.kodekutters.czml.CzmlImplicits._
 import play.api.libs.json.Json
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashSet
 
 
 /**
@@ -30,7 +30,7 @@ object Example3 {
     // create a polygon
     val poly = new Polygon(positions = polyPos, material = Material(Color.blue))
     // create a czml packet with all the czml properties
-    val packet = new CZMLPacket("test packet", ListBuffer[CzmlProperty](pos, bb, label, poly))
+    val packet = new CZMLPacket("test packet", HashSet[CzmlProperty](pos, bb, label, poly))
     // add the packet to the czml object
     czml.packets += packet
     // convert the czml object to json

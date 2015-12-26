@@ -36,8 +36,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
-import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ArrayBuffer, HashSet}
 
 import com.kodekutters.czml.czmlCore._
 
@@ -930,21 +929,21 @@ package object czmlProperties {
     */
   case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
                         description: Option[String] = None, version: Option[String] = None,
-                        properties: ListBuffer[CzmlProperty] = ListBuffer.empty) extends Packet {
+                        properties: HashSet[CzmlProperty] = HashSet.empty) extends Packet {
 
     // the typical first packet
     def this(id: String, version: String) = this(Option(id), None, None, None, Option(version))
 
-    def this(id: String, name: String, parent: String, description: String, version: String, properties: ListBuffer[CzmlProperty]) =
+    def this(id: String, name: String, parent: String, description: String, version: String, properties: HashSet[CzmlProperty]) =
       this(Option(id), Option(name), Option(parent), Option(description), Option(version), properties)
 
-    def this(id: String, name: String, properties: ListBuffer[CzmlProperty]) =
+    def this(id: String, name: String, properties: HashSet[CzmlProperty]) =
       this(Option(id), Option(name), None, None, None, properties)
 
-    def this(id: String, name: String, description: String, properties: ListBuffer[CzmlProperty]) =
+    def this(id: String, name: String, description: String, properties: HashSet[CzmlProperty]) =
       this(Option(id), Option(name), None, Option(description), None, properties)
 
-    def this(id: String, properties: ListBuffer[CzmlProperty]) = this(Option(id), None, None, None, None, properties)
+    def this(id: String, properties: HashSet[CzmlProperty]) = this(Option(id), None, None, None, None, properties)
 
     def this(packet: CZMLPacket) = this(packet.id, packet.name, packet.parent, packet.description, packet.version, packet.properties)
 
@@ -952,7 +951,7 @@ package object czmlProperties {
       * returns an eventSource representation of this packet
       */
     def asEventSource(): String = {
-      val sb = new mutable.StringBuilder("event: czml \n data: ")
+      val sb = new StringBuilder("event: czml \n data: ")
       sb.append(Json.prettyPrint(Json.toJson(this)) + "\n\n")
       sb.toString()
     }
@@ -969,7 +968,7 @@ package object czmlProperties {
         val description = (JsPath \ "description").read[String].reads(js).asOpt
         val version = (JsPath \ "version").read[String].reads(js).asOpt
 
-        val propList = new ListBuffer[CzmlProperty]()
+        val propList = new HashSet[CzmlProperty]()
 
         (JsPath \ "availability").read[Availability].reads(js).asOpt.map(propList += _)
         (JsPath \ "position").read[CzmlPositions].reads(js).asOpt.map(propList += _)
@@ -1000,7 +999,7 @@ package object czmlProperties {
 
     val theWrites = new Writes[CZMLPacket] {
       def writes(packet: CZMLPacket) = {
-        val theList = ListBuffer[Option[(String, JsValue)]](
+        val theSet = HashSet[Option[(String, JsValue)]](
           packet.id.map("id" -> JsString(_)),
           packet.name.map("name" -> JsString(_)),
           packet.parent.map("parent" -> JsString(_)),
@@ -1008,32 +1007,32 @@ package object czmlProperties {
           packet.version.map("version" -> JsString(_)))
 
         packet.properties.foreach({
-          case x: Availability => theList += Availability.fmt.writes(x).asOpt[Availability].map("availability" -> Json.toJson(_))
-          case x: CzmlPositions => theList += CzmlPositions.fmt.writes(x).asOpt[CzmlPositions].map("position" -> Json.toJson(_))
-          case x: Billboard => theList += Billboard.fmt.writes(x).asOpt[Billboard].map("billboard" -> Json.toJson(_))
-          case x: Orientation => theList += Orientation.fmt.writes(x).asOpt[Orientation].map("orientation" -> Json.toJson(_))
-          case x: Point => theList += Point.fmt.writes(x).asOpt[Point].map("point" -> Json.toJson(_))
-          case x: Label => theList += Label.fmt.writes(x).asOpt[Label].map("label" -> Json.toJson(_))
-          case x: Polyline => theList += Polyline.fmt.writes(x).asOpt[Polyline].map("polyline" -> Json.toJson(_))
-          case x: Path => theList += Path.fmt.writes(x).asOpt[Path].map("path" -> Json.toJson(_))
-          case x: Polygon => theList += Polygon.fmt.writes(x).asOpt[Polygon].map("polygon" -> Json.toJson(_))
-          case x: Ellipsoid => theList += Ellipsoid.fmt.writes(x).asOpt[Ellipsoid].map("ellipsoid" -> Json.toJson(_))
-          case x: CzmlCartesian => theList += CzmlCartesian.fmt.writes(x).asOpt[CzmlCartesian].map("viewFrom" -> Json.toJson(_))
-          case x: Rectangle => theList += Rectangle.fmt.writes(x).asOpt[Rectangle].map("rectangle" -> Json.toJson(_))
-          case x: Wall => theList += Wall.fmt.writes(x).asOpt[Wall].map("wall" -> Json.toJson(_))
-          case x: Model => theList += Model.fmt.writes(x).asOpt[Model].map("model" -> Json.toJson(_))
-          case x: Ellipse => theList += Ellipse.fmt.writes(x).asOpt[Ellipse].map("ellipse" -> Json.toJson(_))
-          case x: Clock => theList += Clock.fmt.writes(x).asOpt[Clock].map("clock" -> Json.toJson(_))
+          case x: Availability => theSet += Availability.fmt.writes(x).asOpt[Availability].map("availability" -> Json.toJson(_))
+          case x: CzmlPositions => theSet += CzmlPositions.fmt.writes(x).asOpt[CzmlPositions].map("position" -> Json.toJson(_))
+          case x: Billboard => theSet += Billboard.fmt.writes(x).asOpt[Billboard].map("billboard" -> Json.toJson(_))
+          case x: Orientation => theSet += Orientation.fmt.writes(x).asOpt[Orientation].map("orientation" -> Json.toJson(_))
+          case x: Point => theSet += Point.fmt.writes(x).asOpt[Point].map("point" -> Json.toJson(_))
+          case x: Label => theSet += Label.fmt.writes(x).asOpt[Label].map("label" -> Json.toJson(_))
+          case x: Polyline => theSet += Polyline.fmt.writes(x).asOpt[Polyline].map("polyline" -> Json.toJson(_))
+          case x: Path => theSet += Path.fmt.writes(x).asOpt[Path].map("path" -> Json.toJson(_))
+          case x: Polygon => theSet += Polygon.fmt.writes(x).asOpt[Polygon].map("polygon" -> Json.toJson(_))
+          case x: Ellipsoid => theSet += Ellipsoid.fmt.writes(x).asOpt[Ellipsoid].map("ellipsoid" -> Json.toJson(_))
+          case x: CzmlCartesian => theSet += CzmlCartesian.fmt.writes(x).asOpt[CzmlCartesian].map("viewFrom" -> Json.toJson(_))
+          case x: Rectangle => theSet += Rectangle.fmt.writes(x).asOpt[Rectangle].map("rectangle" -> Json.toJson(_))
+          case x: Wall => theSet += Wall.fmt.writes(x).asOpt[Wall].map("wall" -> Json.toJson(_))
+          case x: Model => theSet += Model.fmt.writes(x).asOpt[Model].map("model" -> Json.toJson(_))
+          case x: Ellipse => theSet += Ellipse.fmt.writes(x).asOpt[Ellipse].map("ellipse" -> Json.toJson(_))
+          case x: Clock => theSet += Clock.fmt.writes(x).asOpt[Clock].map("clock" -> Json.toJson(_))
 
-          case x: ConicSensor => theList += ConicSensor.fmt.writes(x).asOpt[ConicSensor].map("agi_conicSensor" -> Json.toJson(_))
-          case x: CustomPatternSensor => theList += CustomPatternSensor.fmt.writes(x).asOpt[CustomPatternSensor].map("agi_customPatternSensor" -> Json.toJson(_))
-          case x: Fan => theList += Fan.fmt.writes(x).asOpt[Fan].map("agi_fan" -> Json.toJson(_))
-          case x: RectangularSensor => theList += RectangularSensor.fmt.writes(x).asOpt[RectangularSensor].map("agi_rectangularSensor" -> Json.toJson(_))
-          case x: AgiVector => theList += AgiVector.fmt.writes(x).asOpt[AgiVector].map("agi_vector" -> Json.toJson(_))
+          case x: ConicSensor => theSet += ConicSensor.fmt.writes(x).asOpt[ConicSensor].map("agi_conicSensor" -> Json.toJson(_))
+          case x: CustomPatternSensor => theSet += CustomPatternSensor.fmt.writes(x).asOpt[CustomPatternSensor].map("agi_customPatternSensor" -> Json.toJson(_))
+          case x: Fan => theSet += Fan.fmt.writes(x).asOpt[Fan].map("agi_fan" -> Json.toJson(_))
+          case x: RectangularSensor => theSet += RectangularSensor.fmt.writes(x).asOpt[RectangularSensor].map("agi_rectangularSensor" -> Json.toJson(_))
+          case x: AgiVector => theSet += AgiVector.fmt.writes(x).asOpt[AgiVector].map("agi_vector" -> Json.toJson(_))
           case _ =>
         })
 
-        JsObject(theList.flatten)
+        JsObject(theSet.toList.flatten)
       }
     }
 
@@ -1055,7 +1054,7 @@ package object czmlProperties {
       * returns the whole CZML document as a string consisting of an array of eventSource elements.
       */
     def asStreamData(): String = {
-      val sb = new mutable.StringBuilder("[ \n")
+      val sb = new StringBuilder("[ \n")
       for (packet <- packets) sb.append(packet.asEventSource())
       sb.append(" ]")
       sb.toString()

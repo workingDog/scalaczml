@@ -5,6 +5,7 @@ import com.kodekutters.czml.czmlCore._
 import com.kodekutters.czml.Util._
 
 import play.api.libs.json.Json
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
@@ -15,7 +16,7 @@ import scala.io.Source
 object Example1 {
   def main(args: Array[String]) {
     // read a CZML document from a file
-    val jsonDoc = Source.fromFile("/......./test4.czml").mkString
+    val jsonDoc = Source.fromFile("/.....test5.czml").mkString
     // create a czml object from the json document
     val czml = CZML[CZMLPacket](jsonDoc)
     // create a position property
@@ -23,7 +24,7 @@ object Example1 {
     // create a billboard property with image uri and scale fields
     val bb = Billboard("http://localhost/img.png", 0.7)
     // create a czml packet
-    val packet = new CZMLPacket("test packet", ListBuffer[CzmlProperty](pos, bb))
+    val packet = new CZMLPacket("test packet", mutable.HashSet[CzmlProperty](pos, bb))
     // add the packet to the existing czml object
     czml.add(packet) // or czml.packets += packet
     // convert the czml object to json
