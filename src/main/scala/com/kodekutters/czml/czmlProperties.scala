@@ -925,7 +925,7 @@ package object czmlProperties {
     * @param parent      The ID of the parent object or folder.
     * @param description An HTML description of the object.
     * @param version     The CZML version being written. Only valid on the document object.
-    * @param properties  The list of properties of this object
+    * @param properties  The set of properties of this object
     */
   case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
                         description: Option[String] = None, version: Option[String] = None,

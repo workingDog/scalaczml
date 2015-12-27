@@ -28,7 +28,7 @@ object Example1 {
     czml.add(packet) // or czml.packets += packet
     // convert the czml object to json
     val jsczml = Json.toJson(czml)
-    // write the czml to file (here to System.out)
+    // write the czml as a json document to file (here to System.out)
     Util.writeToFile("", czml)
     // alternatively
     //  Util.writeToFile("", Json.prettyPrint(jsczml))
