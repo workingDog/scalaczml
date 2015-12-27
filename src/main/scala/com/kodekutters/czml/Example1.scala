@@ -5,8 +5,7 @@ import com.kodekutters.czml.czmlCore._
 import com.kodekutters.czml.Util._
 
 import play.api.libs.json.Json
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashSet
 import scala.io.Source
 
 
@@ -24,7 +23,7 @@ object Example1 {
     // create a billboard property with image uri and scale fields
     val bb = Billboard("http://localhost/img.png", 0.7)
     // create a czml packet
-    val packet = new CZMLPacket("test packet", mutable.HashSet[CzmlProperty](pos, bb))
+    val packet = new CZMLPacket("test packet", HashSet[CzmlProperty](pos, bb))
     // add the packet to the existing czml object
     czml.add(packet) // or czml.packets += packet
     // convert the czml object to json
