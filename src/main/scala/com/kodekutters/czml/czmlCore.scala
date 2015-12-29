@@ -1215,11 +1215,11 @@ package object czmlCore {
     * Typically used for pixelOffset of a billboard or grid lineOffset, lineCount and lineThickness
     *
     * @param cartesian2 The Cartesian2D [X, Y] in meters. If the array has two elements, the cartesian is constant.
-    *                  If it has three or more elements, they are time-tagged samples arranged as
-    *                  [Time, X, Y, Time, X, Y, Time, X, Y,  ...], where Time is an ISO 8601 date and
-    *                  time string or seconds since epoch.
-    * @param interval  Time interval
-    * @param reference A reference property.
+    *                   If it has three or more elements, they are time-tagged samples arranged as
+    *                   [Time, X, Y, Time, X, Y, Time, X, Y,  ...], where Time is an ISO 8601 date and
+    *                   time string or seconds since epoch.
+    * @param interval   Time interval
+    * @param reference  A reference property.
     * @param timeFields the time interpolatable part of this property
     */
   case class CzmlCartesian2(cartesian2: Option[Cartesian2D] = None,
@@ -1271,10 +1271,10 @@ package object czmlCore {
     * if epoch is not defined, then "number" becomes either an array of timed values (see TimedNumbers) or
     * a single double value.
     *
-    * @param number    the number that depends on epoch
-    * @param interval  the time interval value
-    * @param reference a reference property
-    * @param timeFields  the time interpolatable part of this property
+    * @param number     the number that depends on epoch
+    * @param interval   the time interval value
+    * @param reference  a reference property
+    * @param timeFields the time interpolatable part of this property
     */
   case class CzmlNumber(number: Option[Any] = None, interval: Option[String] = None,
                         reference: Option[String] = None,
@@ -1451,20 +1451,20 @@ package object czmlCore {
   /**
     * Defines a color property. The color can optionally vary over time.
     *
-    * @param rgba      A color specified as an array of color components [Red, Green, Blue, Alpha]
-    *                  where each component is in the range 0-255. If the array has four elements,
-    *                  the color is constant. If it has five or more elements,
-    *                  they are time-tagged samples arranged as
-    *                  [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
-    *                  where Time is an ISO 8601 date and time string or seconds since epoch.
-    * @param rgbaf     The color specified as an array of color components [Red, Green, Blue, Alpha]
-    *                  where each component is in the range 0.0-1.0. If the array has four elements,
-    *                  the color is constant. If it has five or more elements, they are time-tagged samples
-    *                  arranged as [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
-    *                  where Time is an ISO 8601 date and time string or seconds since epoch.
-    * @param interval  the interval property
-    * @param reference a reference property
-    * @param timeFields  the time interpolatable part of this property
+    * @param rgba       A color specified as an array of color components [Red, Green, Blue, Alpha]
+    *                   where each component is in the range 0-255. If the array has four elements,
+    *                   the color is constant. If it has five or more elements,
+    *                   they are time-tagged samples arranged as
+    *                   [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
+    *                   where Time is an ISO 8601 date and time string or seconds since epoch.
+    * @param rgbaf      The color specified as an array of color components [Red, Green, Blue, Alpha]
+    *                   where each component is in the range 0.0-1.0. If the array has four elements,
+    *                   the color is constant. If it has five or more elements, they are time-tagged samples
+    *                   arranged as [Time, Red, Green, Blue, Alpha, Time, Red, Green, Blue, Alpha, ...],
+    *                   where Time is an ISO 8601 date and time string or seconds since epoch.
+    * @param interval   the interval property
+    * @param reference  a reference property
+    * @param timeFields the time interpolatable part of this property
     */
   case class CzmlColor(rgba: Option[RgbaList] = None, rgbaf: Option[RgbafList] = None,
                        interval: Option[String] = None,
@@ -1772,7 +1772,7 @@ package object czmlCore {
     * @param cartesianVelocity   the cartesian velocity
     * @param interval            the interval property
     * @param reference           a reference property
-    * @param timeFields            the time interpolatable part of this property
+    * @param timeFields          the time interpolatable part of this property
     */
   case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
                           cartographicRadians: Option[Cartographic[RADIAN]] = None,

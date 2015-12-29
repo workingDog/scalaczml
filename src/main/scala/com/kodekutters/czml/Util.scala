@@ -44,8 +44,8 @@ object Util {
     * @param outFile the file name to write to, if empty or missing output will be to System.out
     * @param czml the CZML document, i.e. the list of CZML packets
     */
-  def writeToFile(outFile: String = "", czml: CZML[CZMLPacket]) = {
-    val writer = if (outFile.trim.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile))
+  def writeCzmlToFile(czml: CZML[CZMLPacket], outFile: Option[String] = None) = {
+    val writer = if (outFile.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile.get))
     try {
       writer.write(Json.prettyPrint(Json.toJson(czml)))
     } catch {
@@ -54,7 +54,7 @@ object Util {
     finally {
       writer.flush()
       // close files, not System.out
-      if (outFile.trim.nonEmpty) writer.close()
+      if (outFile.nonEmpty) writer.close()
     }
   }
 
@@ -63,8 +63,8 @@ object Util {
     * @param outFile the file name to write to, if empty or missing output will be to System.out
     * @param czmljs the CZML document as a (json) string
     */
-  def writeToFile(outFile: String, czmljs: String) = {
-    val writer = if (outFile.trim.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile))
+  def writeJsToFile(czmljs: String, outFile: Option[String]) = {
+    val writer = if (outFile.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile.get))
     try {
       writer.write(czmljs)
     } catch {
@@ -73,7 +73,7 @@ object Util {
     finally {
       writer.flush()
       // close files, not System.out
-      if (outFile.trim.nonEmpty) writer.close()
+      if (outFile.nonEmpty) writer.close()
     }
   }
 

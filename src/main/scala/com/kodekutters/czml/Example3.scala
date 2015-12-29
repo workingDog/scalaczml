@@ -38,6 +38,6 @@ object Example3 {
     // print the json representation
     println(Json.prettyPrint(jsczml))
     // alternatively, write the czml (as json) directly to file (here to System.out)
-    //  Util.writeToFile("", czml)
+    //  Util.writeCzmlToFile(czml)
   }
 }
