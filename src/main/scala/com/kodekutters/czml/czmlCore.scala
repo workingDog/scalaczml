@@ -1168,10 +1168,32 @@ package object czmlCore {
   }
 
   /**
+    * Fills the surface with an image. Used in Material
+    *
+    * @param image The image to display on the surface.
+    * @param repeat The number of times the image repeats along each axis.
+    */
+  case class Image(image: Option[ImageUri] = None, repeat: Option[CzmlCartesian2] = None) {
+    def this(uri: String) = this(Option(ImageUri(uri)))
+
+    def this(uri: String, x: Int, y: Int) = this(Option(ImageUri(uri)), Option(CzmlCartesian2(x, y)))
+
+  }
+
+  object Image {
+    implicit val fmt = Json.format[Image]
+
+    def apply(uri: String): Image = new Image(uri)
+
+    def apply(uri: String, x: Int, y: Int): Image = new Image(uri, x, y)
+
+  }
+
+  /**
     * The image displayed on the billboard, expressed as a URL. For broadest client compatibility,
     * the URL should be accessible via Cross-Origin Resource Sharing (CORS). The URL may also be a data URI.
     *
-    * @param uri       A URI value.  The URI can optionally vary with time.  todo ?
+    * @param uri       A URI value.  The URI can optionally vary with time.
     * @param reference A reference property.
     */
   case class ImageUri(uri: Option[String] = None, reference: Option[String] = None) {
@@ -2075,7 +2097,7 @@ package object czmlCore {
     * @param grid       fill the surface with a gird
     * @param stripe     fill the surface with a stripe
     */
-  case class Material(solidColor: Option[SolidColor] = None, image: Option[ImageUri] = None,
+  case class Material(solidColor: Option[SolidColor] = None, image: Option[Image] = None,
                       grid: Option[Grid] = None, stripe: Option[Stripe] = None) {
 
     def this(solidColor: ColorProperty) = this(solidColor = Option(SolidColor(solidColor)))
@@ -2092,9 +2114,9 @@ package object czmlCore {
 
     def this(r: Double, g: Double, b: Double, a: Double) = this(solidColor = Option(SolidColor(r, g, b, a)))
 
-    def this(uri: ImageUri) = this(image = Option(uri))
+    def this(image: Image) = this(image = Option(image))
 
-    def this(uri: String) = this(image = Option(ImageUri(uri)))
+    def this(uri: String) = this(image = Option(Image(uri)))
 
     def this(color: javafx.scene.paint.Color) = this(CzmlColor(color))
 
@@ -2119,7 +2141,7 @@ package object czmlCore {
 
     def apply(r: Double, g: Double, b: Double, a: Double): Material = new Material(r, g, b, a)
 
-    def apply(uri: ImageUri): Material = new Material(uri)
+    def apply(image: Image): Material = new Material(image)
 
     def apply(uri: String): Material = new Material(uri)
 
