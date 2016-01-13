@@ -61,13 +61,13 @@ To generate the ScalaCZML API documentation, type "sbt doc". The documentation w
        // convert the czml object to json
        val jsczml = Json.toJson(czml)
        // write the czml as a json document to file (here to System.out)
-       Util.writeToFile("", czml)
+       Util.writeToFile(czml)
        // alternatively
-       //  Util.writeToFile("", Json.prettyPrint(jsczml))
+       //  Util.writeToFile(Json.prettyPrint(jsczml))
      }
     }
     
 ## Status
 
-work in progress, no formal tests. 
+work in progress
 

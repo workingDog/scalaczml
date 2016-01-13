@@ -7,7 +7,7 @@ import scala.reflect.runtime.universe._
 
 
 /**
-  * a set of implicit conversions
+  * a set of implicit conversions. Use with care.
   *
   */
 object CzmlImplicits {

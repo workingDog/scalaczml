@@ -12,6 +12,7 @@ import play.api.libs.json.Json
   */
 object Util {
 
+  // constants
   val COMPLETE = "COMPLETE"
   val BELOW_ELLIPSOID_HORIZON = "BELOW_ELLIPSOID_HORIZON"
   val ABOVE_ELLIPSOID_HORIZON = "ABOVE_ELLIPSOID_HORIZON"
@@ -29,6 +30,7 @@ object Util {
   val SYSTEM_CLOCK = "SYSTEM_CLOCK"
   val SYSTEM_CLOCK_MULTIPLIER = "SYSTEM_CLOCK_MULTIPLIER"
   val TICK_DEPENDENT = "TICK_DEPENDENT"
+
   // interpolators
   val HERMITE = "HERMITE"
   val LAGRANGE = "LAGRANGE"
