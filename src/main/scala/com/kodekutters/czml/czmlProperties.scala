@@ -928,20 +928,20 @@ package object czmlProperties {
     * @param properties  The set of properties of this object
     */
   case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
-                        description: Option[String] = None, version: Option[String] = None,
+                        description: Option[Description] = None, version: Option[String] = None,
                         properties: HashSet[CzmlProperty] = HashSet.empty) extends Packet {
 
     // the typical first packet
     def this(id: String, version: String) = this(Option(id), None, None, None, Option(version))
 
     def this(id: String, name: String, parent: String, description: String, version: String, properties: HashSet[CzmlProperty]) =
-      this(Option(id), Option(name), Option(parent), Option(description), Option(version), properties)
+      this(Option(id), Option(name), Option(parent), Option(new Description(description)), Option(version), properties)
 
     def this(id: String, name: String, properties: HashSet[CzmlProperty]) =
       this(Option(id), Option(name), None, None, None, properties)
 
     def this(id: String, name: String, description: String, properties: HashSet[CzmlProperty]) =
-      this(Option(id), Option(name), None, Option(description), None, properties)
+      this(Option(id), Option(name), None, Option(new Description(description)), None, properties)
 
     def this(id: String, properties: HashSet[CzmlProperty]) = this(Option(id), None, None, None, None, properties)
 
@@ -965,7 +965,7 @@ package object czmlProperties {
         val id = (JsPath \ "id").read[String].reads(js).asOpt
         val name = (JsPath \ "name").read[String].reads(js).asOpt
         val parent = (JsPath \ "parent").read[String].reads(js).asOpt
-        val description = (JsPath \ "description").read[String].reads(js).asOpt
+        val description = (JsPath \ "description").read[Description].reads(js).asOpt
         val version = (JsPath \ "version").read[String].reads(js).asOpt
 
         val propList = new HashSet[CzmlProperty]()
@@ -999,11 +999,12 @@ package object czmlProperties {
 
     val theWrites = new Writes[CZMLPacket] {
       def writes(packet: CZMLPacket) = {
+
         val theSet = HashSet[Option[(String, JsValue)]](
           packet.id.map("id" -> JsString(_)),
           packet.name.map("name" -> JsString(_)),
           packet.parent.map("parent" -> JsString(_)),
-          packet.description.map("description" -> JsString(_)),
+          packet.description.map("description" -> Description.fmt.writes(_)),
           packet.version.map("version" -> JsString(_)))
 
         packet.properties.foreach({

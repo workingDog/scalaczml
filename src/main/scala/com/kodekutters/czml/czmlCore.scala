@@ -1168,9 +1168,47 @@ package object czmlCore {
   }
 
   /**
+    * An HTML description of the object.
+    *
+    * @param string    The string value
+    * @param reference A reference property.
+    */
+  case class Description(string: Option[String] = None, reference: Option[String] = None) {
+    def this(string: String) = this(Option(string))
+  }
+
+  object Description {
+
+    def apply(string: String): Description = new Description(string)
+
+    val theReads = new Reads[Description] {
+      def reads(js: JsValue): JsResult[Description] = {
+        // try to read a simple String
+        JsPath.read[String].reads(js).asOpt match {
+          case None => JsSuccess(
+            new Description((JsPath \ "string").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
+
+          case Some(str) => JsSuccess(new Description(Some(str)))
+        }
+      }
+    }
+
+    val theWrites = new Writes[Description] {
+      def writes(obj: Description) = {
+        obj.reference match {
+          case Some(ref) => Json.obj("string" -> JsString(obj.string.getOrElse("")), "reference" -> JsString(ref))
+          case None => JsString(obj.string.getOrElse(""))
+        }
+      }
+    }
+
+    implicit val fmt: Format[Description] = Format(theReads, theWrites)
+  }
+
+  /**
     * Fills the surface with an image. Used in Material
     *
-    * @param image The image to display on the surface.
+    * @param image  The image to display on the surface.
     * @param repeat The number of times the image repeats along each axis.
     */
   case class Image(image: Option[ImageUri] = None, repeat: Option[CzmlCartesian2] = None) {

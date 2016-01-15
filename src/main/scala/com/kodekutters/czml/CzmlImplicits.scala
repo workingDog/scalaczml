@@ -66,7 +66,13 @@ object CzmlImplicits {
 
   implicit def StringToPortionToDisplay(value: String): PortionToDisplay = new PortionToDisplay(value)
 
+  implicit def StringToDescription(value: String): Description = Description(value)
+
+  implicit def StringToDescriptionOp(value: String): Option[Description] = Option(Description(value))
+
   // ------------------X to Option[X]-----------------------------------------------------------------------------------
+
+  implicit def DescriptionToDescriptionOp(value: Description): Option[Description] = Option(value)
 
   implicit def CzmlCartesian2ToCzmlCartesian2Op(value: CzmlCartesian2): Option[CzmlCartesian2] = Option(value)
 
