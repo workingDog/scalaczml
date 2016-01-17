@@ -104,11 +104,6 @@ package object czmlCore {
   //      }
   //    }
 
-  //  case class Description(reference: Option[String] = None, string: Option[String] = None)
-  //  object Description {
-  //    implicit val fmt = Json.format[Description]
-  //  }
-
   /**
     * representing time as a String or a Double
     *
