@@ -909,7 +909,7 @@ package object czmlProperties {
     * Characterises a packet in the CZML document.
     */
   trait Packet {
-    def asEventSource(): String
+    def asEventSourceData(): String
   }
 
   /**
@@ -948,11 +948,11 @@ package object czmlProperties {
     def this(packet: CZMLPacket) = this(packet.id, packet.name, packet.parent, packet.description, packet.version, packet.properties)
 
     /**
-      * returns an eventSource representation of this packet
+      * returns an eventSource data representation of this packet
       */
-    def asEventSource(): String = {
-      val sb = new StringBuilder("event: czml \n data: ")
-      sb.append(Json.prettyPrint(Json.toJson(this)) + "\n\n")
+    def asEventSourceData(): String = {
+      val sb = new StringBuilder("data: \n")
+      sb.append(Json.toJson(this) + "\n\n")
       sb.toString()
     }
   }
@@ -1051,15 +1051,6 @@ package object czmlProperties {
 
     def remove(packet: T) = packets -= packet
 
-    /**
-      * returns the whole CZML document as a string consisting of an array of eventSource elements.
-      */
-    def asStreamData(): String = {
-      val sb = new StringBuilder("[ \n")
-      for (packet <- packets) sb.append(packet.asEventSource())
-      sb.append(" ]")
-      sb.toString()
-    }
   }
 
   object CZML {

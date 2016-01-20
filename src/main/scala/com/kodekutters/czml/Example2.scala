@@ -19,9 +19,9 @@ import scala.io.Source
   * @param czmlPacket the CZML standard packet
   */
 case class MyPacket(mydata: Option[Array[Int]], czmlPacket: Option[CZMLPacket]) extends Packet {
-  def asEventSource(): String = {
-    val sb = new mutable.StringBuilder("event: czml \n data: ")
-    sb.append(Json.prettyPrint(Json.toJson(this)) + "\n\n")
+  def asEventSourceData(): String = {
+    val sb = new mutable.StringBuilder("data: \n")
+    sb.append(Json.toJson(this) + "\n\n")
     sb.toString()
   }
 }
