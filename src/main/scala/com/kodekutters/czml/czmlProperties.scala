@@ -33,6 +33,7 @@ package com.kodekutters.czml
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
@@ -61,6 +62,7 @@ package object czmlProperties {
 
   /**
     * all CzmlPacket constituent properties extend this trait
+    * (see also object CzmlProperty)
     */
   trait CzmlProperty
 
@@ -201,8 +203,8 @@ package object czmlProperties {
     *
     * @param axes
     * @param unitQuaternion
-    * @param reference A reference property.
-    * @param interval  an interval
+    * @param reference  A reference property.
+    * @param interval   an interval
     * @param timeFields the time interpolatable part of this property
     */
   case class Orientation(axes: Option[String] = None, unitQuaternion: Option[Array[Double]] = None,
@@ -447,7 +449,7 @@ package object czmlProperties {
   /**
     * The rectangle conforms to the curvature of the globe and can be placed on the surface or at altitude and can optionally be extruded into a volume.
     *
-    * @param coordinates the coordinate of the rectangle in WsenDegrees
+    * @param coordinates    the coordinate of the rectangle in WsenDegrees
     * @param show           A boolean Property specifying the visibility of the rectangle.
     * @param material       A Property specifying the material used to fill the rectangle.
     * @param height         A numeric Property specifying the altitude of the rectangle.
@@ -562,12 +564,12 @@ package object czmlProperties {
     * Also describes the "viewFrom" property.
     * It is also used in NodeTransformation for scale and translation
     *
-    * @param cartesian The Cartesian [X, Y, Z] in meters. If the array has three elements, the cartesian is constant.
-    *                  If it has four or more elements, they are time-tagged samples arranged as
-    *                  [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date and
-    *                  time string or seconds since epoch.
-    * @param interval  Time interval
-    * @param reference A reference property.
+    * @param cartesian  The Cartesian [X, Y, Z] in meters. If the array has three elements, the cartesian is constant.
+    *                   If it has four or more elements, they are time-tagged samples arranged as
+    *                   [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date and
+    *                   time string or seconds since epoch.
+    * @param interval   Time interval
+    * @param reference  A reference property.
     * @param timeFields the time interpolatable part of this property
     */
   case class CzmlCartesian(cartesian: Option[Cartesian] = None,
@@ -986,7 +988,6 @@ package object czmlProperties {
         (JsPath \ "model").read[Model].reads(js).asOpt.map(propList += _)
         (JsPath \ "ellipse").read[Ellipse].reads(js).asOpt.map(propList += _)
         (JsPath \ "clock").read[Clock].reads(js).asOpt.map(propList += _)
-
         (JsPath \ "agi_conicSensor").read[ConicSensor].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_customPatternSensor").read[CustomPatternSensor].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_fan").read[Fan].reads(js).asOpt.map(propList += _)
@@ -999,7 +1000,6 @@ package object czmlProperties {
 
     val theWrites = new Writes[CZMLPacket] {
       def writes(packet: CZMLPacket) = {
-
         val theSet = HashSet[Option[(String, JsValue)]](
           packet.id.map("id" -> JsString(_)),
           packet.name.map("name" -> JsString(_)),
@@ -1024,13 +1024,11 @@ package object czmlProperties {
           case x: Model => theSet += Model.fmt.writes(x).asOpt[Model].map("model" -> Json.toJson(_))
           case x: Ellipse => theSet += Ellipse.fmt.writes(x).asOpt[Ellipse].map("ellipse" -> Json.toJson(_))
           case x: Clock => theSet += Clock.fmt.writes(x).asOpt[Clock].map("clock" -> Json.toJson(_))
-
           case x: ConicSensor => theSet += ConicSensor.fmt.writes(x).asOpt[ConicSensor].map("agi_conicSensor" -> Json.toJson(_))
           case x: CustomPatternSensor => theSet += CustomPatternSensor.fmt.writes(x).asOpt[CustomPatternSensor].map("agi_customPatternSensor" -> Json.toJson(_))
           case x: Fan => theSet += Fan.fmt.writes(x).asOpt[Fan].map("agi_fan" -> Json.toJson(_))
           case x: RectangularSensor => theSet += RectangularSensor.fmt.writes(x).asOpt[RectangularSensor].map("agi_rectangularSensor" -> Json.toJson(_))
           case x: AgiVector => theSet += AgiVector.fmt.writes(x).asOpt[AgiVector].map("agi_vector" -> Json.toJson(_))
-          case _ =>
         })
 
         JsObject(theSet.toList.flatten)
@@ -1090,5 +1088,65 @@ package object czmlProperties {
     }
 
   }
+
+  /**
+    * a CzmlProperty
+    */
+  object CzmlProperty {
+
+    val theReads = new Reads[CzmlProperty] {
+      def reads(js: JsValue): JsResult[CzmlProperty] = {
+        (JsPath \ "availability").read[Availability].reads(js) or
+          (JsPath \ "position").read[CzmlPositions].reads(js) or
+          (JsPath \ "billboard").read[Billboard].reads(js) or
+          (JsPath \ "orientation").read[Orientation].reads(js) or
+          (JsPath \ "point").read[Point].reads(js) or
+          (JsPath \ "label").read[Label].reads(js) or
+          (JsPath \ "path").read[Path].reads(js) or
+          (JsPath \ "polyline").read[Polyline].reads(js) or
+          (JsPath \ "polygon").read[Polygon].reads(js) or
+          (JsPath \ "ellipsoid").read[Ellipsoid].reads(js) or
+          (JsPath \ "viewFrom").read[CzmlCartesian].reads(js) or
+          (JsPath \ "rectangle").read[Rectangle].reads(js) or
+          (JsPath \ "wall").read[Wall].reads(js) or
+          (JsPath \ "model").read[Model].reads(js) or
+          (JsPath \ "ellipse").read[Ellipse].reads(js) or
+          (JsPath \ "clock").read[Clock].reads(js) or
+          (JsPath \ "agi_conicSensor").read[ConicSensor].reads(js) or
+          (JsPath \ "agi_customPatternSensor").read[CustomPatternSensor].reads(js) or
+          (JsPath \ "agi_fan").read[Fan].reads(js) or
+          (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js) or
+          (JsPath \ "agi_vector").read[AgiVector].reads(js)
+      }
+    }
+
+    val theWrites = Writes[CzmlProperty] {
+      case x: Availability => Json.obj("availability" -> Availability.fmt.writes(x))
+      case x: CzmlPositions => Json.obj("position" -> CzmlPositions.fmt.writes(x))
+      case x: Billboard => Json.obj("billboard" -> Billboard.fmt.writes(x))
+      case x: Orientation => Json.obj("orientation" -> Orientation.fmt.writes(x))
+      case x: Point => Json.obj("point" -> Point.fmt.writes(x))
+      case x: Label => Json.obj("label" -> Label.fmt.writes(x))
+      case x: Polyline => Json.obj("polyline" -> Polyline.fmt.writes(x))
+      case x: Path => Json.obj("path" -> Path.fmt.writes(x))
+      case x: Polygon => Json.obj("polygon" -> Polygon.fmt.writes(x))
+      case x: Ellipsoid => Json.obj("ellipsoid" -> Ellipsoid.fmt.writes(x))
+      case x: CzmlCartesian => Json.obj("viewFrom" -> CzmlCartesian.fmt.writes(x))
+      case x: Rectangle => Json.obj("rectangle" -> Rectangle.fmt.writes(x))
+      case x: Wall => Json.obj("wall" -> Wall.fmt.writes(x))
+      case x: Model => Json.obj("model" -> Model.fmt.writes(x))
+      case x: Ellipse => Json.obj("ellipse" -> Ellipse.fmt.writes(x))
+      case x: Clock => Json.obj("clock" -> Clock.fmt.writes(x))
+      case x: ConicSensor => Json.obj("agi_conicSensor" -> ConicSensor.fmt.writes(x))
+      case x: CustomPatternSensor => Json.obj("agi_customPatternSensor" -> CustomPatternSensor.fmt.writes(x))
+      case x: Fan => Json.obj("agi_fan" -> Fan.fmt.writes(x))
+      case x: RectangularSensor => Json.obj("agi_rectangularSensor" -> RectangularSensor.fmt.writes(x))
+      case x: AgiVector => Json.obj("agi_vector" -> AgiVector.fmt.writes(x))
+    }
+
+    implicit val fmt: Format[CzmlProperty] = Format(theReads, theWrites)
+
+  }
+
 
 }

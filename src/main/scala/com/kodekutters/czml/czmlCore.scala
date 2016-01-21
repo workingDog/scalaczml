@@ -93,17 +93,6 @@ package object czmlCore {
     def stopLocalDateTime() = LocalDateTime.parse(stop(), TimeInterval.fmter)
   }
 
-  //    case class Duration(days: Int, seconds: Double) {
-  //      def this(days: Int, hours: Int, minutes: Int, seconds: Double) = this(days, Duration.toSeconds(hours, minutes, seconds))
-  //    }
-  //    object Duration {
-  //      def toSeconds(hours: Int, minutes: Int, seconds: Double): Double = hours * 3600.0 + minutes * 60.0 + seconds
-  //      implicit val fmt = Json.format[Duration]
-  //      implicit def StringToDuration(value: String): Duration = {
-  //
-  //      }
-  //    }
-
   /**
     * representing time as a String or a Double
     *
@@ -142,7 +131,7 @@ package object czmlCore {
   /**
     * The base for a property whose value may be determined by
     * interpolating over the provided time-tagged samples.
-    *
+//    *
     * @param epoch                         Specifies the epoch to use for times specifies as seconds since an epoch.
     * @param nextTime                      The time of the next sample within this interval, specified as either
      an ISO 8601 date and time string or as seconds since epoch.
