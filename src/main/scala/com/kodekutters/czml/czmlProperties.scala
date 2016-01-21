@@ -33,7 +33,6 @@ package com.kodekutters.czml
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
@@ -134,67 +133,10 @@ package object czmlProperties {
                        rotation: Option[Number] = None,
                        alignedAxis: Option[CzmlCartesian] = None,
                        show: Option[CzmlBoolean] = None,
-                       verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty {
-
-    def this(color: ColorProperty) = this(color = Option(color), show = Option(CzmlBoolean(true)))
-
-    def this(color: CzmlColor) = this(color = Option(ColorProperty(color)), show = Option(CzmlBoolean(true)))
-
-    def this(rgba: Rgba) = this(color = Option(ColorProperty(rgba)), show = Option(CzmlBoolean(true)))
-
-    def this(r: Int, g: Int, b: Int, a: Int) = this(Option(ColorProperty(r, g, b, a)), show = Option(CzmlBoolean(true)))
-
-    def this(rgbaf: Rgbaf) = this(color = Option(ColorProperty(rgbaf)), show = Option(CzmlBoolean(true)))
-
-    def this(r: Float, g: Float, b: Float, a: Float) = this(Option(ColorProperty(r, g, b, a)), show = Option(CzmlBoolean(true)))
-
-    def this(r: Double, g: Double, b: Double, a: Double) = this(Option(ColorProperty(r, g, b, a)), show = Option(CzmlBoolean(true)))
-
-    def this(image: ImageUri) = this(image = Option(image), show = Option(CzmlBoolean(true)))
-
-    def this(uri: String) = this(image = Option(ImageUri(uri)), show = Option(CzmlBoolean(true)))
-
-    def this(uri: String, scale: Double) = this(image = Option(ImageUri(uri)), scale = Option(Number(scale)), show = Option(CzmlBoolean(true)))
-
-    def this(image: ImageUri, scale: Double) = this(image = Option(image), scale = Option(Number(scale)), show = Option(CzmlBoolean(true)))
-
-    def this(image: ImageUri, scale: Double, rotation: Double) = this(image = Option(image), scale = Option(Number(scale)),
-      rotation = Option(Number(rotation)), show = Option(CzmlBoolean(true)))
-
-    def this(c: javafx.scene.paint.Color) = this(CzmlColor(c))
-
-    def this(c: java.awt.Color) = this(CzmlColor(c))
-  }
+                       verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty
 
   object Billboard {
     implicit val fmt = Json.format[Billboard]
-
-    def apply(color: ColorProperty): Billboard = new Billboard(color)
-
-    def apply(color: CzmlColor): Billboard = new Billboard(color)
-
-    def apply(rgba: Rgba): Billboard = new Billboard(rgba)
-
-    def apply(r: Int, g: Int, b: Int, a: Int): Billboard = new Billboard(r, g, b, a)
-
-    def apply(rgbaf: Rgbaf): Billboard = new Billboard(rgbaf)
-
-    def apply(r: Float, g: Float, b: Float, a: Float): Billboard = new Billboard(r, g, b, a)
-
-    def apply(r: Double, g: Double, b: Double, a: Double): Billboard = new Billboard(r, g, b, a)
-
-    def apply(image: ImageUri): Billboard = new Billboard(image)
-
-    def apply(image: ImageUri, scale: Double): Billboard = new Billboard(image, scale)
-
-    def apply(uri: String, scale: Double): Billboard = new Billboard(image = ImageUri(uri), scale)
-
-    def apply(image: ImageUri, scale: Double, rotation: Double): Billboard = new Billboard(image, scale, rotation)
-
-    def apply(c: javafx.scene.paint.Color) = new Billboard(CzmlColor(c))
-
-    def apply(c: java.awt.Color) = new Billboard(CzmlColor(c))
-
   }
 
   /**
@@ -210,18 +152,9 @@ package object czmlProperties {
   case class Orientation(axes: Option[String] = None, unitQuaternion: Option[Array[Double]] = None,
                          interval: Option[String] = None,
                          reference: Option[String] = None,
-                         timeFields: Option[Interpolatable] = None) extends CzmlProperty {
-
-    def this(axes: String) = this(Option(axes))
-
-    def this(unitQuaternion: Array[Double]) = this(None, Option(unitQuaternion))
-
-  }
+                         timeFields: Option[Interpolatable] = None) extends CzmlProperty
 
   object Orientation {
-    def apply(axes: String): Orientation = new Orientation(axes)
-
-    def apply(unitQuaternion: Array[Double]): Orientation = new Orientation(unitQuaternion)
 
     val theReads: Reads[Orientation] =
       ((JsPath \ "axes").readNullable[String] and
@@ -251,25 +184,10 @@ package object czmlProperties {
     */
   case class Point(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None, pixelSize: Option[Number] = None,
-                   show: Option[CzmlBoolean] = None) extends CzmlProperty {
-
-    def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number, pixelSize: Number) =
-      this(Option(color), Option(outlineColor), Option(outlineWidth), Option(pixelSize), Option(new CzmlBoolean(true)))
-
-    def this(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double, pixelSize: Double) =
-      this(Option(new ColorProperty(color)), Option(new ColorProperty(outlineColor)),
-        Option(new Number(outlineWidth)), Option(new Number(pixelSize)), Option(new CzmlBoolean(true)))
-  }
+                   show: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Point {
     implicit val fmt = Json.format[Point]
-
-    def apply(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number, pixelSize: Number): Point =
-      new Point(color, outlineColor, outlineWidth, pixelSize)
-
-    def apply(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double, pixelSize: Double): Point =
-      new Point(color, outlineColor, outlineWidth, pixelSize)
-
   }
 
   /**
@@ -300,20 +218,10 @@ package object czmlProperties {
                    horizontalOrigin: Option[Origin[HORIZONTAL]] = None, outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None, pixelOffset: Option[CzmlCartesian2] = None,
                    scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[Style] = None,
-                   text: Option[Text] = None, verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty {
-
-    def this(text: String) = this(text = Option(Text(text)), show = Option(CzmlBoolean(true)))
-
-    def this(text: String, font: String) = this(text = Option(Text(text)), font = Option(Font(font)), show = Option(CzmlBoolean(true)))
-  }
+                   text: Option[Text] = None, verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty
 
   object Label {
     implicit val fmt = Json.format[Label]
-
-    def apply(text: String): Label = new Label(text)
-
-    def apply(text: String, font: String): Label = new Label(text, font)
-
   }
 
   /**
@@ -326,12 +234,6 @@ package object czmlProperties {
 
     def this(position: CzmlPosition) = this(Option(Array(position)))
 
-    def this(referenceFrame: String, cartesian: Cartesian, interval: String) =
-      this(CzmlPosition(referenceFrame, cartesian, interval))
-
-    def this(referenceFrame: String, x: Double, y: Double, z: Double, interval: String) =
-      this(CzmlPosition(referenceFrame, x, y, z, interval))
-
     def this(x: Double, y: Double, z: Double) = this(CzmlPosition(x, y, z))
 
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(CzmlPosition(referenceFrame, x, y, z))
@@ -343,10 +245,6 @@ package object czmlProperties {
     def apply(values: Array[CzmlPosition]): CzmlPositions = new CzmlPositions(Option(values))
 
     def apply(position: CzmlPosition): CzmlPositions = new CzmlPositions(Option(Array(position)))
-
-    def apply(referenceFrame: String, cartesian: Cartesian, interval: String): CzmlPositions = new CzmlPositions(referenceFrame, cartesian, interval)
-
-    def apply(referenceFrame: String, x: Double, y: Double, z: Double, interval: String): CzmlPositions = new CzmlPositions(referenceFrame, x, y, z, interval)
 
     def apply(x: Double, y: Double, z: Double): CzmlPositions = new CzmlPositions(x, y, z)
 
@@ -393,25 +291,10 @@ package object czmlProperties {
     */
   case class Path(show: Option[CzmlBoolean] = None, material: Option[LineMaterial] = None,
                   width: Option[Number] = None, resolution: Option[Number] = None,
-                  leadTime: Option[Number] = None, trailTime: Option[Number] = None) extends CzmlProperty {
-
-    def this(show: CzmlBoolean, material: LineMaterial, width: Number, resolution: Number, leadTime: Number, trailTime: Number) =
-      this(Option(show), Option(material), Option(width), Option(resolution), Option(leadTime), Option(trailTime))
-
-    def this(material: LineMaterial, width: Number, resolution: Number) =
-      this(Option(CzmlBoolean(true)), Option(material), Option(width), Option(resolution))
-
-    def this(material: LineMaterial, width: Double, resolution: Double) =
-      this(Option(CzmlBoolean(true)), Option(material), Option(new Number(width)), Option(new Number(resolution)))
-  }
+                  leadTime: Option[Number] = None, trailTime: Option[Number] = None) extends CzmlProperty
 
   object Path {
     implicit val fmt = Json.format[Path]
-
-    def apply(material: LineMaterial, width: Number, resolution: Number): Path = new Path(material, width, resolution)
-
-    def apply(material: LineMaterial, width: Double, resolution: Double): Path = new Path(material, width, resolution)
-
   }
 
   /**
@@ -425,25 +308,10 @@ package object czmlProperties {
     */
   case class Polyline(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                       material: Option[LineMaterial] = None, width: Option[Number] = None,
-                      followSurface: Option[CzmlBoolean] = None) extends CzmlProperty {
-
-    def this(positions: Positions, material: LineMaterial, width: Number, followSurface: Boolean) =
-      this(Option(positions), Option(CzmlBoolean(true)), Option(material), Option(width), Option(CzmlBoolean(followSurface)))
-
-    def this(positions: Position, material: LineMaterial, width: Double, followSurface: Boolean) =
-      this(Option(new Positions(positions)), Option(CzmlBoolean(true)),
-        Option(material), Option(new Number(width)), Option(CzmlBoolean(followSurface)))
-  }
+                      followSurface: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Polyline {
     implicit val fmt = Json.format[Polyline]
-
-    def apply(positions: Positions, material: LineMaterial, width: Number, followSurface: Boolean): Polyline =
-      new Polyline(positions, material, width, followSurface)
-
-    def apply(positions: Position, material: LineMaterial, width: Double, followSurface: Boolean): Polyline =
-      new Polyline(positions, material, width, followSurface)
-
   }
 
   /**
@@ -538,24 +406,10 @@ package object czmlProperties {
                      stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
                      outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                      outlineWidth: Option[Number] = None,
-                     perPositionHeight: Option[CzmlBoolean] = None) extends CzmlProperty {
-
-    def this(positions: Positions, material: Material, height: Double, extrudedHeight: Double) =
-      this(Option(positions), Option(CzmlBoolean(true)), Option(material), Option(Number(height)), Option(Number(extrudedHeight)))
-
-    def this(positions: Position, material: Material, height: Double, extrudedHeight: Double) =
-      this(Option(Positions(positions)), Option(CzmlBoolean(true)), Option(material), Option(Number(height)), Option(Number(extrudedHeight)))
-
-  }
+                     perPositionHeight: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Polygon {
     implicit val fmt = Json.format[Polygon]
-
-    def apply(positions: Positions, material: Material, height: Double, extrudedHeight: Double): Polygon =
-      new Polygon(positions, material, height, extrudedHeight)
-
-    def apply(positions: Position, material: Material, height: Double, extrudedHeight: Double): Polygon =
-      new Polygon(positions, material, height, extrudedHeight)
   }
 
   /**
@@ -631,24 +485,10 @@ package object czmlProperties {
                        fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                        stackPartitions: Option[Number] = None, slicePartitions: Option[Number] = None,
-                       subdivisions: Option[Number] = None) extends CzmlProperty {
-
-    def this(x: Double, y: Double, z: Double, fill: Boolean, material: Material,
-             outline: Boolean, outlineColor: ColorProperty, stackPartitions: Double, slicePartitions: Double,
-             subdivisions: Double) = this(Option(CzmlBoolean(true)), Option(CzmlCartesian(x, y, z)), Option(CzmlBoolean(fill)),
-      Option(material), Option(CzmlBoolean(outline)), Option(outlineColor), Option(Number(stackPartitions)),
-      Option(Number(slicePartitions)), Option(Number(subdivisions)))
-
-  }
+                       subdivisions: Option[Number] = None) extends CzmlProperty
 
   object Ellipsoid {
     implicit val fmt = Json.format[Ellipsoid]
-
-    def apply(x: Double, y: Double, z: Double,
-              fill: Boolean, material: Material,
-              outline: Boolean, outlineColor: ColorProperty,
-              stackPartitions: Double, slicePartitions: Double,
-              subdivisions: Double): Ellipsoid = new Ellipsoid(x, y, z, fill, material, outline, outlineColor, stackPartitions, slicePartitions, subdivisions)
   }
 
   /**
@@ -675,27 +515,10 @@ package object czmlProperties {
                      granularity: Option[Number] = None, stRotation: Option[Number] = None,
                      fill: Option[CzmlBoolean] = None, outline: Option[CzmlBoolean] = None,
                      outlineColor: Option[ColorProperty] = None,
-                     numberOfVerticalLines: Option[Number] = None) extends CzmlProperty {
-
-    def this(semiMajorAxis: Double, semiMinorAxis: Double, rotation: Double,
-             material: Material, height: Double, extrudedHeight: Double, granularity: Double,
-             stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: CzmlColor, numberOfVerticalLines: Double) =
-      this(Option(CzmlBoolean(true)), Option(Number(semiMajorAxis)), Option(Number(semiMinorAxis)),
-        Option(Number(rotation)), Option(material),
-        Option(Number(height)), Option(Number(extrudedHeight)),
-        Option(Number(granularity)), Option(Number(stRotation)), Option(CzmlBoolean(fill)),
-        Option(CzmlBoolean(outline)), Option(ColorProperty(outlineColor)), Option(Number(numberOfVerticalLines)))
-
-  }
+                     numberOfVerticalLines: Option[Number] = None) extends CzmlProperty
 
   object Ellipse {
     implicit val fmt = Json.format[Ellipse]
-
-    def apply(semiMajorAxis: Double, semiMinorAxis: Double, rotation: Double,
-              material: Material, height: Double, extrudedHeight: Double, granularity: Double,
-              stRotation: Double, fill: Boolean, outline: Boolean, outlineColor: CzmlColor, numberOfVerticalLines: Double): Ellipse =
-      new Ellipse(semiMajorAxis, semiMinorAxis, rotation, material, height, extrudedHeight, granularity,
-        stRotation, fill, outline, outlineColor, numberOfVerticalLines)
   }
 
   /**
@@ -841,11 +664,7 @@ package object czmlProperties {
     */
   case class AgiVector(show: Option[CzmlBoolean] = None, color: Option[ColorProperty] = None,
                        direction: Option[Directions] = None, length: Option[Number] = None,
-                       minimumLengthInPixels: Option[Number] = None) extends CzmlProperty {
-
-    def this(show: CzmlBoolean, color: ColorProperty, direction: Directions, length: Number, minimumLengthInPixels: Number) =
-      this(Option(show), Option(color), Option(direction), Option(length), Option(minimumLengthInPixels))
-  }
+                       minimumLengthInPixels: Option[Number] = None) extends CzmlProperty
 
   object AgiVector {
     implicit val fmt = Json.format[AgiVector]
@@ -865,18 +684,11 @@ package object czmlProperties {
     * @param interval    an interval of time.
     */
   case class Clock(currentTime: Option[String] = None, multiplier: Option[Double] = None,
-                   range: Option[String] = None, step: Option[String] = None, interval: Option[String] = None) extends CzmlProperty {
-
-    def this(currentTime: String, multiplier: Double, range: String, step: String, interval: String) =
-      this(Option(currentTime), Option(multiplier), Option(range), Option(step), Option(interval))
-  }
+                   range: Option[String] = None, step: Option[String] = None,
+                   interval: Option[String] = None) extends CzmlProperty
 
   object Clock {
     implicit val fmt = Json.format[Clock]
-
-    def apply(currentTime: String, multiplier: Double, range: String, step: String, interval: String): Clock =
-      new Clock(currentTime, multiplier, range, step, interval)
-
   }
 
   /**
@@ -892,19 +704,10 @@ package object czmlProperties {
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
                    minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None,
                    runAnimations: Option[CzmlBoolean] = None,
-                   nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty {
-
-    def this(scale: Double, minimumPixelSize: Double, gltf: String) =
-      this(Option(CzmlBoolean(true)), Option(new Number(scale)),
-        Option(new Number(minimumPixelSize)), Option(new ImageUri(gltf)))
-
-  }
+                   nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
 
   object Model {
     implicit val fmt = Json.format[Model]
-
-    def apply(scale: Double, minimumPixelSize: Double, gltf: String): Model = new Model(scale, minimumPixelSize, gltf)
-
   }
 
   /**

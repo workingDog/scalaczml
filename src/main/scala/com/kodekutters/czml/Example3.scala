@@ -11,7 +11,7 @@ import scala.collection.mutable.HashSet
 
 
 /**
-  * Example using CzmlImplicits
+  * another example
   */
 object Example3 {
   def main(args: Array[String]) {

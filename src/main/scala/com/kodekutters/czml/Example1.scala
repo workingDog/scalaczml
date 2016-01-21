@@ -1,8 +1,7 @@
 package com.kodekutters.czml
 
 import com.kodekutters.czml.czmlProperties._
-import com.kodekutters.czml.czmlCore._
-import com.kodekutters.czml.Util._
+import com.kodekutters.czml.CzmlImplicits._
 
 import play.api.libs.json.Json
 import scala.collection.mutable.HashSet
@@ -21,7 +20,7 @@ object Example1 {
     // create a position property
     val pos = CzmlPositions(9.3, 8.2, 7.1)
     // create a billboard property with image uri and scale fields
-    val bb = Billboard("http://localhost/img.png", 0.7)
+    val bb = new Billboard(image = "http://localhost/img.png", scale = 0.7)
     // create a czml packet
     val packet = new CZMLPacket("test packet", HashSet[CzmlProperty](pos, bb))
     // add the packet to the existing czml object

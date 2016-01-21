@@ -131,7 +131,8 @@ package object czmlCore {
   /**
     * The base for a property whose value may be determined by
     * interpolating over the provided time-tagged samples.
-//    *
+    * //    *
+    *
     * @param epoch                         Specifies the epoch to use for times specifies as seconds since an epoch.
     * @param nextTime                      The time of the next sample within this interval, specified as either
      an ISO 8601 date and time string or as seconds since epoch.
@@ -156,22 +157,10 @@ package object czmlCore {
                             forwardExtrapolationType: Option[String] = None,
                             forwardExtrapolationDuration: Option[Double] = None,
                             backwardExtrapolationType: Option[String] = None,
-                            backwardExtrapolationDuration: Option[Double] = None) {
-
-    def this(epoch: String) = this(Option(epoch))
-
-    def this(epoch: String, interpolationAlgorithm: String, interpolationDegree: Int) =
-      this(Option(epoch), None, None, Option(interpolationAlgorithm), Option(interpolationDegree))
-  }
+                            backwardExtrapolationDuration: Option[Double] = None)
 
   object Interpolatable {
-
     implicit val fmt = Json.format[Interpolatable]
-
-    def apply(epoch: String): Interpolatable = new Interpolatable(epoch)
-
-    def apply(epoch: String, interpolationAlgorithm: String, interpolationDegree: Int): Interpolatable =
-      new Interpolatable(epoch, interpolationAlgorithm, interpolationDegree)
   }
 
   /**
@@ -2049,19 +2038,10 @@ package object czmlCore {
     */
   case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
                   lineCount: Option[CzmlCartesian2] = None, lineThickness: Option[CzmlCartesian2] = None,
-                  lineOffset: Option[CzmlCartesian2] = None) {
-
-    def this(color: CzmlColor, cellAlpha: Double,
-             lineCount: Cartesian2D, lineThickness: Cartesian2D, lineOffset: Cartesian2D) =
-      this(Option(new ColorProperty(color)), Option(new Number(cellAlpha)),
-        Option(new CzmlCartesian2(lineCount)), Option(new CzmlCartesian2(lineThickness)), Option(new CzmlCartesian2(lineOffset)))
-  }
+                  lineOffset: Option[CzmlCartesian2] = None)
 
   object Grid {
     implicit val fmt = Json.format[Grid]
-
-    def apply(color: CzmlColor, cellAlpha: Double, lineCount: Cartesian2D, lineThickness: Cartesian2D, lineOffset: Cartesian2D): Grid =
-      new Grid(color, cellAlpha, lineCount, lineThickness, lineOffset)
   }
 
   /**
