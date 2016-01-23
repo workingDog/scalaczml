@@ -1179,28 +1179,6 @@ package object czmlCore {
   }
 
   /**
-    * Fills the surface with an image. Used in Material
-    *
-    * @param image  The image to display on the surface.
-    * @param repeat The number of times the image repeats along each axis.
-    */
-  case class Image(image: Option[ImageUri] = None, repeat: Option[CzmlCartesian2] = None) {
-    def this(uri: String) = this(Option(ImageUri(uri)))
-
-    def this(uri: String, x: Int, y: Int) = this(Option(ImageUri(uri)), Option(CzmlCartesian2(x, y)))
-
-  }
-
-  object Image {
-    implicit val fmt = Json.format[Image]
-
-    def apply(uri: String): Image = new Image(uri)
-
-    def apply(uri: String, x: Int, y: Int): Image = new Image(uri, x, y)
-
-  }
-
-  /**
     * The image displayed on the billboard, expressed as a URL. For broadest client compatibility,
     * the URL should be accessible via Cross-Origin Resource Sharing (CORS). The URL may also be a data URI.
     *
@@ -1480,6 +1458,28 @@ package object czmlCore {
     implicit val fmt: Format[Number] = Format(theReads, theWrites)
   }
 
+  /**
+    * Fills the surface with an image. Used in Material
+    *
+    * @param image  The image to display on the surface.
+    * @param alpha  The alpha value for the whole image.  This will be multiplied with alpha values within the image, if any.
+    * @param repeat The number of times the image repeats along each axis.
+    */
+  case class Image(image: Option[ImageUri] = None, alpha: Option[CzmlNumber] = None, repeat: Option[CzmlCartesian2] = None) {
+    def this(uri: String) = this(Option(ImageUri(uri)))
+
+    def this(uri: String, alpha: Double, x: Int, y: Int) = this(Option(ImageUri(uri)), Option(CzmlNumber(alpha)), Option(CzmlCartesian2(x, y)))
+
+  }
+
+  object Image {
+    implicit val fmt = Json.format[Image]
+
+    def apply(uri: String): Image = new Image(uri)
+
+    def apply(uri: String, alpha: Double, x: Int, y: Int): Image = new Image(uri, alpha, x, y)
+
+  }
 
   /**
     * Defines a color property. The color can optionally vary over time.
