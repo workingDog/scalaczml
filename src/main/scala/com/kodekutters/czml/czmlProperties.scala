@@ -730,27 +730,29 @@ package object czmlProperties {
     * @param parent      The ID of the parent object or folder.
     * @param description An HTML description of the object.
     * @param version     The CZML version being written. Only valid on the document object.
+    * @param delete      Whether the client should delete all existing data for this object, identified by ID. If true,
+    *                    all other properties in this packet will be ignored.
     * @param properties  The set of properties of this object
     */
   case class CZMLPacket(id: Option[String] = None, name: Option[String] = None, parent: Option[String] = None,
-                        description: Option[Description] = None, version: Option[String] = None,
+                        description: Option[Description] = None, version: Option[String] = None, delete: Option[Boolean] = None,
                         properties: HashSet[CzmlProperty] = HashSet.empty) extends Packet {
 
     // the typical first packet
-    def this(id: String, version: String) = this(Option(id), None, None, None, Option(version))
+    def this(id: String, version: String) = this(Option(id), None, None, None, Option(version), None)
 
     def this(id: String, name: String, parent: String, description: String, version: String, properties: HashSet[CzmlProperty]) =
-      this(Option(id), Option(name), Option(parent), Option(new Description(description)), Option(version), properties)
+      this(Option(id), Option(name), Option(parent), Option(new Description(description)), Option(version), None, properties)
 
     def this(id: String, name: String, properties: HashSet[CzmlProperty]) =
-      this(Option(id), Option(name), None, None, None, properties)
+      this(Option(id), Option(name), None, None, None, None, properties)
 
     def this(id: String, name: String, description: String, properties: HashSet[CzmlProperty]) =
-      this(Option(id), Option(name), None, Option(new Description(description)), None, properties)
+      this(Option(id), Option(name), None, Option(new Description(description)), None, None, properties)
 
-    def this(id: String, properties: HashSet[CzmlProperty]) = this(Option(id), None, None, None, None, properties)
+    def this(id: String, properties: HashSet[CzmlProperty]) = this(Option(id), None, None, None, None, None, properties)
 
-    def this(packet: CZMLPacket) = this(packet.id, packet.name, packet.parent, packet.description, packet.version, packet.properties)
+    def this(packet: CZMLPacket) = this(packet.id, packet.name, packet.parent, packet.description, packet.version, packet.delete, packet.properties)
 
     /**
       * returns an eventSource data representation of this packet
@@ -772,6 +774,7 @@ package object czmlProperties {
         val parent = (JsPath \ "parent").read[String].reads(js).asOpt
         val description = (JsPath \ "description").read[Description].reads(js).asOpt
         val version = (JsPath \ "version").read[String].reads(js).asOpt
+        val delete = (JsPath \ "delete").read[Boolean].reads(js).asOpt
 
         val propList = new HashSet[CzmlProperty]()
 
@@ -797,7 +800,7 @@ package object czmlProperties {
         (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_vector").read[AgiVector].reads(js).asOpt.map(propList += _)
 
-        JsSuccess(new CZMLPacket(id, name, parent, description, version, propList))
+        JsSuccess(new CZMLPacket(id, name, parent, description, version, delete, propList))
       }
     }
 
@@ -808,7 +811,8 @@ package object czmlProperties {
           packet.name.map("name" -> JsString(_)),
           packet.parent.map("parent" -> JsString(_)),
           packet.description.map("description" -> Description.fmt.writes(_)),
-          packet.version.map("version" -> JsString(_)))
+          packet.version.map("version" -> JsString(_)),
+          packet.delete.map("delete" -> JsBoolean(_)))
 
         packet.properties.foreach({
           case x: Availability => theSet += Availability.fmt.writes(x).asOpt[Availability].map("availability" -> Json.toJson(_))
