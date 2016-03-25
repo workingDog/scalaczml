@@ -37,13 +37,13 @@ import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
-import play.api.libs.json._
+import play.api.libs.json.{JsObject, _}
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.reflect.runtime.universe._
-
 import com.kodekutters.czml.czmlProperties._
+
 
 
 /**
@@ -135,19 +135,19 @@ package object czmlCore {
     *
     * @param epoch                         Specifies the epoch to use for times specifies as seconds since an epoch.
     * @param nextTime                      The time of the next sample within this interval, specified as either
-     an ISO 8601 date and time string or as seconds since epoch.
-     This property is used to determine if there is a gap between samples specified in different packets.
+    *                                      an ISO 8601 date and time string or as seconds since epoch.
+    *                                      This property is used to determine if there is a gap between samples specified in different packets.
     * @param previousTime                  The time of the previous sample within this interval, specified as either
-     an ISO 8601 date and time string or as seconds since epoch.
-     This property is used to determine if there is a gap between samples specified in different packets.
+    *                                      an ISO 8601 date and time string or as seconds since epoch.
+    *                                      This property is used to determine if there is a gap between samples specified in different packets.
     * @param interpolationAlgorithm        specifies the algorithm to use to interpolate a value at a different time from the provided data
     * @param interpolationDegree           specifies the degree of the polynomial to use for interpolation
     * @param forwardExtrapolationType      the type of extrapolation to perform when a value is requested at a time after any available samples.
     * @param forwardExtrapolationDuration  the amount of time to extrapolate backward before the property becomes undefined.
-     A value of 0 will extrapolate forever.
+    *                                      A value of 0 will extrapolate forever.
     * @param backwardExtrapolationType     the type of extrapolation to perform when a value is requested at a time before any available samples.
     * @param backwardExtrapolationDuration the amount of time to extrapolate backward before the property becomes undefined.
-     A value of 0 will extrapolate forever.
+    *                                      A value of 0 will extrapolate forever.
     */
   case class Interpolatable(epoch: Option[String] = None,
                             nextTime: Option[TimeValue] = None,

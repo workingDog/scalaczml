@@ -37,8 +37,12 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 
 import scala.collection.mutable.{ArrayBuffer, HashSet}
-
 import com.kodekutters.czml.czmlCore._
+import com.kodekutters.czml.czmlCustom.CustomProperty
+
+import scala.collection.immutable.ListMap
+
+
 
 /**
   * The Cesium CZML language as described in the following references:
@@ -64,6 +68,27 @@ package object czmlProperties {
     * (see also object CzmlProperty)
     */
   trait CzmlProperty
+
+  /**
+    * a CzmlProperty representing custom properties
+    *
+    * @param properties a map with key = the field name, and value = a CustomProperty
+    */
+  case class CustomProperties(properties: Map[String, CustomProperty] = ListMap.empty) extends CzmlProperty
+
+  object CustomProperties {
+
+    val theReads = new Reads[CustomProperties] {
+      def reads(json: JsValue): JsResult[CustomProperties] =
+        JsPath.read[Map[String, CustomProperty]].map(CustomProperties(_)).reads(json)
+    }
+
+    val theWrites = new Writes[CustomProperties] {
+      def writes(custom: CustomProperties) = Json.toJson(custom.properties)
+    }
+
+    implicit val fmt: Format[CustomProperties] = Format(theReads, theWrites)
+  }
 
   /**
     * represents time availability as a String or an array of strings
@@ -799,6 +824,8 @@ package object czmlProperties {
         (JsPath \ "agi_fan").read[Fan].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_vector").read[AgiVector].reads(js).asOpt.map(propList += _)
+        //
+        (JsPath \ "properties").read[CustomProperties].reads(js).asOpt.map(propList += _)
 
         JsSuccess(new CZMLPacket(id, name, parent, description, version, delete, propList))
       }
@@ -836,6 +863,7 @@ package object czmlProperties {
           case x: Fan => theSet += Fan.fmt.writes(x).asOpt[Fan].map("agi_fan" -> Json.toJson(_))
           case x: RectangularSensor => theSet += RectangularSensor.fmt.writes(x).asOpt[RectangularSensor].map("agi_rectangularSensor" -> Json.toJson(_))
           case x: AgiVector => theSet += AgiVector.fmt.writes(x).asOpt[AgiVector].map("agi_vector" -> Json.toJson(_))
+          case x: CustomProperties => theSet += CustomProperties.fmt.writes(x).asOpt[CustomProperties].map("properties" -> Json.toJson(_))
         })
 
         JsObject(theSet.toList.flatten)
@@ -924,6 +952,7 @@ package object czmlProperties {
           (JsPath \ "agi_fan").read[Fan].reads(js) or
           (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js) or
           (JsPath \ "agi_vector").read[AgiVector].reads(js)
+          (JsPath \ "properties").read[CustomProperties].reads(js)
       }
     }
 
@@ -949,11 +978,10 @@ package object czmlProperties {
       case x: Fan => Json.obj("agi_fan" -> Fan.fmt.writes(x))
       case x: RectangularSensor => Json.obj("agi_rectangularSensor" -> RectangularSensor.fmt.writes(x))
       case x: AgiVector => Json.obj("agi_vector" -> AgiVector.fmt.writes(x))
+      case x: CustomProperties => Json.obj("properties" -> CustomProperties.fmt.writes(x))
     }
 
     implicit val fmt: Format[CzmlProperty] = Format(theReads, theWrites)
-
   }
-
 
 }

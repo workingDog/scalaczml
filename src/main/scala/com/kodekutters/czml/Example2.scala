@@ -9,7 +9,10 @@ import scala.collection.mutable
 import scala.io.Source
 
 /**
-  * example of mixing in a custom property
+  * example of ad-hock mixing in a custom element
+  *
+  * NOTE: for a more principled way to add custom properties see ExampleCustom
+  *
   */
 
 /**
