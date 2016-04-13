@@ -5,10 +5,10 @@ import java.awt.Color
 import com.kodekutters.czml.CzmlImplicits._
 import com.kodekutters.czml.czmlCore._
 import com.kodekutters.czml.czmlProperties._
-import com.kodekutters.czml.czmlCustom.{CustomList, CustomBasic, CustomMap}
+import com.kodekutters.czml.czmlCustom.{CustomBasic, CustomInterval, CustomList, CustomMap}
 import play.api.libs.json.Json
 
-import scala.collection.mutable.{ListMap, HashSet, ListBuffer}
+import scala.collection.mutable.{HashSet, ListBuffer, ListMap}
 
 
 /**
@@ -38,6 +38,7 @@ object ExampleCustom {
       "custom-array" -> new CustomList(List(1, 2, 3, 4, 5)),
       "basic-double" -> new CustomBasic(23.4),
       "basic-string" -> new CustomBasic("some-text"),
+      "change-name" -> new CustomInterval("2007-03-02T13:00:00Z/2008-05-11T15:30:00Z", "XYZ"),
       "basic-array" -> new CustomBasic(ListBuffer(9, 8, 7)))
 
     // create a custom properties czml property

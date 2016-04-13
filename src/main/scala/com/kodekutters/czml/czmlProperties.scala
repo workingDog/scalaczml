@@ -279,9 +279,9 @@ package object czmlProperties {
     val theReads = new Reads[CzmlPositions] {
       def reads(js: JsValue): JsResult[CzmlPositions] = {
         JsPath.read[Array[CzmlPosition]].reads(js).asOpt match {
-          // have a single property that we wrap in an option array
+          // have a single CzmlPosition that we wrap in an option array
           case None => JsSuccess(new CzmlPositions(Option(Array(JsPath.read[CzmlPosition].reads(js).getOrElse(new CzmlPosition())))))
-          // have an array of properties
+          // have an array of CzmlPosition
           case Some(b) => JsSuccess(new CzmlPositions(Some(b)))
         }
       }
@@ -824,7 +824,6 @@ package object czmlProperties {
         (JsPath \ "agi_fan").read[Fan].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js).asOpt.map(propList += _)
         (JsPath \ "agi_vector").read[AgiVector].reads(js).asOpt.map(propList += _)
-        //
         (JsPath \ "properties").read[CustomProperties].reads(js).asOpt.map(propList += _)
 
         JsSuccess(new CZMLPacket(id, name, parent, description, version, delete, propList))

@@ -1462,13 +1462,20 @@ package object czmlCore {
     * Fills the surface with an image. Used in Material
     *
     * @param image  The image to display on the surface.
-    * @param alpha  The alpha value for the whole image.  This will be multiplied with alpha values within the image, if any.
+    * @param color  The color of the image. This color value is multiplied with the image to produce the final color.
+    * @param transparent Whether or not the image has transparency.
     * @param repeat The number of times the image repeats along each axis.
     */
-  case class Image(image: Option[ImageUri] = None, alpha: Option[CzmlNumber] = None, repeat: Option[CzmlCartesian2] = None) {
+  case class Image(image: Option[ImageUri] = None, color: Option[CzmlColor] = None,
+                   transparent: Option[Boolean] = None, repeat: Option[CzmlCartesian2] = None) {
+
     def this(uri: String) = this(Option(ImageUri(uri)))
 
-    def this(uri: String, alpha: Double, x: Int, y: Int) = this(Option(ImageUri(uri)), Option(CzmlNumber(alpha)), Option(CzmlCartesian2(x, y)))
+    def this(uri: String, color: CzmlColor, transparent: Boolean, x: Int, y: Int) =
+      this(Option(ImageUri(uri)), Option(color), Option(transparent), Option(CzmlCartesian2(x, y)))
+
+    def this(uri: String, x: Int, y: Int) =
+      this(Option(ImageUri(uri)), None, None, Option(CzmlCartesian2(x, y)))
 
   }
 
@@ -1477,7 +1484,9 @@ package object czmlCore {
 
     def apply(uri: String): Image = new Image(uri)
 
-    def apply(uri: String, alpha: Double, x: Int, y: Int): Image = new Image(uri, alpha, x, y)
+    def apply(uri: String, x: Int, y: Int): Image = new Image(uri, x, y)
+
+    def apply(uri: String, color: CzmlColor, transparent: Boolean, x: Int, y: Int): Image = new Image(uri, color, transparent, x, y)
 
   }
 
