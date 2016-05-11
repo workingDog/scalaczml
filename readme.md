@@ -31,11 +31,17 @@ of the [Play Framework](https://www.playframework.com/)
 
 See also the build.sbt file.
 
-## Compiling and packaging
+## Installation and packaging
 
-Using [SBT](http://www.scala-sbt.org/), just type "sbt package" to generate a jar file that you can then 
-include in your project. The jar file will be in the directory:
- ".../target/scala-2.11/scalaczml_2.11-1.0.jar" 
+Add the following dependency to build.sbt:
+
+    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.1"
+
+To compile and generate a jar file from the source:
+
+    sbt package
+
+The jar file (scalaczml_2.11-0.1.jar) will be in the "./target/scala-2.11/" directory.
 
 ## Documentation
 
