@@ -2247,14 +2247,29 @@ package object czmlCore {
   }
 
   /**
+    * A material that fills the surface of a line with an arrow
+    *
+    * @param color  The color of the surface
+    */
+  case class PolylineArrow(color: Option[CzmlColor])
+
+  object PolylineArrow {
+    implicit val fmt = Json.format[PolylineArrow]
+  }
+
+  /**
     * material used by a line such as a Path or a Polyline
     *
     * @param solidColor      Fills the surface with a solid color, which may be translucent.
     * @param polylineOutline Colors the line with a color and outline.
     * @param polylineGlow    Colors the line with a glowing color.
     */
-  case class LineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
-                          polylineGlow: Option[PolylineGlow] = None) {
+  case class PolylineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
+                              polylineGlow: Option[PolylineGlow] = None,
+                              polylineArrow: Option[PolylineArrow] = None,
+                              image: Option[Image] = None,
+                              grid: Option[Grid] = None,
+                              stripe: Option[Stripe] = None) {
 
     def this(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow) =
       this(Option(solidColor), Option(polylineOutline), Option(polylineGlow))
@@ -2263,14 +2278,14 @@ package object czmlCore {
       this(Option(new SolidColor(solidColor)), Option(new PolylineOutline(polylineOutline)), Option(new PolylineGlow(polylineGlow)))
   }
 
-  object LineMaterial {
-    implicit val fmt = Json.format[LineMaterial]
+  object PolylineMaterial {
+    implicit val fmt = Json.format[PolylineMaterial]
 
-    def apply(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow): LineMaterial =
-      new LineMaterial(solidColor, polylineOutline, polylineGlow)
+    def apply(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow): PolylineMaterial =
+      new PolylineMaterial(solidColor, polylineOutline, polylineGlow)
 
-    def apply(solidColor: CzmlColor, polylineOutline: CzmlColor, polylineGlow: CzmlColor): LineMaterial =
-      new LineMaterial(solidColor, polylineOutline, polylineGlow)
+    def apply(solidColor: CzmlColor, polylineOutline: CzmlColor, polylineGlow: CzmlColor): PolylineMaterial =
+      new PolylineMaterial(solidColor, polylineOutline, polylineGlow)
 
   }
 

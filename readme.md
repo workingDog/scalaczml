@@ -41,7 +41,7 @@ To compile and generate a jar file from the source:
 
     sbt package
 
-The jar file (scalaczml_2.11-0.1.jar) will be in the "./target/scala-2.11/" directory.
+The jar file (scalaczml_2.11-0.2-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
 
 ## Documentation
 

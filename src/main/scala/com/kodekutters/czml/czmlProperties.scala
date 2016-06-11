@@ -314,7 +314,7 @@ package object czmlProperties {
     * @param leadTime   The time ahead of the animation time, in seconds, to show the path.
     * @param trailTime  The time behind the animation time, in seconds, to show the path.
     */
-  case class Path(show: Option[CzmlBoolean] = None, material: Option[LineMaterial] = None,
+  case class Path(show: Option[CzmlBoolean] = None, material: Option[PolylineMaterial] = None,
                   width: Option[Number] = None, resolution: Option[Number] = None,
                   leadTime: Option[Number] = None, trailTime: Option[Number] = None) extends CzmlProperty
 
@@ -332,7 +332,7 @@ package object czmlProperties {
     * @param followSurface Whether or not the positions are connected as great arcs (the default) or as straight lines.
     */
   case class Polyline(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
-                      material: Option[LineMaterial] = None, width: Option[Number] = None,
+                      material: Option[PolylineMaterial] = None, width: Option[Number] = None,
                       followSurface: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Polyline {

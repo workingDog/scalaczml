@@ -100,9 +100,11 @@ object CzmlImplicits {
 
   implicit def PolylineGlowToPolylineGlowOp(value: PolylineGlow): Option[PolylineGlow] = Option(value)
 
+  implicit def PolylineArrowToPolylineArrowOp(value: PolylineArrow): Option[PolylineArrow] = Option(value)
+
   implicit def PolylineOutlineToPolylineOutlineOp(value: PolylineOutline): Option[PolylineOutline] = Option(value)
 
-  implicit def LineMaterialToLineMaterialOp(value: LineMaterial): Option[LineMaterial] = Option(value)
+  implicit def LineMaterialToLineMaterialOp(value: PolylineMaterial): Option[PolylineMaterial] = Option(value)
 
   implicit def PortionToDisplayToPortionToDisplayOp(value: PortionToDisplay): Option[PortionToDisplay] = Option(value)
 
