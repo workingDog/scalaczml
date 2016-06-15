@@ -45,7 +45,6 @@ import scala.reflect.runtime.universe._
 import com.kodekutters.czml.czmlProperties._
 
 
-
 /**
   * The Cesium CZML language as described in the following references:
   *
@@ -646,6 +645,117 @@ package object czmlCore {
     }
 
     implicit val fmt: Format[CartesianVelocity] = Format(theReads, theWrites)
+  }
+
+/**
+  * A optional TimeValue plus a set of 4-dimensional coordinates used to represent rotation in 3-dimensional space,
+  * specified as [t, X, Y, Z, W]
+  * used to construct UnitQuaternion
+  */
+  case class UnitQuaternionValue(t: Option[TimeValue] = None, x: Double, y: Double, z: Double, w: Double) {
+    def this(t: String, x: Double, y: Double, z: Double, w: Double) = this(Option(TimeValue(t)), x, y, z, w)
+    def this(t: Double, x: Double, y: Double, z: Double, w: Double) = this(Option(TimeValue(t)), x, y, z, w)
+    def this(t: TimeValue, x: Double, y: Double, z: Double, w: Double) = this(Option(t), x, y, z, w)
+  }
+
+  object UnitQuaternionValue {
+    def apply(t: TimeValue, x: Double, y: Double, z: Double, w: Double): UnitQuaternionValue = new UnitQuaternionValue(t, x, y, z, w)
+    def apply(t: String, x: Double, y: Double, z: Double, w: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, z, w)
+    def apply(t: Double, x: Double, y: Double, z: Double, w: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, z, w)
+
+    val theReads: Reads[UnitQuaternionValue] =
+      (JsPath.readNullable[TimeValue] and
+        JsPath.read[Array[Double]]) ((t, q) => UnitQuaternionValue(t, q(0), q(1), q(2), q(3)))
+
+    val theWrites = new Writes[UnitQuaternionValue] {
+      def writes(values: UnitQuaternionValue) = {
+        val theList = values.t match {
+            case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.x), JsNumber(values.y), JsNumber(values.z), JsNumber(values.w))
+            case None => List(JsNumber(values.x), JsNumber(values.y), JsNumber(values.z), JsNumber(values.w))
+          }
+        JsArray(theList)
+      }
+    }
+
+    implicit val fmt: Format[UnitQuaternionValue] = Format(theReads, theWrites)
+  }
+
+  /**
+    * A set of 4-dimensional coordinates used to represent rotation in 3-dimensional space,
+    * specified as [X, Y, Z, W].
+    * If the array has four elements, the value is constant.
+    * If it has five or more elements, they are time-tagged samples
+    * arranged as [Time, X, Y, Z, W, Time, X, Y, Z, W, ...], where Time is an ISO 8601 date and
+    * time string or seconds since epoch.
+    *
+    * @param q the sequence of UnitQuaternionValue
+    */
+  case class UnitQuaternion(q: Seq[UnitQuaternionValue]) {
+    def this(q: UnitQuaternionValue) = this(Seq(q))
+
+    def this(x: Double, y: Double, z: Double, w: Double) = this(new UnitQuaternionValue(None, x, y, z, w))
+
+    def this(t: TimeValue, x: Double, y: Double, z: Double, w: Double) = this(new UnitQuaternionValue(t, x, y, z, w))
+
+    def this(t: String, x: Double, y: Double, z: Double, w: Double) = this(TimeValue(t), x, y, z, w)
+
+    def this(t: Double, x: Double, y: Double, z: Double, w: Double) = this(TimeValue(t), x, y, z, w)
+
+  }
+
+  object UnitQuaternion {
+
+    def apply(q: UnitQuaternionValue) = new UnitQuaternion(q)
+
+    def apply(x: Double, y: Double, z: Double, w: Double) = new UnitQuaternion(x, y, z, w)
+
+    def apply(t: TimeValue, x: Double, y: Double, z: Double, w: Double) = new UnitQuaternion(t, x, y, z, w)
+
+    def apply(t: String, x: Double, y: Double, z: Double, w: Double) = new UnitQuaternion(TimeValue(t), x, y, z, w)
+
+    def apply(t: Double, x: Double, y: Double, z: Double, w: Double) = new UnitQuaternion(TimeValue(t), x, y, z, w)
+
+
+    // todo does not read a mix array of values properly
+    val theReads = new Reads[UnitQuaternion] {
+      def reads(js: JsValue): JsResult[UnitQuaternion] = {
+        val jsList = js.as[JsArray].value
+        // have a list of one or more UnitQuaternionValue, multiple of 5 elements
+        if (jsList.length >= 5 && (jsList.length % 5) == 0) {
+          JsSuccess(new UnitQuaternion(
+            (for (i <- jsList.indices by 5) yield ((JsPath \ i).readNullable[TimeValue] and
+              (JsPath \ (i + 1)).read[Double] and (JsPath \ (i + 2)).read[Double] and
+              (JsPath \ (i + 3)).read[Double] and (JsPath \ (i + 4)).read[Double]
+              ) (UnitQuaternionValue.apply(_, _, _, _, _)).reads(js).asOpt).flatten))
+        }
+        // have a single UnitQuaternion [X, Y, Z, W]
+        else {
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]
+            ) (UnitQuaternionValue.apply(None, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[UnitQuaternionValue] => JsSuccess(new UnitQuaternion(Seq(s.get)))
+            case e: JsError =>
+              logger.error("could not read UnitQuaternion values: " + js.toString)
+              JsError("could not read UnitQuaternion values: " + js.toString)
+          }
+        }
+      }
+    }
+
+    val theWrites = new Writes[UnitQuaternion] {
+      def writes(value: UnitQuaternion) = {
+        val theList = for (unitQ <- value.q) yield {
+          unitQ.t match {
+            case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(unitQ.x), JsNumber(unitQ.y), JsNumber(unitQ.z), JsNumber(unitQ.w))
+            case None => List(JsNumber(unitQ.x), JsNumber(unitQ.y), JsNumber(unitQ.z), JsNumber(unitQ.w))
+          }
+        }
+        JsArray(theList.flatten)
+      }
+    }
+
+    implicit val fmt: Format[UnitQuaternion] = Format(theReads, theWrites)
   }
 
   /**
@@ -1461,10 +1571,10 @@ package object czmlCore {
   /**
     * Fills the surface with an image. Used in Material
     *
-    * @param image  The image to display on the surface.
-    * @param color  The color of the image. This color value is multiplied with the image to produce the final color.
+    * @param image       The image to display on the surface.
+    * @param color       The color of the image. This color value is multiplied with the image to produce the final color.
     * @param transparent Whether or not the image has transparency.
-    * @param repeat The number of times the image repeats along each axis.
+    * @param repeat      The number of times the image repeats along each axis.
     */
   case class Image(image: Option[ImageUri] = None, color: Option[CzmlColor] = None,
                    transparent: Option[Boolean] = None, repeat: Option[CzmlCartesian2] = None) {
@@ -2249,7 +2359,7 @@ package object czmlCore {
   /**
     * A material that fills the surface of a line with an arrow
     *
-    * @param color  The color of the surface
+    * @param color The color of the surface
     */
   case class PolylineArrow(color: Option[CzmlColor])
 
@@ -2341,28 +2451,57 @@ package object czmlCore {
   }
 
   /**
+    * Defines a rotation that transforms a vector expressed in one axes and transforms it to another
+    *
+    */
+  case class Rotation(unitQuaternion: UnitQuaternion,
+                      reference: Option[String] = None,
+                      timeFields: Option[Interpolatable] = None) {
+
+    def this(unitQuaternion: UnitQuaternion, reference: String) = this(unitQuaternion, Option(reference))
+
+  }
+
+  object Rotation {
+
+    val theReads: Reads[Rotation] =
+      ((JsPath \ "unitQuaternion").read[UnitQuaternion] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((u, r, t) => Rotation(u, r, Option(t)))
+
+    val theWrites: Writes[Rotation] =
+      ((JsPath \ "unitQuaternion").write[UnitQuaternion] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(Rotation.unapply))
+
+    implicit val fmt: Format[Rotation] = Format(theReads, theWrites)
+  }
+
+  /**
     * Transformations to apply to a particular node in a 3D model
     *
     * @param scale       Defines an scaling factor which can optionally vary over time.
     * @param translation Defines an translational offset which can optionally vary over time
     * @param rotation
     */
-  case class NodeTransformation(scale: Option[CzmlCartesian] = None, translation: Option[CzmlCartesian] = None, rotation: Option[Orientation] = None) {
+  case class NodeTransformation(scale: Option[CzmlCartesian] = None,
+                                translation: Option[CzmlCartesian] = None,
+                                rotation: Option[Rotation] = None) {
 
-    def this(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Orientation) =
+    def this(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Rotation) =
       this(Option(new CzmlCartesian(sx, sy, sz)), Option(new CzmlCartesian(tx, ty, tz)), Option(rotation))
 
-    def this(scale: Cartesian, translation: Cartesian, rotation: Orientation) =
+    def this(scale: Cartesian, translation: Cartesian, rotation: Rotation) =
       this(Option(CzmlCartesian(scale)), Option(CzmlCartesian(translation)), Option(rotation))
   }
 
   object NodeTransformation {
     implicit val fmt = Json.format[NodeTransformation]
 
-    def apply(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Orientation) =
+    def apply(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Rotation) =
       new NodeTransformation(sx, sy, sz, tx, ty, tz, rotation)
 
-    def apply(scale: Cartesian, translation: Cartesian, rotation: Orientation): NodeTransformation =
+    def apply(scale: Cartesian, translation: Cartesian, rotation: Rotation): NodeTransformation =
       new NodeTransformation(scale, translation, rotation)
   }
 
@@ -2400,5 +2539,49 @@ package object czmlCore {
 
     implicit val fmt: Format[NodeTransformations] = Format(theReads, theWrites)
   }
+
+  /**
+    * The width, depth, and height of a box.
+    *
+    */
+  case class BoxDimensions(cartesian: Option[Cartesian] = None, reference: Option[String] = None) {
+    def this(cartesian: Cartesian) = this(Option(cartesian))
+
+    def this(cartesian: Cartesian, reference: String) = this(Option(cartesian), Option(reference))
+
+  }
+
+  object BoxDimensions {
+    implicit val fmt = Json.format[BoxDimensions]
+  }
+
+  /**
+    * The style of a corner values
+    */
+  sealed trait CornerTypeValue
+
+  case object BEVELED extends CornerTypeValue
+
+  case object MITERED extends CornerTypeValue
+
+  case object ROUNDED extends CornerTypeValue
+
+  object CornerTypeValue {
+    def fromString(value: String): Option[CornerTypeValue] = Vector(BEVELED, MITERED, ROUNDED).find(_.toString == value)
+  }
+
+  /**
+    * The style of a corner
+    */
+  case class CornerType(cornerType: Option[CornerType] = None, reference: Option[String] = None) {
+    def this(cornerType: CornerType) = this(Option(cornerType))
+
+    def this(cornerType: CornerType, reference: String) = this(Option(cornerType), Option(reference))
+  }
+
+  object CornerType {
+    implicit val fmt = Json.format[CornerType]
+  }
+
 
 }

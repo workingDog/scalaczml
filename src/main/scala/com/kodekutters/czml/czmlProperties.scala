@@ -43,7 +43,6 @@ import com.kodekutters.czml.czmlCustom.CustomProperty
 import scala.collection.immutable.ListMap
 
 
-
 /**
   * The Cesium CZML language as described in the following references:
   *
@@ -126,6 +125,90 @@ package object czmlProperties {
   }
 
   /**
+    * A box, which is a closed rectangular cuboid
+    *
+    * @param show           A boolean Property specifying the visibility of the box.
+    * @param dimensions     The dimensions of the box
+    * @param material       A Property specifying the material used to fill the box.
+    * @param fill           A boolean Property specifying whether the box is filled with the provided material.
+    * @param outline        A boolean Property specifying whether the box is outlined.
+    * @param outlineColor   A Property specifying the Color of the outline.
+    * @param outlineWidth   A numeric Property specifying the width of the outline.
+    */
+  case class Box(show: Option[CzmlBoolean] = None,
+                 dimensions: Option[BoxDimensions] = None,
+                 material: Option[Material] = None,
+                 fill: Option[CzmlBoolean] = None,
+                 outline: Option[CzmlBoolean] = None,
+                 outlineColor: Option[ColorProperty] = None,
+                 outlineWidth: Option[CzmlNumber] = None) extends CzmlProperty
+
+  object Box {
+    implicit val fmt = Json.format[Box]
+  }
+
+  /**
+    * A corridor, which is a shape defined by a centerline and width that conforms to the curvature of the globe.
+    * It can be placed on the surface or at altitude and can optionally be extruded into a volume
+    *
+    * @param show           A boolean Property specifying the visibility of the corridor.
+    * @param width          The width of the corridor
+    * @param material       A Property specifying the material used to fill the corridor.
+    * @param height         A numeric Property specifying the height of the corridor.
+    * @param extrudedHeight A numeric Property specifying the altitude of the corridor extrusion.
+    * @param granularity    A numeric Property specifying the angular distance between points on the corridor.
+    * @param cornerType     The corner type of the corridor
+    * @param fill           A boolean Property specifying whether the corridor is filled with the provided material.
+    * @param outline        A boolean Property specifying whether the corridor is outlined.
+    * @param outlineColor   A Property specifying the Color of the outline.
+    * @param outlineWidth   A numeric Property specifying the width of the outline.
+    *
+    */
+  case class Corridor(show: Option[CzmlBoolean] = None,
+                      width: Option[CzmlNumber] = None,
+                      height: Option[CzmlNumber] = None,
+                      extrudedHeight: Option[CzmlNumber] = None,
+                      cornerType: Option[CornerType] = None,
+                      granularity: Option[CzmlNumber] = None,
+                      material: Option[Material] = None,
+                      fill: Option[CzmlBoolean] = None,
+                      outline: Option[CzmlBoolean] = None,
+                      outlineColor: Option[ColorProperty] = None,
+                      outlineWidth: Option[CzmlNumber] = None) extends CzmlProperty
+
+  object Corridor {
+    implicit val fmt = Json.format[Corridor]
+  }
+
+  /**
+    * A cylinder
+    *
+    * @param show         A boolean Property specifying the visibility of the cylinder.
+    * @param length       The length of the cylinder
+    * @param material     A Property specifying the material used to fill the cylinder.
+    * @param topRadius    The top radius of the cylinder
+    * @param bottomRadius The bottom radius of the cylinder
+    * @param fill         A boolean Property specifying whether the cylinder is filled with the provided material.
+    * @param outline      A boolean Property specifying whether the cylinder is outlined.
+    * @param outlineColor A Property specifying the Color of the outline.
+    * @param outlineWidth A numeric Property specifying the width of the outline.
+    *
+    */
+  case class Cylinder(show: Option[CzmlBoolean] = None,
+                      length: Option[CzmlNumber] = None,
+                      topRadius: Option[CzmlNumber] = None,
+                      bottomRadius: Option[CzmlNumber] = None,
+                      material: Option[Material] = None,
+                      fill: Option[CzmlBoolean] = None,
+                      outline: Option[CzmlBoolean] = None,
+                      outlineColor: Option[ColorProperty] = None,
+                      outlineWidth: Option[CzmlNumber] = None) extends CzmlProperty
+
+  object Cylinder {
+    implicit val fmt = Json.format[Cylinder]
+  }
+
+  /**
     * A billboard, or viewport-aligned image. The billboard is positioned in the scene by the position property.
     * A billboard is sometimes called a marker.
     *
@@ -169,12 +252,12 @@ package object czmlProperties {
     * but it is used to orient models, cones, and pyramids attached to the object.
     *
     * @param axes
-    * @param unitQuaternion
+    * @param unitQuaternion The orientation specified as a 4-dimensional unit magnitude quaternion, specified as [X, Y, Z, W]
     * @param reference  A reference property.
     * @param interval   an interval
     * @param timeFields the time interpolatable part of this property
     */
-  case class Orientation(axes: Option[String] = None, unitQuaternion: Option[Array[Double]] = None,
+  case class Orientation(axes: Option[String] = None, unitQuaternion: Option[UnitQuaternionValue] = None,
                          interval: Option[String] = None,
                          reference: Option[String] = None,
                          timeFields: Option[Interpolatable] = None) extends CzmlProperty
@@ -183,14 +266,14 @@ package object czmlProperties {
 
     val theReads: Reads[Orientation] =
       ((JsPath \ "axes").readNullable[String] and
-        (JsPath \ "unitQuaternion").readNullable[Array[Double]] and
+        (JsPath \ "unitQuaternion").readNullable[UnitQuaternionValue] and
         (JsPath \ "interval").readNullable[String] and
         (JsPath \ "reference").readNullable[String] and
         Interpolatable.fmt) ((ax, uni, intrv, ref, interpo) => Orientation(ax, uni, intrv, ref, Option(interpo)))
 
     val theWrites: Writes[Orientation] =
       ((JsPath \ "axes").writeNullable[String] and
-        (JsPath \ "unitQuaternion").writeNullable[Array[Double]] and
+        (JsPath \ "unitQuaternion").writeNullable[UnitQuaternionValue] and
         (JsPath \ "interval").writeNullable[String] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(Orientation.unapply))
@@ -440,7 +523,6 @@ package object czmlProperties {
   /**
     * Describes a 3d Cartesian property which can optionally vary over time.
     * Can represent the dimensions of the ellipsoid radii.
-    * Also describes the "viewFrom" property.
     * It is also used in NodeTransformation for scale and translation
     *
     * @param cartesian  The Cartesian [X, Y, Z] in meters. If the array has three elements, the cartesian is constant.
@@ -489,6 +571,45 @@ package object czmlProperties {
         JsPath.writeNullable[Interpolatable]) (unlift(CzmlCartesian.unapply))
 
     implicit val fmt: Format[CzmlCartesian] = Format(theReads, theWrites)
+  }
+
+  /**
+    * A suggested camera location when viewing an object, specified as a Cartesian position in
+    * the East (x), North (y), Up (z) reference frame relative to the object's position.
+    *
+    * @param cartesian  The Cartesian [X, Y, Z] in meters. If the array has three elements, the cartesian is constant.
+    *                   If it has four or more elements, they are time-tagged samples arranged as
+    *                   [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date and
+    *                   time string or seconds since epoch.
+    * @param reference  A reference property.
+    * @param timeFields the time interpolatable part of this property
+    */
+  case class ViewFrom(cartesian: Option[Cartesian] = None,
+                      reference: Option[String] = None,
+                      timeFields: Option[Interpolatable] = None) extends CzmlProperty {
+
+    def this(cartesian: Cartesian) = this(Option(cartesian))
+
+    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
+  }
+
+  object ViewFrom {
+
+    def apply(cartesian: Cartesian): CzmlCartesian = new CzmlCartesian(cartesian)
+
+    def apply(x: Double, y: Double, z: Double): CzmlCartesian = new CzmlCartesian(x, y, z)
+
+    val theReads: Reads[ViewFrom] =
+      ((JsPath \ "cartesian").readNullable[Cartesian] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((cart, ref, interpo) => ViewFrom(cart, ref, Option(interpo)))
+
+    val theWrites: Writes[ViewFrom] =
+      ((JsPath \ "cartesian").writeNullable[Cartesian] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(ViewFrom.unapply))
+
+    implicit val fmt: Format[ViewFrom] = Format(theReads, theWrites)
   }
 
 
@@ -813,7 +934,7 @@ package object czmlProperties {
         (JsPath \ "polyline").read[Polyline].reads(js).asOpt.map(propList += _)
         (JsPath \ "polygon").read[Polygon].reads(js).asOpt.map(propList += _)
         (JsPath \ "ellipsoid").read[Ellipsoid].reads(js).asOpt.map(propList += _)
-        (JsPath \ "viewFrom").read[CzmlCartesian].reads(js).asOpt.map(propList += _)
+        (JsPath \ "viewFrom").read[ViewFrom].reads(js).asOpt.map(propList += _)
         (JsPath \ "rectangle").read[Rectangle].reads(js).asOpt.map(propList += _)
         (JsPath \ "wall").read[Wall].reads(js).asOpt.map(propList += _)
         (JsPath \ "model").read[Model].reads(js).asOpt.map(propList += _)
@@ -951,7 +1072,7 @@ package object czmlProperties {
           (JsPath \ "agi_fan").read[Fan].reads(js) or
           (JsPath \ "agi_rectangularSensor").read[RectangularSensor].reads(js) or
           (JsPath \ "agi_vector").read[AgiVector].reads(js)
-          (JsPath \ "properties").read[CustomProperties].reads(js)
+        (JsPath \ "properties").read[CustomProperties].reads(js)
       }
     }
 
