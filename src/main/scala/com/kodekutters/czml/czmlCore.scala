@@ -647,20 +647,24 @@ package object czmlCore {
     implicit val fmt: Format[CartesianVelocity] = Format(theReads, theWrites)
   }
 
-/**
-  * A optional TimeValue plus a set of 4-dimensional coordinates used to represent rotation in 3-dimensional space,
-  * specified as [t, X, Y, Z, W]
-  * used to construct UnitQuaternion
-  */
+  /**
+    * A optional TimeValue plus a set of 4-dimensional coordinates used to represent rotation in 3-dimensional space,
+    * specified as [t, X, Y, Z, W]
+    * used to construct UnitQuaternion
+    */
   case class UnitQuaternionValue(t: Option[TimeValue] = None, x: Double, y: Double, z: Double, w: Double) {
     def this(t: String, x: Double, y: Double, z: Double, w: Double) = this(Option(TimeValue(t)), x, y, z, w)
+
     def this(t: Double, x: Double, y: Double, z: Double, w: Double) = this(Option(TimeValue(t)), x, y, z, w)
+
     def this(t: TimeValue, x: Double, y: Double, z: Double, w: Double) = this(Option(t), x, y, z, w)
   }
 
   object UnitQuaternionValue {
     def apply(t: TimeValue, x: Double, y: Double, z: Double, w: Double): UnitQuaternionValue = new UnitQuaternionValue(t, x, y, z, w)
+
     def apply(t: String, x: Double, y: Double, z: Double, w: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, z, w)
+
     def apply(t: Double, x: Double, y: Double, z: Double, w: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, z, w)
 
     val theReads: Reads[UnitQuaternionValue] =
@@ -670,9 +674,9 @@ package object czmlCore {
     val theWrites = new Writes[UnitQuaternionValue] {
       def writes(values: UnitQuaternionValue) = {
         val theList = values.t match {
-            case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.x), JsNumber(values.y), JsNumber(values.z), JsNumber(values.w))
-            case None => List(JsNumber(values.x), JsNumber(values.y), JsNumber(values.z), JsNumber(values.w))
-          }
+          case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.x), JsNumber(values.y), JsNumber(values.z), JsNumber(values.w))
+          case None => List(JsNumber(values.x), JsNumber(values.y), JsNumber(values.z), JsNumber(values.w))
+        }
         JsArray(theList)
       }
     }
@@ -2568,15 +2572,34 @@ package object czmlCore {
 
   object CornerTypeValue {
     def fromString(value: String): Option[CornerTypeValue] = Vector(BEVELED, MITERED, ROUNDED).find(_.toString == value)
+
+    // todo fix this get
+    val theReads = new Reads[CornerTypeValue] {
+      def reads(json: JsValue): JsResult[CornerTypeValue] = {
+        JsPath.read[String].map(CornerTypeValue.fromString(_).get).reads(json)
+      }
+    }
+
+    val theWrites = new Writes[CornerTypeValue] {
+      def writes(value: CornerTypeValue) = {
+       value match {
+         case BEVELED => JsString(BEVELED.toString)
+         case MITERED => JsString(MITERED.toString)
+         case ROUNDED => JsString(ROUNDED.toString)
+       }
+      }
+    }
+
+    implicit val fmt: Format[CornerTypeValue] = Format(theReads, theWrites)
   }
 
   /**
     * The style of a corner
     */
-  case class CornerType(cornerType: Option[CornerType] = None, reference: Option[String] = None) {
-    def this(cornerType: CornerType) = this(Option(cornerType))
+  case class CornerType(cornerType: Option[CornerTypeValue] = None, reference: Option[String] = None) {
+    def this(cornerType: CornerTypeValue) = this(Option(cornerType))
 
-    def this(cornerType: CornerType, reference: String) = this(Option(cornerType), Option(reference))
+    def this(cornerType: CornerTypeValue, reference: String) = this(Option(cornerType), Option(reference))
   }
 
   object CornerType {

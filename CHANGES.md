@@ -14,7 +14,6 @@ Change Log
     * added CornerType and CornerTypeValue to czmlCore
     * added Cylinder to czmlProperties
     * added Corridor to czmlProperties
-    * added Rotation to czmlCore
     * added UnitQuaternion and UnitQuaternionValue to czmlCore
     * added Rotation to czmlCore
     * changed Orientation to use UnitQuaternionValue
