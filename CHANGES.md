@@ -10,6 +10,16 @@ Change Log
     * changed CZMLPacket to take ViewFrom for field viewFrom instead of CzmlCartesian
     * changed Orientation to use UnitQuaternionValue
     * changed NodeTransformation to its own Rotation type instead of Orientation
+    * renamed Stripe to StripeMaterial
+    * renamed Grid to GridMaterial
+    * renamed SolidColor to SolidColorMaterial
+    * renamed Image to ImageMaterial
+    * renamed Cartesian to Cartesian3D
+    * renamed PolylineArrow to PolylineArrowMaterial
+    * renamed PolylineGlow to PolylineGlowMaterial
+    * renamed PolylineOutline to PolylineOutlineMaterial
+    * renamed Style to LabelStyle
+
 
 * other changes
     * added PolylineArrow to czmlCore

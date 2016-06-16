@@ -329,7 +329,7 @@ package object czmlProperties {
   case class Label(eyeOffset: Option[CzmlCartesian] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
                    horizontalOrigin: Option[Origin[HORIZONTAL]] = None, outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None, pixelOffset: Option[CzmlCartesian2] = None,
-                   scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[Style] = None,
+                   scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[LabelStyle] = None,
                    text: Option[Text] = None, verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty
 
   object Label {
@@ -538,39 +538,39 @@ package object czmlProperties {
     * @param reference  A reference property.
     * @param timeFields the time interpolatable part of this property
     */
-  case class CzmlCartesian(cartesian: Option[Cartesian] = None,
+  case class CzmlCartesian(cartesian: Option[Cartesian3D] = None,
                            interval: Option[String] = None,
                            reference: Option[String] = None,
                            timeFields: Option[Interpolatable] = None) extends CzmlProperty {
 
-    def this(cartesian: Cartesian, interval: String) = this(Option(cartesian), Option(interval))
+    def this(cartesian: Cartesian3D, interval: String) = this(Option(cartesian), Option(interval))
 
-    def this(x: Double, y: Double, z: Double, interval: String) = this(Option(new Cartesian(x, y, z)), Option(interval))
+    def this(x: Double, y: Double, z: Double, interval: String) = this(Option(new Cartesian3D(x, y, z)), Option(interval))
 
-    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
+    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian3D(x, y, z)))
 
-    def this(cartesian: Cartesian) = this(Option(cartesian))
+    def this(cartesian: Cartesian3D) = this(Option(cartesian))
 
   }
 
   object CzmlCartesian {
 
-    def apply(cartesian: Cartesian, interval: String): CzmlCartesian = new CzmlCartesian(cartesian, interval)
+    def apply(cartesian: Cartesian3D, interval: String): CzmlCartesian = new CzmlCartesian(cartesian, interval)
 
     def apply(x: Double, y: Double, z: Double, interval: String): CzmlCartesian = new CzmlCartesian(x, y, z, interval)
 
     def apply(x: Double, y: Double, z: Double): CzmlCartesian = new CzmlCartesian(x, y, z)
 
-    def apply(cartesian: Cartesian): CzmlCartesian = new CzmlCartesian(cartesian)
+    def apply(cartesian: Cartesian3D): CzmlCartesian = new CzmlCartesian(cartesian)
 
     val theReads: Reads[CzmlCartesian] =
-      ((JsPath \ "cartesian").readNullable[Cartesian] and
+      ((JsPath \ "cartesian").readNullable[Cartesian3D] and
         (JsPath \ "interval").readNullable[String] and
         (JsPath \ "reference").readNullable[String] and
         Interpolatable.fmt) ((cart, intrv, ref, interpo) => CzmlCartesian(cart, intrv, ref, Option(interpo)))
 
     val theWrites: Writes[CzmlCartesian] =
-      ((JsPath \ "cartesian").writeNullable[Cartesian] and
+      ((JsPath \ "cartesian").writeNullable[Cartesian3D] and
         (JsPath \ "interval").writeNullable[String] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(CzmlCartesian.unapply))
@@ -589,28 +589,28 @@ package object czmlProperties {
     * @param reference  A reference property.
     * @param timeFields the time interpolatable part of this property
     */
-  case class ViewFrom(cartesian: Option[Cartesian] = None,
+  case class ViewFrom(cartesian: Option[Cartesian3D] = None,
                       reference: Option[String] = None,
                       timeFields: Option[Interpolatable] = None) extends CzmlProperty {
 
-    def this(cartesian: Cartesian) = this(Option(cartesian))
+    def this(cartesian: Cartesian3D) = this(Option(cartesian))
 
-    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian(x, y, z)))
+    def this(x: Double, y: Double, z: Double) = this(Option(new Cartesian3D(x, y, z)))
   }
 
   object ViewFrom {
 
-    def apply(cartesian: Cartesian): CzmlCartesian = new CzmlCartesian(cartesian)
+    def apply(cartesian: Cartesian3D): CzmlCartesian = new CzmlCartesian(cartesian)
 
     def apply(x: Double, y: Double, z: Double): CzmlCartesian = new CzmlCartesian(x, y, z)
 
     val theReads: Reads[ViewFrom] =
-      ((JsPath \ "cartesian").readNullable[Cartesian] and
+      ((JsPath \ "cartesian").readNullable[Cartesian3D] and
         (JsPath \ "reference").readNullable[String] and
         Interpolatable.fmt) ((cart, ref, interpo) => ViewFrom(cart, ref, Option(interpo)))
 
     val theWrites: Writes[ViewFrom] =
-      ((JsPath \ "cartesian").writeNullable[Cartesian] and
+      ((JsPath \ "cartesian").writeNullable[Cartesian3D] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(ViewFrom.unapply))
 
@@ -979,7 +979,7 @@ package object czmlProperties {
           case x: Path => theSet += Path.fmt.writes(x).asOpt[Path].map("path" -> Json.toJson(_))
           case x: Polygon => theSet += Polygon.fmt.writes(x).asOpt[Polygon].map("polygon" -> Json.toJson(_))
           case x: Ellipsoid => theSet += Ellipsoid.fmt.writes(x).asOpt[Ellipsoid].map("ellipsoid" -> Json.toJson(_))
-          case x: CzmlCartesian => theSet += CzmlCartesian.fmt.writes(x).asOpt[CzmlCartesian].map("viewFrom" -> Json.toJson(_))
+          case x: ViewFrom => theSet += ViewFrom.fmt.writes(x).asOpt[ViewFrom].map("viewFrom" -> Json.toJson(_))
           case x: Rectangle => theSet += Rectangle.fmt.writes(x).asOpt[Rectangle].map("rectangle" -> Json.toJson(_))
           case x: Wall => theSet += Wall.fmt.writes(x).asOpt[Wall].map("wall" -> Json.toJson(_))
           case x: Model => theSet += Model.fmt.writes(x).asOpt[Model].map("model" -> Json.toJson(_))
@@ -1068,7 +1068,7 @@ package object czmlProperties {
           (JsPath \ "polyline").read[Polyline].reads(js) or
           (JsPath \ "polygon").read[Polygon].reads(js) or
           (JsPath \ "ellipsoid").read[Ellipsoid].reads(js) or
-          (JsPath \ "viewFrom").read[CzmlCartesian].reads(js) or
+          (JsPath \ "viewFrom").read[ViewFrom].reads(js) or
           (JsPath \ "rectangle").read[Rectangle].reads(js) or
           (JsPath \ "wall").read[Wall].reads(js) or
           (JsPath \ "model").read[Model].reads(js) or
@@ -1094,7 +1094,7 @@ package object czmlProperties {
       case x: Path => Json.obj("path" -> Path.fmt.writes(x))
       case x: Polygon => Json.obj("polygon" -> Polygon.fmt.writes(x))
       case x: Ellipsoid => Json.obj("ellipsoid" -> Ellipsoid.fmt.writes(x))
-      case x: CzmlCartesian => Json.obj("viewFrom" -> CzmlCartesian.fmt.writes(x))
+      case x: ViewFrom => Json.obj("viewFrom" -> ViewFrom.fmt.writes(x))
       case x: Rectangle => Json.obj("rectangle" -> Rectangle.fmt.writes(x))
       case x: Wall => Json.obj("wall" -> Wall.fmt.writes(x))
       case x: Model => Json.obj("model" -> Model.fmt.writes(x))

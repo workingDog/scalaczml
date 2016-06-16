@@ -14,7 +14,7 @@ object CzmlImplicits {
 
   implicit def ArrayOfDoubleToRect(value: Array[Double]): RectangleCoordinates = new RectangleCoordinates(value)
 
-  implicit def SeqOfCoordinateToCartesian(value: Seq[Coordinate]): Cartesian = new Cartesian(value)
+  implicit def SeqOfCoordinateToCartesian(value: Seq[Coordinate]): Cartesian3D = new Cartesian3D(value)
 
   implicit def SeqOfCoordinate2DToCartesian2D(value: Seq[Coordinate2D]): Cartesian2D = new Cartesian2D(value)
 
@@ -58,11 +58,11 @@ object CzmlImplicits {
 
   implicit def StringToText(value: String): Text = new Text(value)
 
-  implicit def StringToStyle(value: String): Style = new Style(value)
+  implicit def StringToStyle(value: String): LabelStyle = new LabelStyle(value)
 
   implicit def StringToStripeOrientation(value: String): StripeOrientation = new StripeOrientation(value)
 
-  implicit def ColorToSolidColor(value: java.awt.Color): SolidColor = new SolidColor(value)
+  implicit def ColorToSolidColor(value: java.awt.Color): SolidColorMaterial = new SolidColorMaterial(value)
 
   implicit def StringToPortionToDisplay(value: String): PortionToDisplay = new PortionToDisplay(value)
 
@@ -84,25 +84,25 @@ object CzmlImplicits {
 
   implicit def TextToTextOp(value: Text): Option[Text] = Option(value)
 
-  implicit def StyleToStyleOp(value: Style): Option[Style] = Option(value)
+  implicit def StyleToStyleOp(value: LabelStyle): Option[LabelStyle] = Option(value)
 
   implicit def CzmlPositionToCzmlPositionOp(value: CzmlPosition): Option[CzmlPosition] = Option(value)
 
   implicit def StripeOrientationToStripeOrientationOp(value: StripeOrientation): Option[StripeOrientation] = Option(value)
 
-  implicit def StripeToStripeOp(value: Stripe): Option[Stripe] = Option(value)
+  implicit def StripeToStripeOp(value: StripeMaterial): Option[StripeMaterial] = Option(value)
 
-  implicit def GridToGridOp(value: Grid): Option[Grid] = Option(value)
+  implicit def GridToGridOp(value: GridMaterial): Option[GridMaterial] = Option(value)
 
-  implicit def SolidColorToSolidColorOp(value: SolidColor): Option[SolidColor] = Option(value)
+  implicit def SolidColorToSolidColorOp(value: SolidColorMaterial): Option[SolidColorMaterial] = Option(value)
 
   implicit def MaterialToMaterialOp(value: Material): Option[Material] = Option(value)
 
-  implicit def PolylineGlowToPolylineGlowOp(value: PolylineGlow): Option[PolylineGlow] = Option(value)
+  implicit def PolylineGlowToPolylineGlowOp(value: PolylineGlowMaterial): Option[PolylineGlowMaterial] = Option(value)
 
-  implicit def PolylineArrowToPolylineArrowOp(value: PolylineArrow): Option[PolylineArrow] = Option(value)
+  implicit def PolylineArrowToPolylineArrowOp(value: PolylineArrowMaterial): Option[PolylineArrowMaterial] = Option(value)
 
-  implicit def PolylineOutlineToPolylineOutlineOp(value: PolylineOutline): Option[PolylineOutline] = Option(value)
+  implicit def PolylineOutlineToPolylineOutlineOp(value: PolylineOutlineMaterial): Option[PolylineOutlineMaterial] = Option(value)
 
   implicit def LineMaterialToLineMaterialOp(value: PolylineMaterial): Option[PolylineMaterial] = Option(value)
 
@@ -130,7 +130,7 @@ object CzmlImplicits {
 
   implicit def ImageUriToImageUriOp(value: CzmlUri): Option[CzmlUri] = Option(value)
 
-  implicit def CartesianToCartesianOp(value: Cartesian): Option[Cartesian] = Option(value)
+  implicit def CartesianToCartesianOp(value: Cartesian3D): Option[Cartesian3D] = Option(value)
 
   implicit def Cartesian2DToCartesian2DOp(value: Cartesian2D): Option[Cartesian2D] = Option(value)
 
@@ -158,9 +158,9 @@ object CzmlImplicits {
 
   implicit def StringToFontOp(value: String): Option[Font] = Option(new Font(value))
 
-  implicit def StringToStyleOp(value: String): Option[Style] = Option(new Style(value))
+  implicit def StringToStyleOp(value: String): Option[LabelStyle] = Option(new LabelStyle(value))
 
-  implicit def ColorToSolidColorOp(value: java.awt.Color): Option[SolidColor] = Option(new SolidColor(value))
+  implicit def ColorToSolidColorOp(value: java.awt.Color): Option[SolidColorMaterial] = Option(new SolidColorMaterial(value))
 
   implicit def ColorToCzmlColorOp(value: java.awt.Color): Option[CzmlColor] = Option(new CzmlColor(value))
 

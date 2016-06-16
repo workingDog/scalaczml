@@ -273,7 +273,7 @@ package object czmlCore {
     * arranged as [Time, X, Y, Z, Time, X, Y, Z, Time, X, Y, Z, ...], where Time is an ISO 8601 date
     * and time string or seconds since epoch.
     */
-  case class Cartesian(coordinates: Seq[Coordinate]) {
+  case class Cartesian3D(coordinates: Seq[Coordinate]) {
     def this(coordinate: Coordinate) = this(Seq(coordinate))
 
     def this(x: Double, y: Double, z: Double) = this(Seq(Coordinate(x, y, z)))
@@ -286,26 +286,26 @@ package object czmlCore {
 
   }
 
-  object Cartesian {
+  object Cartesian3D {
 
-    def ZERO(): Cartesian = new Cartesian(0.0, 0.0, 0.0)
+    def ZERO(): Cartesian3D = new Cartesian3D(0.0, 0.0, 0.0)
 
-    def apply(x: Double, y: Double, z: Double): Cartesian = new Cartesian(x, y, z)
+    def apply(x: Double, y: Double, z: Double): Cartesian3D = new Cartesian3D(x, y, z)
 
-    def apply(coordinate: Coordinate): Cartesian = new Cartesian(coordinate)
+    def apply(coordinate: Coordinate): Cartesian3D = new Cartesian3D(coordinate)
 
-    def apply(t: String, x: Double, y: Double, z: Double): Cartesian = new Cartesian(Coordinate(t, x, y, z))
+    def apply(t: String, x: Double, y: Double, z: Double): Cartesian3D = new Cartesian3D(Coordinate(t, x, y, z))
 
-    def apply(t: Double, x: Double, y: Double, z: Double): Cartesian = new Cartesian(Coordinate(t, x, y, z))
+    def apply(t: Double, x: Double, y: Double, z: Double): Cartesian3D = new Cartesian3D(Coordinate(t, x, y, z))
 
-    def apply(t: TimeValue, x: Double, y: Double, z: Double): Cartesian = new Cartesian(Coordinate(t, x, y, z))
+    def apply(t: TimeValue, x: Double, y: Double, z: Double): Cartesian3D = new Cartesian3D(Coordinate(t, x, y, z))
 
-    val theReads = new Reads[Cartesian] {
-      def reads(js: JsValue): JsResult[Cartesian] = {
+    val theReads = new Reads[Cartesian3D] {
+      def reads(js: JsValue): JsResult[Cartesian3D] = {
         val jsList = js.as[JsArray].value
         // have a list of timed coordinates, multiple of 4 elements
         if (jsList.length >= 4 && (jsList.length % 4) == 0) {
-          JsSuccess(new Cartesian(
+          JsSuccess(new Cartesian3D(
             (for (i <- jsList.indices by 4) yield ((JsPath \ i).readNullable[TimeValue] and
               (JsPath \ (i + 1)).read[Double] and (JsPath \ (i + 2)).read[Double] and
               (JsPath \ (i + 3)).read[Double]) (Coordinate.apply(_, _, _, _)).reads(js).asOpt).flatten))
@@ -315,7 +315,7 @@ package object czmlCore {
           val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
             (JsPath \ 2).read[Double]) (Coordinate.apply(None, _, _, _)).reads(js)
           result match {
-            case s: JsSuccess[Coordinate] => JsSuccess(new Cartesian(Seq(s.get)))
+            case s: JsSuccess[Coordinate] => JsSuccess(new Cartesian3D(Seq(s.get)))
             case e: JsError =>
               logger.error("could not read Coordinate values: " + js.toString)
               JsError("could not read Coordinate values: " + js.toString)
@@ -324,8 +324,8 @@ package object czmlCore {
       }
     }
 
-    val theWrites = new Writes[Cartesian] {
-      def writes(cart: Cartesian) = {
+    val theWrites = new Writes[Cartesian3D] {
+      def writes(cart: Cartesian3D) = {
         val coordList = for (coord <- cart.coordinates) yield {
           coord.t match {
             case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(coord.x), JsNumber(coord.y), JsNumber(coord.z))
@@ -336,7 +336,7 @@ package object czmlCore {
       }
     }
 
-    implicit val fmt: Format[Cartesian] = Format(theReads, theWrites)
+    implicit val fmt: Format[Cartesian3D] = Format(theReads, theWrites)
   }
 
   /**
@@ -1592,8 +1592,8 @@ package object czmlCore {
     * @param transparent Whether or not the image has transparency.
     * @param repeat      The number of times the image repeats along each axis.
     */
-  case class Image(image: Option[CzmlUri] = None, color: Option[CzmlColor] = None,
-                   transparent: Option[Boolean] = None, repeat: Option[CzmlCartesian2] = None) {
+  case class ImageMaterial(image: Option[CzmlUri] = None, color: Option[CzmlColor] = None,
+                           transparent: Option[Boolean] = None, repeat: Option[CzmlCartesian2] = None) {
 
     def this(uri: String) = this(Option(CzmlUri(uri)))
 
@@ -1605,14 +1605,14 @@ package object czmlCore {
 
   }
 
-  object Image {
-    implicit val fmt = Json.format[Image]
+  object ImageMaterial {
+    implicit val fmt = Json.format[ImageMaterial]
 
-    def apply(uri: String): Image = new Image(uri)
+    def apply(uri: String): ImageMaterial = new ImageMaterial(uri)
 
-    def apply(uri: String, x: Int, y: Int): Image = new Image(uri, x, y)
+    def apply(uri: String, x: Int, y: Int): ImageMaterial = new ImageMaterial(uri, x, y)
 
-    def apply(uri: String, color: CzmlColor, transparent: Boolean, x: Int, y: Int): Image = new Image(uri, color, transparent, x, y)
+    def apply(uri: String, color: CzmlColor, transparent: Boolean, x: Int, y: Int): ImageMaterial = new ImageMaterial(uri, color, transparent, x, y)
 
   }
 
@@ -1890,34 +1890,34 @@ package object czmlCore {
     * @param labelStyle "FILL", "OUTLINE", and "FILL_AND_OUTLINE"
     * @param reference  A reference property
     */
-  case class Style(labelStyle: Option[String] = None, reference: Option[String] = None) {
+  case class LabelStyle(labelStyle: Option[String] = None, reference: Option[String] = None) {
 
     def this(labelStyle: String) = this(Option(labelStyle))
 
     def this(labelStyle: String, reference: String) = this(Option(labelStyle), Option(reference))
   }
 
-  object Style {
+  object LabelStyle {
 
-    def apply(labelStyle: String): Style = new Style(labelStyle)
+    def apply(labelStyle: String): LabelStyle = new LabelStyle(labelStyle)
 
-    def apply(labelStyle: String, reference: String): Style = new Style(labelStyle, reference)
+    def apply(labelStyle: String, reference: String): LabelStyle = new LabelStyle(labelStyle, reference)
 
 
-    val theReads = new Reads[Style] {
-      def reads(js: JsValue): JsResult[Style] = {
+    val theReads = new Reads[LabelStyle] {
+      def reads(js: JsValue): JsResult[LabelStyle] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
           case None => JsSuccess(
-            new Style((JsPath \ "labelStyle").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
+            new LabelStyle((JsPath \ "labelStyle").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
 
-          case Some(s) => JsSuccess(new Style(Some(s)))
+          case Some(s) => JsSuccess(new LabelStyle(Some(s)))
         }
       }
     }
 
-    val theWrites = new Writes[Style] {
-      def writes(obj: Style) = {
+    val theWrites = new Writes[LabelStyle] {
+      def writes(obj: LabelStyle) = {
         obj.reference match {
           case Some(ref) => Json.obj("labelStyle" -> JsString(obj.labelStyle.getOrElse("")), "reference" -> JsString(ref))
           case None => JsString(obj.labelStyle.getOrElse(""))
@@ -1925,7 +1925,7 @@ package object czmlCore {
       }
     }
 
-    implicit val fmt: Format[Style] = Format(theReads, theWrites)
+    implicit val fmt: Format[LabelStyle] = Format(theReads, theWrites)
   }
 
   /**
@@ -1942,7 +1942,7 @@ package object czmlCore {
     * @param reference           a reference property
     * @param timeFields          the time interpolatable part of this property
     */
-  case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
+  case class CzmlPosition(referenceFrame: Option[String] = None, cartesian: Option[Cartesian3D] = None,
                           cartographicRadians: Option[Cartographic[RADIAN]] = None,
                           cartographicDegrees: Option[Cartographic[DEGREE]] = None,
                           cartesianVelocity: Option[CartesianVelocity] = None,
@@ -1950,33 +1950,33 @@ package object czmlCore {
                           reference: Option[String] = None,
                           timeFields: Option[Interpolatable] = None) {
 
-    def this(referenceFrame: String, cartesian: Cartesian, interval: String) = this(Option(referenceFrame), Option(cartesian), None, None, None, Option(interval))
+    def this(referenceFrame: String, cartesian: Cartesian3D, interval: String) = this(Option(referenceFrame), Option(cartesian), None, None, None, Option(interval))
 
-    def this(referenceFrame: String, x: Double, y: Double, z: Double, interval: String) = this(Option(referenceFrame), Option(new Cartesian(x, y, z)), None, None, None, Option(interval))
+    def this(referenceFrame: String, x: Double, y: Double, z: Double, interval: String) = this(Option(referenceFrame), Option(new Cartesian3D(x, y, z)), None, None, None, Option(interval))
 
-    def this(x: Double, y: Double, z: Double) = this(None, Option(new Cartesian(x, y, z)))
+    def this(x: Double, y: Double, z: Double) = this(None, Option(new Cartesian3D(x, y, z)))
 
-    def this(cartesian: Cartesian) = this(None, Option(cartesian))
+    def this(cartesian: Cartesian3D) = this(None, Option(cartesian))
 
-    def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(Option(referenceFrame), Option(new Cartesian(x, y, z)))
+    def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(Option(referenceFrame), Option(new Cartesian3D(x, y, z)))
 
   }
 
   object CzmlPosition {
 
-    def apply(referenceFrame: String, cartesian: Cartesian, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, cartesian, interval)
+    def apply(referenceFrame: String, cartesian: Cartesian3D, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, cartesian, interval)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double, interval: String): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z, interval)
 
     def apply(x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(x, y, z)
 
-    def apply(cartesian: Cartesian): CzmlPosition = new CzmlPosition(cartesian)
+    def apply(cartesian: Cartesian3D): CzmlPosition = new CzmlPosition(cartesian)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z)
 
     val theReads: Reads[CzmlPosition] =
       ((JsPath \ "referenceFrame").readNullable[String] and
-        (JsPath \ "cartesian").readNullable[Cartesian] and
+        (JsPath \ "cartesian").readNullable[Cartesian3D] and
         (JsPath \ "cartographicRadians").readNullable[Cartographic[RADIAN]] and
         (JsPath \ "cartographicDegrees").readNullable[Cartographic[DEGREE]] and
         (JsPath \ "cartesianVelocity").readNullable[CartesianVelocity] and
@@ -1986,7 +1986,7 @@ package object czmlCore {
 
     val theWrites: Writes[CzmlPosition] =
       ((JsPath \ "referenceFrame").writeNullable[String] and
-        (JsPath \ "cartesian").writeNullable[Cartesian] and
+        (JsPath \ "cartesian").writeNullable[Cartesian3D] and
         (JsPath \ "cartographicRadians").writeNullable[Cartographic[RADIAN]] and
         (JsPath \ "cartographicDegrees").writeNullable[Cartographic[DEGREE]] and
         (JsPath \ "cartesianVelocity").writeNullable[CartesianVelocity] and
@@ -2001,21 +2001,21 @@ package object czmlCore {
     * A non-timed/non-interpolatable value position, typically used to define a geometry, such as:
     * Polyline, Wall and Polygon
     */
-  case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian] = None,
+  case class Position(referenceFrame: Option[String] = None, cartesian: Option[Cartesian3D] = None,
                       cartographicRadians: Option[Array[Double]] = None,
                       cartographicDegrees: Option[Array[Double]] = None,
                       references: Option[Array[String]] = None,
                       interval: Option[String] = None) {
 
-    def this(cartesian: Cartesian) = this(cartesian = Option(cartesian))
+    def this(cartesian: Cartesian3D) = this(cartesian = Option(cartesian))
 
-    def this(x: Double, y: Double, z: Double) = this(cartesian = Cartesian(x, y, z))
+    def this(x: Double, y: Double, z: Double) = this(cartesian = Cartesian3D(x, y, z))
 
-    def this(t: String, x: Double, y: Double, z: Double) = this(cartesian = Cartesian(t, x, y, z))
+    def this(t: String, x: Double, y: Double, z: Double) = this(cartesian = Cartesian3D(t, x, y, z))
 
-    def this(t: Double, x: Double, y: Double, z: Double) = this(cartesian = Cartesian(t, x, y, z))
+    def this(t: Double, x: Double, y: Double, z: Double) = this(cartesian = Cartesian3D(t, x, y, z))
 
-    def this(t: TimeValue, x: Double, y: Double, z: Double) = this(cartesian = Cartesian(t, x, y, z))
+    def this(t: TimeValue, x: Double, y: Double, z: Double) = this(cartesian = Cartesian3D(t, x, y, z))
 
     def this(cartographicDegrees: Array[Double]) = this(cartographicDegrees = Option(cartographicDegrees))
 
@@ -2025,7 +2025,7 @@ package object czmlCore {
 
     implicit val fmt = Json.format[Position]
 
-    def apply(cartesian: Cartesian): Position = new Position(cartesian)
+    def apply(cartesian: Cartesian3D): Position = new Position(cartesian)
 
     def apply(x: Double, y: Double, z: Double): Position = new Position(x, y, z)
 
@@ -2049,7 +2049,7 @@ package object czmlCore {
 
     def this(positions: Position) = this(Option(Array(positions)))
 
-    def this(cartesian: Cartesian) = this(Position(cartesian))
+    def this(cartesian: Cartesian3D) = this(Position(cartesian))
 
     def this(x: Double, y: Double, z: Double) = this(Position(x, y, z))
 
@@ -2058,7 +2058,7 @@ package object czmlCore {
   }
 
   object Positions {
-    def apply(cartesian: Cartesian): Positions = new Positions(cartesian)
+    def apply(cartesian: Cartesian3D): Positions = new Positions(cartesian)
 
     def apply(positions: Position): Positions = new Positions(Option(Array(positions)))
 
@@ -2145,9 +2145,9 @@ package object czmlCore {
     *                    and any multiple or fractional values being in between.
     * @param repeat      The number of time the stripes repeat.
     */
-  case class Stripe(orientation: Option[StripeOrientation] = None, evenColor: Option[ColorProperty] = None,
-                    oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
-                    repeat: Option[Number] = None) {
+  case class StripeMaterial(orientation: Option[StripeOrientation] = None, evenColor: Option[ColorProperty] = None,
+                            oddColor: Option[ColorProperty] = None, offset: Option[Number] = None,
+                            repeat: Option[Number] = None) {
 
     def this(orientation: String, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Int) =
       this(Option(new StripeOrientation(orientation)), Option(new ColorProperty(evenColor)),
@@ -2155,11 +2155,11 @@ package object czmlCore {
 
   }
 
-  object Stripe {
-    implicit val fmt = Json.format[Stripe]
+  object StripeMaterial {
+    implicit val fmt = Json.format[StripeMaterial]
 
-    def apply(orientation: String, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Int): Stripe =
-      new Stripe(orientation, evenColor, oddColor, offset, repeat)
+    def apply(orientation: String, evenColor: CzmlColor, oddColor: CzmlColor, offset: Double, repeat: Int): StripeMaterial =
+      new StripeMaterial(orientation, evenColor, oddColor, offset, repeat)
   }
 
   /**
@@ -2171,12 +2171,12 @@ package object czmlCore {
     * @param lineThickness The thickness of grid lines along each axis, in pixels.
     * @param lineOffset    The offset of grid lines along each axis, as a percentage from 0 to 1.
     */
-  case class Grid(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
-                  lineCount: Option[CzmlCartesian2] = None, lineThickness: Option[CzmlCartesian2] = None,
-                  lineOffset: Option[CzmlCartesian2] = None)
+  case class GridMaterial(color: Option[ColorProperty] = None, cellAlpha: Option[Number] = None,
+                          lineCount: Option[CzmlCartesian2] = None, lineThickness: Option[CzmlCartesian2] = None,
+                          lineOffset: Option[CzmlCartesian2] = None)
 
-  object Grid {
-    implicit val fmt = Json.format[Grid]
+  object GridMaterial {
+    implicit val fmt = Json.format[GridMaterial]
   }
 
   /**
@@ -2184,7 +2184,7 @@ package object czmlCore {
     *
     * @param color the color to fill the surface with
     */
-  case class SolidColor(color: Option[ColorProperty] = None) {
+  case class SolidColorMaterial(color: Option[ColorProperty] = None) {
     def this(color: ColorProperty) = this(Option(color))
 
     def this(color: CzmlColor) = this(Option(new ColorProperty(color)))
@@ -2204,26 +2204,26 @@ package object czmlCore {
     def this(color: java.awt.Color) = this(CzmlColor(color))
   }
 
-  object SolidColor {
-    implicit val fmt = Json.format[SolidColor]
+  object SolidColorMaterial {
+    implicit val fmt = Json.format[SolidColorMaterial]
 
-    def apply(color: ColorProperty): SolidColor = new SolidColor(color)
+    def apply(color: ColorProperty): SolidColorMaterial = new SolidColorMaterial(color)
 
-    def apply(color: CzmlColor): SolidColor = new SolidColor(color)
+    def apply(color: CzmlColor): SolidColorMaterial = new SolidColorMaterial(color)
 
-    def apply(rgba: Rgba): SolidColor = new SolidColor(rgba)
+    def apply(rgba: Rgba): SolidColorMaterial = new SolidColorMaterial(rgba)
 
-    def apply(r: Int, g: Int, b: Int, a: Int): SolidColor = new SolidColor(r, g, b, a)
+    def apply(r: Int, g: Int, b: Int, a: Int): SolidColorMaterial = new SolidColorMaterial(r, g, b, a)
 
-    def apply(rgbaf: Rgbaf): SolidColor = new SolidColor(rgbaf)
+    def apply(rgbaf: Rgbaf): SolidColorMaterial = new SolidColorMaterial(rgbaf)
 
-    def apply(r: Float, g: Float, b: Float, a: Float): SolidColor = new SolidColor(r, g, b, a)
+    def apply(r: Float, g: Float, b: Float, a: Float): SolidColorMaterial = new SolidColorMaterial(r, g, b, a)
 
-    def apply(r: Double, g: Double, b: Double, a: Double): SolidColor = new SolidColor(r, g, b, a)
+    def apply(r: Double, g: Double, b: Double, a: Double): SolidColorMaterial = new SolidColorMaterial(r, g, b, a)
 
-    def apply(color: javafx.scene.paint.Color): SolidColor = new SolidColor(color)
+    def apply(color: javafx.scene.paint.Color): SolidColorMaterial = new SolidColorMaterial(color)
 
-    def apply(color: java.awt.Color): SolidColor = new SolidColor(color)
+    def apply(color: java.awt.Color): SolidColorMaterial = new SolidColorMaterial(color)
   }
 
   /**
@@ -2234,26 +2234,26 @@ package object czmlCore {
     * @param grid       fill the surface with a gird
     * @param stripe     fill the surface with a stripe
     */
-  case class Material(solidColor: Option[SolidColor] = None, image: Option[Image] = None,
-                      grid: Option[Grid] = None, stripe: Option[Stripe] = None) {
+  case class Material(solidColor: Option[SolidColorMaterial] = None, image: Option[ImageMaterial] = None,
+                      grid: Option[GridMaterial] = None, stripe: Option[StripeMaterial] = None) {
 
-    def this(solidColor: ColorProperty) = this(solidColor = Option(SolidColor(solidColor)))
+    def this(solidColor: ColorProperty) = this(solidColor = Option(SolidColorMaterial(solidColor)))
 
-    def this(solidColor: CzmlColor) = this(solidColor = Option(SolidColor(solidColor)))
+    def this(solidColor: CzmlColor) = this(solidColor = Option(SolidColorMaterial(solidColor)))
 
-    def this(rgba: Rgba) = this(solidColor = Option(SolidColor(rgba)))
+    def this(rgba: Rgba) = this(solidColor = Option(SolidColorMaterial(rgba)))
 
-    def this(r: Int, g: Int, b: Int, a: Int) = this(solidColor = Option(SolidColor(r, g, b, a)))
+    def this(r: Int, g: Int, b: Int, a: Int) = this(solidColor = Option(SolidColorMaterial(r, g, b, a)))
 
-    def this(rgbaf: Rgbaf) = this(solidColor = Option(SolidColor(rgbaf)))
+    def this(rgbaf: Rgbaf) = this(solidColor = Option(SolidColorMaterial(rgbaf)))
 
-    def this(r: Float, g: Float, b: Float, a: Float) = this(solidColor = Option(SolidColor(r, g, b, a)))
+    def this(r: Float, g: Float, b: Float, a: Float) = this(solidColor = Option(SolidColorMaterial(r, g, b, a)))
 
-    def this(r: Double, g: Double, b: Double, a: Double) = this(solidColor = Option(SolidColor(r, g, b, a)))
+    def this(r: Double, g: Double, b: Double, a: Double) = this(solidColor = Option(SolidColorMaterial(r, g, b, a)))
 
-    def this(image: Image) = this(image = Option(image))
+    def this(image: ImageMaterial) = this(image = Option(image))
 
-    def this(uri: String) = this(image = Option(Image(uri)))
+    def this(uri: String) = this(image = Option(ImageMaterial(uri)))
 
     def this(color: javafx.scene.paint.Color) = this(CzmlColor(color))
 
@@ -2278,7 +2278,7 @@ package object czmlCore {
 
     def apply(r: Double, g: Double, b: Double, a: Double): Material = new Material(r, g, b, a)
 
-    def apply(image: Image): Material = new Material(image)
+    def apply(image: ImageMaterial): Material = new Material(image)
 
     def apply(uri: String): Material = new Material(uri)
 
@@ -2294,7 +2294,7 @@ package object czmlCore {
     * @param color     the color of glow
     * @param glowPower the strenght of the glow
     */
-  case class PolylineGlow(color: Option[ColorProperty] = None, glowPower: Option[Number] = None) {
+  case class PolylineGlowMaterial(color: Option[ColorProperty] = None, glowPower: Option[Number] = None) {
     def this(color: ColorProperty, glowPower: Number) = this(Option(color), Option(glowPower))
 
     def this(color: CzmlColor, glowPower: Double) = this(Option(new ColorProperty(color)), Option(new Number(glowPower)))
@@ -2310,22 +2310,22 @@ package object czmlCore {
     def this(color: CzmlColor) = this(Option(new ColorProperty(color)))
   }
 
-  object PolylineGlow {
-    implicit val fmt = Json.format[PolylineGlow]
+  object PolylineGlowMaterial {
+    implicit val fmt = Json.format[PolylineGlowMaterial]
 
-    def apply(color: ColorProperty, glowPower: Number): PolylineGlow = new PolylineGlow(color, glowPower)
+    def apply(color: ColorProperty, glowPower: Number): PolylineGlowMaterial = new PolylineGlowMaterial(color, glowPower)
 
-    def apply(color: CzmlColor, glowPower: Double): PolylineGlow = new PolylineGlow(color, glowPower)
+    def apply(color: CzmlColor, glowPower: Double): PolylineGlowMaterial = new PolylineGlowMaterial(color, glowPower)
 
-    def apply(rgba: Rgba, glowPower: Double): PolylineGlow = new PolylineGlow(rgba, glowPower)
+    def apply(rgba: Rgba, glowPower: Double): PolylineGlowMaterial = new PolylineGlowMaterial(rgba, glowPower)
 
-    def apply(r: Int, g: Int, b: Int, a: Int, glowPower: Double): PolylineGlow = new PolylineGlow(r, g, b, a, glowPower)
+    def apply(r: Int, g: Int, b: Int, a: Int, glowPower: Double): PolylineGlowMaterial = new PolylineGlowMaterial(r, g, b, a, glowPower)
 
-    def apply(rgbaf: Rgbaf, glowPower: Double): PolylineGlow = new PolylineGlow(rgbaf, glowPower)
+    def apply(rgbaf: Rgbaf, glowPower: Double): PolylineGlowMaterial = new PolylineGlowMaterial(rgbaf, glowPower)
 
-    def apply(r: Double, g: Double, b: Double, a: Double, glowPower: Double): PolylineGlow = new PolylineGlow(r, g, b, a, glowPower)
+    def apply(r: Double, g: Double, b: Double, a: Double, glowPower: Double): PolylineGlowMaterial = new PolylineGlowMaterial(r, g, b, a, glowPower)
 
-    def apply(color: CzmlColor): PolylineGlow = new PolylineGlow(color)
+    def apply(color: CzmlColor): PolylineGlowMaterial = new PolylineGlowMaterial(color)
 
   }
 
@@ -2336,8 +2336,8 @@ package object czmlCore {
     * @param outlineColor color
     * @param outlineWidth with of the outline
     */
-  case class PolylineOutline(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
-                             outlineWidth: Option[Number] = None) {
+  case class PolylineOutlineMaterial(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
+                                     outlineWidth: Option[Number] = None) {
 
     def this(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number) = this(Option(color), Option(outlineColor), Option(outlineWidth))
 
@@ -2354,22 +2354,22 @@ package object czmlCore {
 
   }
 
-  object PolylineOutline {
-    implicit val fmt = Json.format[PolylineOutline]
+  object PolylineOutlineMaterial {
+    implicit val fmt = Json.format[PolylineOutlineMaterial]
 
-    def apply(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number): PolylineOutline =
-      new PolylineOutline(color, outlineColor, outlineWidth)
+    def apply(color: ColorProperty, outlineColor: ColorProperty, outlineWidth: Number): PolylineOutlineMaterial =
+      new PolylineOutlineMaterial(color, outlineColor, outlineWidth)
 
-    def apply(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double): PolylineOutline =
-      new PolylineOutline(color, outlineColor, outlineWidth)
+    def apply(color: CzmlColor, outlineColor: CzmlColor, outlineWidth: Double): PolylineOutlineMaterial =
+      new PolylineOutlineMaterial(color, outlineColor, outlineWidth)
 
-    def apply(color: Rgba, outlineColor: Rgba, outlineWidth: Double): PolylineOutline =
-      new PolylineOutline(color, outlineColor, outlineWidth)
+    def apply(color: Rgba, outlineColor: Rgba, outlineWidth: Double): PolylineOutlineMaterial =
+      new PolylineOutlineMaterial(color, outlineColor, outlineWidth)
 
-    def apply(color: Rgbaf, outlineColor: Rgbaf, outlineWidth: Double): PolylineOutline =
-      new PolylineOutline(color, outlineColor, outlineWidth)
+    def apply(color: Rgbaf, outlineColor: Rgbaf, outlineWidth: Double): PolylineOutlineMaterial =
+      new PolylineOutlineMaterial(color, outlineColor, outlineWidth)
 
-    def apply(color: CzmlColor): PolylineOutline = new PolylineOutline(color)
+    def apply(color: CzmlColor): PolylineOutlineMaterial = new PolylineOutlineMaterial(color)
   }
 
   /**
@@ -2377,10 +2377,10 @@ package object czmlCore {
     *
     * @param color The color of the surface
     */
-  case class PolylineArrow(color: Option[CzmlColor])
+  case class PolylineArrowMaterial(color: Option[CzmlColor])
 
-  object PolylineArrow {
-    implicit val fmt = Json.format[PolylineArrow]
+  object PolylineArrowMaterial {
+    implicit val fmt = Json.format[PolylineArrowMaterial]
   }
 
   /**
@@ -2390,24 +2390,24 @@ package object czmlCore {
     * @param polylineOutline Colors the line with a color and outline.
     * @param polylineGlow    Colors the line with a glowing color.
     */
-  case class PolylineMaterial(solidColor: Option[SolidColor] = None, polylineOutline: Option[PolylineOutline] = None,
-                              polylineGlow: Option[PolylineGlow] = None,
-                              polylineArrow: Option[PolylineArrow] = None,
-                              image: Option[Image] = None,
-                              grid: Option[Grid] = None,
-                              stripe: Option[Stripe] = None) {
+  case class PolylineMaterial(solidColor: Option[SolidColorMaterial] = None, polylineOutline: Option[PolylineOutlineMaterial] = None,
+                              polylineGlow: Option[PolylineGlowMaterial] = None,
+                              polylineArrow: Option[PolylineArrowMaterial] = None,
+                              image: Option[ImageMaterial] = None,
+                              grid: Option[GridMaterial] = None,
+                              stripe: Option[StripeMaterial] = None) {
 
-    def this(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow) =
+    def this(solidColor: SolidColorMaterial, polylineOutline: PolylineOutlineMaterial, polylineGlow: PolylineGlowMaterial) =
       this(Option(solidColor), Option(polylineOutline), Option(polylineGlow))
 
     def this(solidColor: CzmlColor, polylineOutline: CzmlColor, polylineGlow: CzmlColor) =
-      this(Option(new SolidColor(solidColor)), Option(new PolylineOutline(polylineOutline)), Option(new PolylineGlow(polylineGlow)))
+      this(Option(new SolidColorMaterial(solidColor)), Option(new PolylineOutlineMaterial(polylineOutline)), Option(new PolylineGlowMaterial(polylineGlow)))
   }
 
   object PolylineMaterial {
     implicit val fmt = Json.format[PolylineMaterial]
 
-    def apply(solidColor: SolidColor, polylineOutline: PolylineOutline, polylineGlow: PolylineGlow): PolylineMaterial =
+    def apply(solidColor: SolidColorMaterial, polylineOutline: PolylineOutlineMaterial, polylineGlow: PolylineGlowMaterial): PolylineMaterial =
       new PolylineMaterial(solidColor, polylineOutline, polylineGlow)
 
     def apply(solidColor: CzmlColor, polylineOutline: CzmlColor, polylineGlow: CzmlColor): PolylineMaterial =
@@ -2507,7 +2507,7 @@ package object czmlCore {
     def this(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Rotation) =
       this(Option(new CzmlCartesian(sx, sy, sz)), Option(new CzmlCartesian(tx, ty, tz)), Option(rotation))
 
-    def this(scale: Cartesian, translation: Cartesian, rotation: Rotation) =
+    def this(scale: Cartesian3D, translation: Cartesian3D, rotation: Rotation) =
       this(Option(CzmlCartesian(scale)), Option(CzmlCartesian(translation)), Option(rotation))
   }
 
@@ -2517,7 +2517,7 @@ package object czmlCore {
     def apply(sx: Double, sy: Double, sz: Double, tx: Double, ty: Double, tz: Double, rotation: Rotation) =
       new NodeTransformation(sx, sy, sz, tx, ty, tz, rotation)
 
-    def apply(scale: Cartesian, translation: Cartesian, rotation: Rotation): NodeTransformation =
+    def apply(scale: Cartesian3D, translation: Cartesian3D, rotation: Rotation): NodeTransformation =
       new NodeTransformation(scale, translation, rotation)
   }
 
@@ -2560,10 +2560,10 @@ package object czmlCore {
     * The width, depth, and height of a box.
     *
     */
-  case class BoxDimensions(cartesian: Option[Cartesian] = None, reference: Option[String] = None) {
-    def this(cartesian: Cartesian) = this(Option(cartesian))
+  case class BoxDimensions(cartesian: Option[Cartesian3D] = None, reference: Option[String] = None) {
+    def this(cartesian: Cartesian3D) = this(Option(cartesian))
 
-    def this(cartesian: Cartesian, reference: String) = this(Option(cartesian), Option(reference))
+    def this(cartesian: Cartesian3D, reference: String) = this(Option(cartesian), Option(reference))
 
   }
 
