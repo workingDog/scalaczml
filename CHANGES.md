@@ -20,5 +20,7 @@ Change Log
     * changed NodeTransformation to its own Rotation type instead of Orientation
     * added ViewFrom to czmlProperties
     * changed CZMLPacket to take ViewFrom for field viewFrom instead of CzmlCartesian
+    * renamed WsenDegrees to RectangleCoordinates in czmlCore and CzmlImplicits
+    *
 
 

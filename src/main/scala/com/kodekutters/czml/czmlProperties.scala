@@ -152,6 +152,7 @@ package object czmlProperties {
     * It can be placed on the surface or at altitude and can optionally be extruded into a volume
     *
     * @param show           A boolean Property specifying the visibility of the corridor.
+    * @param positions      The array of positions defining the centerline of the corridor
     * @param width          The width of the corridor
     * @param material       A Property specifying the material used to fill the corridor.
     * @param height         A numeric Property specifying the height of the corridor.
@@ -165,6 +166,7 @@ package object czmlProperties {
     *
     */
   case class Corridor(show: Option[CzmlBoolean] = None,
+                      positions: Option[Positions] = None,
                       width: Option[CzmlNumber] = None,
                       height: Option[CzmlNumber] = None,
                       extrudedHeight: Option[CzmlNumber] = None,
@@ -234,6 +236,7 @@ package object czmlProperties {
     * @param show             whether or not to show this property
     * @param verticalOrigin   The vertical origin of the billboard. It controls whether the billboard image
     *                         is bottom-, center-, or top-aligned with the position.
+    * @param sizeInMeters     whether this billboard's size (width and height) should be measured in meters, otherwise size is measured in pixels
     */
   case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[CzmlCartesian] = None,
                        horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[ImageUri] = None,
@@ -241,7 +244,8 @@ package object czmlProperties {
                        rotation: Option[Number] = None,
                        alignedAxis: Option[CzmlCartesian] = None,
                        show: Option[CzmlBoolean] = None,
-                       verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty
+                       verticalOrigin: Option[Origin[VERTICAL]]= None,
+                       sizeInMeters: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Billboard {
     implicit val fmt = Json.format[Billboard]
@@ -412,11 +416,12 @@ package object czmlProperties {
     * @param show          whether or not to show this property
     * @param material      The material to use to draw the polyline.
     * @param width         The width of the polyline.
+    * @param granularity   The sampling distance, in radians
     * @param followSurface Whether or not the positions are connected as great arcs (the default) or as straight lines.
     */
   case class Polyline(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                       material: Option[PolylineMaterial] = None, width: Option[Number] = None,
-                      followSurface: Option[CzmlBoolean] = None) extends CzmlProperty
+                      granularity: Option[Number] = None, followSurface: Option[CzmlBoolean] = None) extends CzmlProperty
 
   object Polyline {
     implicit val fmt = Json.format[Polyline]
@@ -440,7 +445,7 @@ package object czmlProperties {
     * @param closeBottom    A boolean Property specifying whether the rectangle has a bottom cover when extruded.
     * @param closeTop       A boolean Property specifying whether the rectangle has a top cover when extruded
     */
-  case class Rectangle(coordinates: Option[WsenDegrees] = None,
+  case class Rectangle(coordinates: Option[RectangleCoordinates] = None,
                        show: Option[CzmlBoolean] = None,
                        material: Option[Material] = None,
                        height: Option[Number] = None,
@@ -455,7 +460,7 @@ package object czmlProperties {
                        closeBottom: Option[CzmlBoolean] = None,
                        closeTop: Option[CzmlBoolean] = None) extends CzmlProperty {
 
-    def this(w: Double, s: Double, e: Double, n: Double) = this(Option(WsenDegrees(w, s, e, n)))
+    def this(w: Double, s: Double, e: Double, n: Double) = this(Option(RectangleCoordinates(w, s, e, n)))
 
   }
 
@@ -844,11 +849,13 @@ package object czmlProperties {
     * @param scale               The scale of the property.
     * @param minimumPixelSize    The approximate minimum pixel size of the model regardless of zoom.
     * @param gltf                The URL of a glTF model.
+    * @param incrementallyLoadTextures   Whether or not the model can be rendered before all textures have loaded
     * @param runAnimations       Whether or not to run animations.
     * @param nodeTransformations node transformations.
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
                    minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None,
+                   incrementallyLoadTextures: Option[CzmlBoolean] = None,
                    runAnimations: Option[CzmlBoolean] = None,
                    nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
 

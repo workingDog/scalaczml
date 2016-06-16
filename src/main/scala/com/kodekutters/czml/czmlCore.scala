@@ -165,14 +165,26 @@ package object czmlCore {
   /**
     * an array of west south, east north degrees coordinates for a rectangle
     */
-  case class WsenDegrees(wsenDegrees: Array[Double]) {
+  case class RectangleCoordinates(wsenDegrees: Array[Double], reference: Option[String] = None,
+                         timeFields: Option[Interpolatable] = None) {
     def this(w: Double, s: Double, e: Double, n: Double) = this(Array(w, s, e, n))
   }
 
-  object WsenDegrees {
-    implicit val fmt = Json.format[WsenDegrees]
+  object RectangleCoordinates {
 
-    def apply(w: Double, s: Double, e: Double, n: Double): WsenDegrees = new WsenDegrees(w, s, e, n)
+    def apply(w: Double, s: Double, e: Double, n: Double): RectangleCoordinates = new RectangleCoordinates(w, s, e, n)
+
+    val theReads: Reads[RectangleCoordinates] =
+      ((JsPath \ "wsenDegrees").read[Array[Double]] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((ws, ref, interpo) => RectangleCoordinates(ws, ref, Option(interpo)))
+
+    val theWrites: Writes[RectangleCoordinates] =
+      ((JsPath \ "wsenDegrees").write[Array[Double]] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(RectangleCoordinates.unapply))
+
+    implicit val fmt: Format[RectangleCoordinates] = Format(theReads, theWrites)
   }
 
   /**

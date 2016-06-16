@@ -12,7 +12,7 @@ import scala.reflect.runtime.universe._
   */
 object CzmlImplicits {
 
-  implicit def ArrayOfDoubleToWsenDegrees(value: Array[Double]): WsenDegrees = new WsenDegrees(value)
+  implicit def ArrayOfDoubleToRect(value: Array[Double]): RectangleCoordinates = new RectangleCoordinates(value)
 
   implicit def SeqOfCoordinateToCartesian(value: Seq[Coordinate]): Cartesian = new Cartesian(value)
 
@@ -146,7 +146,7 @@ object CzmlImplicits {
 
   implicit def PositionsToPositionsOp(value: Positions): Option[Positions] = Option(value)
 
-  implicit def WsenDegreesToWsenDegreesOp(value: WsenDegrees): Option[WsenDegrees] = Option(value)
+  implicit def RectCoordToRectCoordOp(value: RectangleCoordinates): Option[RectangleCoordinates] = Option(value)
 
   // ------------------------------------------------------------------------------------------------------
 
