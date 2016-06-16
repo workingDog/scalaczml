@@ -14,7 +14,7 @@ It describes lines, points, billboards (markers), models and
 other graphical primitives, and specifies how they change with time.
 
 **ScalaCZML** makes the CZML JSON entities available as Scala objects. 
-The library follows the specification of reference 1, but also include additional objects such as Rectangle and Wall.
+The library follows the specifications of reference 1.
 
 ## References
  
@@ -75,5 +75,5 @@ To generate the ScalaCZML API documentation, type "sbt doc". The documentation w
     
 ## Status
 
-work in progress
+usable, ongoing work
 
