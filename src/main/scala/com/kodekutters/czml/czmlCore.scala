@@ -1311,32 +1311,32 @@ package object czmlCore {
     * @param uri       A URI value.  The URI can optionally vary with time.
     * @param reference A reference property.
     */
-  case class ImageUri(uri: Option[String] = None, reference: Option[String] = None) {
+  case class CzmlUri(uri: Option[String] = None, reference: Option[String] = None) {
     def this(uri: String) = this(Option(uri))
 
     def this(uri: String, reference: String) = this(Option(uri), Option(reference))
   }
 
-  object ImageUri {
+  object CzmlUri {
 
-    def apply(uri: String): ImageUri = new ImageUri(uri)
+    def apply(uri: String): CzmlUri = new CzmlUri(uri)
 
-    def apply(uri: String, reference: String): ImageUri = new ImageUri(uri, reference)
+    def apply(uri: String, reference: String): CzmlUri = new CzmlUri(uri, reference)
 
-    val theReads = new Reads[ImageUri] {
-      def reads(js: JsValue): JsResult[ImageUri] = {
+    val theReads = new Reads[CzmlUri] {
+      def reads(js: JsValue): JsResult[CzmlUri] = {
         // try to read a simple String
         JsPath.read[String].reads(js).asOpt match {
           case None => JsSuccess(
-            new ImageUri((JsPath \ "uri").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
+            new CzmlUri((JsPath \ "uri").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
 
-          case Some(ur) => JsSuccess(new ImageUri(Some(ur)))
+          case Some(ur) => JsSuccess(new CzmlUri(Some(ur)))
         }
       }
     }
 
-    val theWrites = new Writes[ImageUri] {
-      def writes(obj: ImageUri) = {
+    val theWrites = new Writes[CzmlUri] {
+      def writes(obj: CzmlUri) = {
         obj.reference match {
           case Some(ref) => Json.obj("uri" -> JsString(obj.uri.getOrElse("")), "reference" -> JsString(ref))
           case None => JsString(obj.uri.getOrElse(""))
@@ -1344,7 +1344,7 @@ package object czmlCore {
       }
     }
 
-    implicit val fmt: Format[ImageUri] = Format(theReads, theWrites)
+    implicit val fmt: Format[CzmlUri] = Format(theReads, theWrites)
   }
 
   /**
@@ -1592,16 +1592,16 @@ package object czmlCore {
     * @param transparent Whether or not the image has transparency.
     * @param repeat      The number of times the image repeats along each axis.
     */
-  case class Image(image: Option[ImageUri] = None, color: Option[CzmlColor] = None,
+  case class Image(image: Option[CzmlUri] = None, color: Option[CzmlColor] = None,
                    transparent: Option[Boolean] = None, repeat: Option[CzmlCartesian2] = None) {
 
-    def this(uri: String) = this(Option(ImageUri(uri)))
+    def this(uri: String) = this(Option(CzmlUri(uri)))
 
     def this(uri: String, color: CzmlColor, transparent: Boolean, x: Int, y: Int) =
-      this(Option(ImageUri(uri)), Option(color), Option(transparent), Option(CzmlCartesian2(x, y)))
+      this(Option(CzmlUri(uri)), Option(color), Option(transparent), Option(CzmlCartesian2(x, y)))
 
     def this(uri: String, x: Int, y: Int) =
-      this(Option(ImageUri(uri)), None, None, Option(CzmlCartesian2(x, y)))
+      this(Option(CzmlUri(uri)), None, None, Option(CzmlCartesian2(x, y)))
 
   }
 

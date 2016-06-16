@@ -5,6 +5,11 @@ Change Log
 
 * Breaking changes
     * renamed LineMaterial to PolylineMaterial
+    * renamed ImageUri to CzmlUri
+    * renamed WsenDegrees to RectangleCoordinates in czmlCore and CzmlImplicits
+    * changed CZMLPacket to take ViewFrom for field viewFrom instead of CzmlCartesian
+    * changed Orientation to use UnitQuaternionValue
+    * changed NodeTransformation to its own Rotation type instead of Orientation
 
 * other changes
     * added PolylineArrow to czmlCore
@@ -16,11 +21,9 @@ Change Log
     * added Corridor to czmlProperties
     * added UnitQuaternion and UnitQuaternionValue to czmlCore
     * added Rotation to czmlCore
-    * changed Orientation to use UnitQuaternionValue
-    * changed NodeTransformation to its own Rotation type instead of Orientation
     * added ViewFrom to czmlProperties
-    * changed CZMLPacket to take ViewFrom for field viewFrom instead of CzmlCartesian
-    * renamed WsenDegrees to RectangleCoordinates in czmlCore and CzmlImplicits
-    *
+
+
+
 
 

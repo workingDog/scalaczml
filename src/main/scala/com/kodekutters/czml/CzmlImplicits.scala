@@ -34,7 +34,7 @@ object CzmlImplicits {
 
   implicit def DoubleToTimedDouble(value: Double): TimedDouble = new TimedDouble(value)
 
-  implicit def StringToImageUri(value: String): ImageUri = new ImageUri(value)
+  implicit def StringToImageUri(value: String): CzmlUri = new CzmlUri(value)
 
   implicit def Cartesian2DToCzmlCartesian2(value: Cartesian2D): CzmlCartesian2 = new CzmlCartesian2(value)
 
@@ -128,7 +128,7 @@ object CzmlImplicits {
 
   implicit def NodeTransformationsToNodeTransformationsOp(value: NodeTransformations): Option[NodeTransformations] = Option(value)
 
-  implicit def ImageUriToImageUriOp(value: ImageUri): Option[ImageUri] = Option(value)
+  implicit def ImageUriToImageUriOp(value: CzmlUri): Option[CzmlUri] = Option(value)
 
   implicit def CartesianToCartesianOp(value: Cartesian): Option[Cartesian] = Option(value)
 
@@ -152,7 +152,7 @@ object CzmlImplicits {
 
   implicit def DoubleToNumberOp(value: Double): Option[Number] = Option(Number(value))
 
-  implicit def StringToImageUriOp(value: String): Option[ImageUri] = Option(new ImageUri(value))
+  implicit def StringToImageUriOp(value: String): Option[CzmlUri] = Option(new CzmlUri(value))
 
   implicit def StringToTextOp(value: String): Option[Text] = Option(new Text(value))
 

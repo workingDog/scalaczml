@@ -239,7 +239,7 @@ package object czmlProperties {
     * @param sizeInMeters     whether this billboard's size (width and height) should be measured in meters, otherwise size is measured in pixels
     */
   case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[CzmlCartesian] = None,
-                       horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[ImageUri] = None,
+                       horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[CzmlUri] = None,
                        pixelOffset: Option[CzmlCartesian2] = None, scale: Option[Number] = None,
                        rotation: Option[Number] = None,
                        alignedAxis: Option[CzmlCartesian] = None,
@@ -854,7 +854,7 @@ package object czmlProperties {
     * @param nodeTransformations node transformations.
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
-                   minimumPixelSize: Option[Number] = None, gltf: Option[ImageUri] = None,
+                   minimumPixelSize: Option[Number] = None, gltf: Option[CzmlUri] = None,
                    incrementallyLoadTextures: Option[CzmlBoolean] = None,
                    runAnimations: Option[CzmlBoolean] = None,
                    nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
