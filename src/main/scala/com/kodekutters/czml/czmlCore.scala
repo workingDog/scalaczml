@@ -1305,7 +1305,7 @@ package object czmlCore {
   }
 
   /**
-    * A uri as a String or an interval
+    * A uri with a possible time interval to be used in CzmlUri
     *
     * @param uri       A URI value.
     * @param interval  Time interval.
@@ -1338,7 +1338,9 @@ package object czmlCore {
 
     def this(uri: UriInterval) = this(Right(Array(uri)))
 
-    def this(uri: String, interval: String, reference: String) = this(Right(Array(new UriInterval(interval, uri))), Option(reference))
+    def this(uri: UriInterval, reference: String) = this(Right(Array(uri)), Option(reference))
+
+    def this(uri: String, interval: String, reference: String) = this(Right(Array(new UriInterval(uri, interval))), Option(reference))
 
   }
 
