@@ -1305,16 +1305,41 @@ package object czmlCore {
   }
 
   /**
+    * A uri as a String or an interval
+    *
+    * @param uri       A URI value.
+    * @param interval  Time interval.
+    */
+  case class UriInterval(uri: Option[String] = None, interval: Option[String] = None) {
+    def this(uri: String, interval: String) = this(Option(uri), Option(interval))
+  }
+
+  object UriInterval {
+    def apply(uri: String, interval: String): UriInterval = new UriInterval(uri, interval)
+    implicit val fmt = Json.format[UriInterval]
+  }
+
+  /**
     * The image displayed on the billboard, expressed as a URL. For broadest client compatibility,
     * the URL should be accessible via Cross-Origin Resource Sharing (CORS). The URL may also be a data URI.
     *
-    * @param uri       A URI value.  The URI can optionally vary with time.
+    * @param uri       A URI value. The URI can optionally vary with time.
     * @param reference A reference property.
     */
-  case class CzmlUri(uri: Option[String] = None, reference: Option[String] = None) {
-    def this(uri: String) = this(Option(uri))
+  case class CzmlUri(uri: Either[String, Array[UriInterval]], reference: Option[String] = None) {
 
-    def this(uri: String, reference: String) = this(Option(uri), Option(reference))
+    def this(uri: String, reference: String) = this(Left(uri), Option(reference))
+
+    def this(uri: Array[UriInterval], reference: String) = this(Right(uri), Option(reference))
+
+    def this(uri: String) = this(Left(uri))
+
+    def this(uri: Array[UriInterval]) = this(Right(uri))
+
+    def this(uri: UriInterval) = this(Right(Array(uri)))
+
+    def this(uri: String, interval: String, reference: String) = this(Right(Array(new UriInterval(interval, uri))), Option(reference))
+
   }
 
   object CzmlUri {
@@ -1325,21 +1350,30 @@ package object czmlCore {
 
     val theReads = new Reads[CzmlUri] {
       def reads(js: JsValue): JsResult[CzmlUri] = {
-        // try to read a simple String
-        JsPath.read[String].reads(js).asOpt match {
-          case None => JsSuccess(
-            new CzmlUri((JsPath \ "uri").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
-
-          case Some(ur) => JsSuccess(new CzmlUri(Some(ur)))
+        // try to read the uri field
+        val result = (JsPath \ "uri").read[String].reads(js).asOpt match {
+          case Some(b) => Left(b)
+          case None =>
+            // try to read a simple String
+            JsPath.read[String].reads(js).asOpt match {
+              case None => Right(JsPath.read[Array[UriInterval]].reads(js).getOrElse(Array[UriInterval]()))
+              case Some(b) => Left(b)
+            }
         }
+        val ref = (JsPath \ "reference").read[String].reads(js).asOpt
+        JsSuccess(new CzmlUri(result, ref))
       }
     }
 
     val theWrites = new Writes[CzmlUri] {
-      def writes(obj: CzmlUri) = {
-        obj.reference match {
-          case Some(ref) => Json.obj("uri" -> JsString(obj.uri.getOrElse("")), "reference" -> JsString(ref))
-          case None => JsString(obj.uri.getOrElse(""))
+      def writes(value: CzmlUri) = {
+        val theValue = value.uri match {
+          case Left(x) => JsString(x)
+          case Right(x) => Json.toJson(x)
+        }
+        value.reference match {
+          case Some(ref) => Json.obj("uri" -> theValue, "reference" -> JsString(ref))
+          case None => theValue
         }
       }
     }

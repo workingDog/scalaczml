@@ -32,6 +32,7 @@ Change Log
     * added UnitQuaternion and UnitQuaternionValue to czmlCore
     * added Rotation to czmlCore
     * added ViewFrom to czmlProperties
+    * added UriInterval to CzmlUri
 
 
 
