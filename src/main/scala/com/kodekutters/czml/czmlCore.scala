@@ -1446,6 +1446,8 @@ package object czmlCore {
     def this(t: Double, x: Double, y: Double, width: Double, height: Double) = this(Option(TimeValue(t)), x, y, width, height)
 
     def this(t: TimeValue, x: Double, y: Double, width: Double, height: Double) = this(Option(t), x, y, width, height)
+
+    def this(x: Double, y: Double, width: Double, height: Double) = this(None, x, y, width, height)
   }
 
   object BoundingRectangleValue {
@@ -1454,6 +1456,9 @@ package object czmlCore {
     def apply(t: String, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValue = new BoundingRectangleValue(TimeValue(t), x, y, width, height)
 
     def apply(t: Double, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValue = new BoundingRectangleValue(TimeValue(t), x, y, width, height)
+
+    def apply(x: Double, y: Double, width: Double, height: Double): BoundingRectangleValue = new BoundingRectangleValue(x, y, width, height)
+
   }
 
   /**
@@ -1484,6 +1489,8 @@ package object czmlCore {
     def apply(t: String, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValues = new BoundingRectangleValues(TimeValue(t), x, y, width, height)
 
     def apply(t: Double, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValues = new BoundingRectangleValues(TimeValue(t), x, y, width, height)
+
+    def apply(x: Double, y: Double, width: Double, height: Double): BoundingRectangleValues = new BoundingRectangleValues(x, y, width, height)
 
     val theReads = new Reads[BoundingRectangleValues] {
       def reads(js: JsValue): JsResult[BoundingRectangleValues] = {
@@ -1815,7 +1822,7 @@ package object czmlCore {
           case true =>
             czmlN.number match {
               case Some(x: TimedNumbers) => JsNumber(x.values.head.v)
-              case Some(x: Double) => Json.obj("number" -> JsNumber(x))
+              case Some(x: Double) => JsNumber(x) // Json.obj("number" -> JsNumber(x))
               case _ => JsNull
             }
           // have complex property

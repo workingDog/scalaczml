@@ -141,7 +141,7 @@ package object czmlProperties {
                  fill: Option[CzmlBoolean] = None,
                  outline: Option[CzmlBoolean] = None,
                  outlineColor: Option[ColorProperty] = None,
-                 outlineWidth: Option[CzmlNumber] = None) extends CzmlProperty
+                 outlineWidth: Option[Number] = None) extends CzmlProperty
 
   object Box {
     implicit val fmt = Json.format[Box]
@@ -167,16 +167,16 @@ package object czmlProperties {
     */
   case class Corridor(show: Option[CzmlBoolean] = None,
                       positions: Option[Positions] = None,
-                      width: Option[CzmlNumber] = None,
-                      height: Option[CzmlNumber] = None,
-                      extrudedHeight: Option[CzmlNumber] = None,
+                      width: Option[Number] = None,
+                      height: Option[Number] = None,
+                      extrudedHeight: Option[Number] = None,
                       cornerType: Option[CornerType] = None,
-                      granularity: Option[CzmlNumber] = None,
+                      granularity: Option[Number] = None,
                       material: Option[Material] = None,
                       fill: Option[CzmlBoolean] = None,
                       outline: Option[CzmlBoolean] = None,
                       outlineColor: Option[ColorProperty] = None,
-                      outlineWidth: Option[CzmlNumber] = None) extends CzmlProperty
+                      outlineWidth: Option[Number] = None) extends CzmlProperty
 
   object Corridor {
     implicit val fmt = Json.format[Corridor]
@@ -197,16 +197,16 @@ package object czmlProperties {
     *
     */
   case class Cylinder(show: Option[CzmlBoolean] = None,
-                      length: Option[CzmlNumber] = None,
-                      topRadius: Option[CzmlNumber] = None,
-                      bottomRadius: Option[CzmlNumber] = None,
+                      length: Option[Number] = None,
+                      topRadius: Option[Number] = None,
+                      bottomRadius: Option[Number] = None,
                       material: Option[Material] = None,
                       fill: Option[CzmlBoolean] = None,
                       outline: Option[CzmlBoolean] = None,
                       outlineColor: Option[ColorProperty] = None,
-                      outlineWidth: Option[CzmlNumber] = None,
-                      numberOfVerticalLines: Option[CzmlNumber] = None,
-                      slices: Option[CzmlNumber] = None) extends CzmlProperty
+                      outlineWidth: Option[Number] = None,
+                      numberOfVerticalLines: Option[Number] = None,
+                      slices: Option[Number] = None) extends CzmlProperty
 
   object Cylinder {
     implicit val fmt = Json.format[Cylinder]

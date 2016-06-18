@@ -78,6 +78,8 @@ object CzmlImplicits {
 
   implicit def NumberToNumberOp(value: Number): Option[Number] = Option(value)
 
+//  implicit def DoubleToCzmlNumberOp(value: Double): Option[CzmlNumber] = Option(new CzmlNumber(value))
+
   implicit def ColorPropertyToColorPropertyOp(value: ColorProperty): Option[ColorProperty] = Option(value)
 
   implicit def FontToFontOp(value: Font): Option[Font] = Option(value)
