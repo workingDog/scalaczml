@@ -166,7 +166,7 @@ package object czmlCore {
     * an array of west south, east north degrees coordinates for a rectangle
     */
   case class RectangleCoordinates(wsenDegrees: Array[Double], reference: Option[String] = None,
-                         timeFields: Option[Interpolatable] = None) {
+                                  timeFields: Option[Interpolatable] = None) {
     def this(w: Double, s: Double, e: Double, n: Double) = this(Array(w, s, e, n))
   }
 
@@ -1305,10 +1305,152 @@ package object czmlCore {
   }
 
   /**
+    * A near-far scalar value specified as four values [NearDistance, NearValue, FarDistance, FarValue].
+    * If the array has four elements, the value is constant.  If it has five or more elements, they are
+    * time-tagged samples arranged as [Time, NearDistance, NearValue, FarDistance, FarValue, Time, NearDistance,
+    * NearValue, FarDistance, FarValue, ...], where Time is an ISO 8601 date and time string or seconds since epoch.
+    */
+  case class NearFarScalarValue(t: Option[TimeValue] = None, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) {
+    def this(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = this(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)
+
+    def this(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = this(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)
+
+    def this(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = this(Option(t), nearDist, nearVal, farDist, farVal)
+  }
+
+  object NearFarScalarValue {
+    def apply(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(t, nearDist, nearVal, farDist, farVal)
+
+    def apply(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
+
+    def apply(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
+
+    val theReads: Reads[NearFarScalarValue] =
+      (JsPath.readNullable[TimeValue] and
+        JsPath.read[Array[Double]]) ((t, q) => NearFarScalarValue(t, q(0), q(1), q(2), q(3)))
+
+    val theWrites = new Writes[NearFarScalarValue] {
+      def writes(values: NearFarScalarValue) = {
+        val theList = values.t match {
+          case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.nearDist), JsNumber(values.nearVal), JsNumber(values.farDist), JsNumber(values.farVal))
+          case None => List(JsNumber(values.nearDist), JsNumber(values.nearVal), JsNumber(values.farDist), JsNumber(values.farVal))
+        }
+        JsArray(theList)
+      }
+    }
+
+    implicit val fmt: Format[NearFarScalarValue] = Format(theReads, theWrites)
+  }
+
+  /**
+    * A numeric value which will be linearly interpolated between two values based on an object's distance
+    * from the camera, in eye coordinates.  The computed value will interpolate between the near value and
+    * the far value while the camera distance falls between the near distance and the far distance, and will be
+    * clamped to the near or far value while the distance is less than the near distance or greater than the
+    * far distance, respectively
+    *
+    * @param nearFarScalar the sequence of NearFarScalarValue
+    */
+  case class NearFarScalar(nearFarScalar: Seq[NearFarScalarValue],
+                           reference: Option[String] = None,
+                           timeFields: Option[Interpolatable] = None) {
+
+    def this(nearFarScalar: NearFarScalarValue) = this(Seq(nearFarScalar))
+
+    def this(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = this(new NearFarScalarValue(None, nearDist, nearVal, farDist, farVal))
+  }
+
+  object NearFarScalar {
+
+    def apply(nearFarScalar: NearFarScalarValue) = new NearFarScalar(nearFarScalar)
+
+    def apply(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = new NearFarScalar(nearDist, nearVal, farDist, farVal)
+
+    val theReads: Reads[NearFarScalar] =
+      ((JsPath \ "nearFarScalar").read[Seq[NearFarScalarValue]] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((n, ref, interpo) => NearFarScalar(n, ref, Option(interpo)))
+
+    val theWrites: Writes[NearFarScalar] =
+      ((JsPath \ "nearFarScalar").write[Seq[NearFarScalarValue]] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(NearFarScalar.unapply))
+
+    implicit val fmt: Format[NearFarScalar] = Format(theReads, theWrites)
+  }
+
+
+  /**
+    * A near-far scalar value specified as four values [X, Y, Width, Height].  If the array has four elements,
+    * the value is constant.  If it has five or more elements, they are time-tagged samples arranged
+    * as [Time, X, Y, Width, Height, Time, X, Y, Width, Height, ...], where Time is an ISO 8601 date and
+    * time string or seconds since epoch
+    */
+  case class BoundingRectangleValue(t: Option[TimeValue] = None, x: Double, y: Double, width: Double, height: Double) {
+    def this(t: String, x: Double, y: Double, width: Double, height: Double) = this(Option(TimeValue(t)), x, y, width, height)
+
+    def this(t: Double, x: Double, y: Double, width: Double, height: Double) = this(Option(TimeValue(t)), x, y, width, height)
+
+    def this(t: TimeValue, x: Double, y: Double, width: Double, height: Double) = this(Option(t), x, y, width, height)
+  }
+
+  object BoundingRectangleValue {
+    def apply(t: TimeValue, x: Double, y: Double, width: Double, height: Double): UnitQuaternionValue = new UnitQuaternionValue(t, x, y, width, height)
+
+    def apply(t: String, x: Double, y: Double, width: Double, height: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, width, height)
+
+    def apply(t: Double, x: Double, y: Double, width: Double, height: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, width, height)
+
+    val theReads: Reads[BoundingRectangleValue] =
+      (JsPath.readNullable[TimeValue] and
+        JsPath.read[Array[Double]]) ((t, q) => BoundingRectangleValue(t, q(0), q(1), q(2), q(3)))
+
+    val theWrites = new Writes[BoundingRectangleValue] {
+      def writes(values: BoundingRectangleValue) = {
+        val theList = values.t match {
+          case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.x), JsNumber(values.y), JsNumber(values.width), JsNumber(values.height))
+          case None => List(JsNumber(values.x), JsNumber(values.y), JsNumber(values.width), JsNumber(values.height))
+        }
+        JsArray(theList)
+      }
+    }
+
+    implicit val fmt: Format[BoundingRectangleValue] = Format(theReads, theWrites)
+  }
+
+  case class BoundingRectangle(boundingRectangle: Seq[BoundingRectangleValue],
+                           reference: Option[String] = None,
+                           timeFields: Option[Interpolatable] = None) {
+
+    def this(boundingRectangle: BoundingRectangleValue) = this(Seq(boundingRectangle))
+
+    def this(x: Double, y: Double, width: Double, height: Double) = this(new BoundingRectangleValue(None, x, y, width, height))
+  }
+
+  object BoundingRectangle {
+
+    def apply(boundingRectangle: BoundingRectangleValue) = new BoundingRectangle(boundingRectangle)
+
+    def apply(x: Double, y: Double, width: Double, height: Double) = new BoundingRectangle(x, y, width, height)
+
+    val theReads: Reads[BoundingRectangle] =
+      ((JsPath \ "boundingRectangle").read[Seq[BoundingRectangleValue]] and
+        (JsPath \ "reference").readNullable[String] and
+        Interpolatable.fmt) ((n, ref, interpo) => BoundingRectangle(n, ref, Option(interpo)))
+
+    val theWrites: Writes[BoundingRectangle] =
+      ((JsPath \ "boundingRectangle").write[Seq[BoundingRectangleValue]] and
+        (JsPath \ "reference").writeNullable[String] and
+        JsPath.writeNullable[Interpolatable]) (unlift(BoundingRectangle.unapply))
+
+    implicit val fmt: Format[BoundingRectangle] = Format(theReads, theWrites)
+  }
+
+  /**
     * A uri with a possible time interval to be used in CzmlUri
     *
-    * @param uri       A URI value.
-    * @param interval  Time interval.
+    * @param uri      A URI value.
+    * @param interval Time interval.
     */
   case class UriInterval(uri: Option[String] = None, interval: Option[String] = None) {
     def this(uri: String, interval: String) = this(Option(uri), Option(interval))
@@ -1316,6 +1458,7 @@ package object czmlCore {
 
   object UriInterval {
     def apply(uri: String, interval: String): UriInterval = new UriInterval(uri, interval)
+
     implicit val fmt = Json.format[UriInterval]
   }
 
@@ -2630,11 +2773,11 @@ package object czmlCore {
 
     val theWrites = new Writes[CornerTypeValue] {
       def writes(value: CornerTypeValue) = {
-       value match {
-         case BEVELED => JsString(BEVELED.toString)
-         case MITERED => JsString(MITERED.toString)
-         case ROUNDED => JsString(ROUNDED.toString)
-       }
+        value match {
+          case BEVELED => JsString(BEVELED.toString)
+          case MITERED => JsString(MITERED.toString)
+          case ROUNDED => JsString(ROUNDED.toString)
+        }
       }
     }
 

@@ -33,7 +33,13 @@ Change Log
     * added Rotation to czmlCore
     * added ViewFrom to czmlProperties
     * added UriInterval to CzmlUri
-
+    * added NearFarScalar and NearFarScalarValue to CzmlCore
+    * added width, height, scaleByDistance, translucencyByDistance, pixelOffsetScaleByDistance and imageSubRegion to Billboard
+    * added translucencyByDistance, pixelOffsetScaleByDistance to Label
+    * added scaleByDistance, translucencyByDistance to Point
+    * added maximumScale to Model
+    * added BoundingRectangle and BoundingRectangleValue to CzmlCore
+    * added outlineWidth to Ellipsoid
 
 
 

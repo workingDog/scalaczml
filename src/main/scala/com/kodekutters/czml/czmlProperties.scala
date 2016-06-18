@@ -204,7 +204,9 @@ package object czmlProperties {
                       fill: Option[CzmlBoolean] = None,
                       outline: Option[CzmlBoolean] = None,
                       outlineColor: Option[ColorProperty] = None,
-                      outlineWidth: Option[CzmlNumber] = None) extends CzmlProperty
+                      outlineWidth: Option[CzmlNumber] = None,
+                      numberOfVerticalLines: Option[CzmlNumber] = None,
+                      slices: Option[CzmlNumber] = None) extends CzmlProperty
 
   object Cylinder {
     implicit val fmt = Json.format[Cylinder]
@@ -242,10 +244,16 @@ package object czmlProperties {
                        horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[CzmlUri] = None,
                        pixelOffset: Option[CzmlCartesian2] = None, scale: Option[Number] = None,
                        rotation: Option[Number] = None,
-                       alignedAxis: Option[CzmlCartesian] = None,
                        show: Option[CzmlBoolean] = None,
                        verticalOrigin: Option[Origin[VERTICAL]]= None,
-                       sizeInMeters: Option[CzmlBoolean] = None) extends CzmlProperty
+                       sizeInMeters: Option[CzmlBoolean] = None,
+                       alignedAxis: Option[CzmlCartesian] = None,
+                       width: Option[Number] = None,
+                       height: Option[Number] = None,
+                       scaleByDistance: Option[NearFarScalar] = None,
+                       translucencyByDistance: Option[NearFarScalar] = None,
+                       pixelOffsetScaleByDistance: Option[NearFarScalar] = None,
+                       imageSubRegion: Option[BoundingRectangle] = None) extends CzmlProperty
 
   object Billboard {
     implicit val fmt = Json.format[Billboard]
@@ -296,7 +304,9 @@ package object czmlProperties {
     */
   case class Point(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None, pixelSize: Option[Number] = None,
-                   show: Option[CzmlBoolean] = None) extends CzmlProperty
+                   show: Option[CzmlBoolean] = None,
+                   scaleByDistance: Option[NearFarScalar] = None,
+                   translucencyByDistance: Option[NearFarScalar] = None) extends CzmlProperty
 
   object Point {
     implicit val fmt = Json.format[Point]
@@ -326,11 +336,20 @@ package object czmlProperties {
     * @param verticalOrigin   The vertical origin of the label. It controls whether the label image is bottom-, center-,
     *                         or top-aligned with the position.
     */
-  case class Label(eyeOffset: Option[CzmlCartesian] = None, fillColor: Option[ColorProperty] = None, font: Option[Font] = None,
-                   horizontalOrigin: Option[Origin[HORIZONTAL]] = None, outlineColor: Option[ColorProperty] = None,
-                   outlineWidth: Option[Number] = None, pixelOffset: Option[CzmlCartesian2] = None,
-                   scale: Option[Number] = None, show: Option[CzmlBoolean] = None, style: Option[LabelStyle] = None,
-                   text: Option[Text] = None, verticalOrigin: Option[Origin[VERTICAL]] = None) extends CzmlProperty
+  case class Label(eyeOffset: Option[CzmlCartesian] = None,
+                   fillColor: Option[ColorProperty] = None,
+                   font: Option[Font] = None,
+                   horizontalOrigin: Option[Origin[HORIZONTAL]] = None,
+                   outlineColor: Option[ColorProperty] = None,
+                   outlineWidth: Option[Number] = None,
+                   pixelOffset: Option[CzmlCartesian2] = None,
+                   scale: Option[Number] = None,
+                   show: Option[CzmlBoolean] = None,
+                   style: Option[LabelStyle] = None,
+                   text: Option[Text] = None,
+                   verticalOrigin: Option[Origin[VERTICAL]] = None,
+                   translucencyByDistance: Option[NearFarScalar] = None,
+                   pixelOffsetScaleByDistance: Option[NearFarScalar] = None) extends CzmlProperty
 
   object Label {
     implicit val fmt = Json.format[Label]
@@ -635,6 +654,7 @@ package object czmlProperties {
   case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[CzmlCartesian] = None,
                        fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
+                       outlineWidth: Option[Number] = None,
                        stackPartitions: Option[Number] = None, slicePartitions: Option[Number] = None,
                        subdivisions: Option[Number] = None) extends CzmlProperty
 
@@ -854,6 +874,7 @@ package object czmlProperties {
     * @param nodeTransformations node transformations.
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
+                   maximumScale: Option[Number] = None,
                    minimumPixelSize: Option[Number] = None, gltf: Option[CzmlUri] = None,
                    incrementallyLoadTextures: Option[CzmlBoolean] = None,
                    runAnimations: Option[CzmlBoolean] = None,
