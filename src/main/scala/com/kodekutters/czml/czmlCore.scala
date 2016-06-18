@@ -1319,11 +1319,11 @@ package object czmlCore {
   }
 
   object NearFarScalarValue {
-    def apply(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(t, nearDist, nearVal, farDist, farVal)
+    def apply(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): NearFarScalarValue = new NearFarScalarValue(t, nearDist, nearVal, farDist, farVal)
 
-    def apply(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
+    def apply(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): NearFarScalarValue = new NearFarScalarValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
 
-    def apply(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
+    def apply(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): NearFarScalarValue = new NearFarScalarValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
   }
 
   /**
@@ -1435,10 +1435,10 @@ package object czmlCore {
   }
 
   /**
-    * A near-far scalar value specified as four values [X, Y, Width, Height].  If the array has four elements,
-    * the value is constant.  If it has five or more elements, they are time-tagged samples arranged
-    * as [Time, X, Y, Width, Height, Time, X, Y, Width, Height, ...], where Time is an ISO 8601 date and
-    * time string or seconds since epoch
+    * A near-far scalar value specified as four values [X, Y, Width, Height].
+    * If the array has four elements, the value is constant.
+    * If it has five, they are time-tagged samples arranged as [Time, X, Y, Width, Height],
+    * where Time is an ISO 8601 date and time string or seconds since epoch.
     */
   case class BoundingRectangleValue(t: Option[TimeValue] = None, x: Double, y: Double, width: Double, height: Double) {
     def this(t: String, x: Double, y: Double, width: Double, height: Double) = this(Option(TimeValue(t)), x, y, width, height)
@@ -1449,51 +1449,116 @@ package object czmlCore {
   }
 
   object BoundingRectangleValue {
-    def apply(t: TimeValue, x: Double, y: Double, width: Double, height: Double): UnitQuaternionValue = new UnitQuaternionValue(t, x, y, width, height)
+    def apply(t: TimeValue, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValue = new BoundingRectangleValue(t, x, y, width, height)
 
-    def apply(t: String, x: Double, y: Double, width: Double, height: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, width, height)
+    def apply(t: String, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValue = new BoundingRectangleValue(TimeValue(t), x, y, width, height)
 
-    def apply(t: Double, x: Double, y: Double, width: Double, height: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), x, y, width, height)
+    def apply(t: Double, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValue = new BoundingRectangleValue(TimeValue(t), x, y, width, height)
+  }
 
-    val theReads: Reads[BoundingRectangleValue] =
-      (JsPath.readNullable[TimeValue] and
-        JsPath.read[Array[Double]]) ((t, q) => BoundingRectangleValue(t, q(0), q(1), q(2), q(3)))
+  /**
+    * A near-far scalar value specified as four values [X, Y, Width, Height].
+    * If the array has four elements, the value is constant.
+    * If it has five or more elements, they are time-tagged samples arranged as
+    * [Time, X, Y, Width, Height, Time, X, Y, Width, Height, ...],
+    * where Time is an ISO 8601 date and time string or seconds since epoch.
+    */
+  case class BoundingRectangleValues(values: Seq[BoundingRectangleValue]) {
 
-    val theWrites = new Writes[BoundingRectangleValue] {
-      def writes(values: BoundingRectangleValue) = {
-        val theList = values.t match {
-          case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.x), JsNumber(values.y), JsNumber(values.width), JsNumber(values.height))
-          case None => List(JsNumber(values.x), JsNumber(values.y), JsNumber(values.width), JsNumber(values.height))
+    def this(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new BoundingRectangleValue(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)))
+
+    def this(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new BoundingRectangleValue(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)))
+
+    def this(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new BoundingRectangleValue(Option(t), nearDist, nearVal, farDist, farVal)))
+
+    def this(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new BoundingRectangleValue(None, nearDist, nearVal, farDist, farVal)))
+  }
+
+  object BoundingRectangleValues {
+    def apply(t: TimeValue, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValues = new BoundingRectangleValues(t, x, y, width, height)
+
+    def apply(t: String, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValues = new BoundingRectangleValues(TimeValue(t), x, y, width, height)
+
+    def apply(t: Double, x: Double, y: Double, width: Double, height: Double): BoundingRectangleValues = new BoundingRectangleValues(TimeValue(t), x, y, width, height)
+
+    val theReads = new Reads[BoundingRectangleValues] {
+      def reads(js: JsValue): JsResult[BoundingRectangleValues] = {
+        val jsList = js.as[JsArray].value
+        // have a list of timed values, multiple of 5 elements
+        if (jsList.length >= 5 && (jsList.length % 5) == 0) {
+          JsSuccess(new BoundingRectangleValues(
+            (for (i <- jsList.indices by 5) yield ((JsPath \ i).readNullable[TimeValue] and
+              (JsPath \ (i + 1)).read[Double] and (JsPath \ (i + 2)).read[Double] and
+              (JsPath \ (i + 3)).read[Double] and (JsPath \ (i + 4)).read[Double]) (BoundingRectangleValue.apply(_, _, _, _, _)).reads(js).asOpt).flatten))
         }
-        JsArray(theList)
+        // have a single set [X, Y, Width, Height]
+        else {
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]) (BoundingRectangleValue.apply(None, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[BoundingRectangleValue] => JsSuccess(new BoundingRectangleValues(Seq(s.get)))
+            case e: JsError =>
+              logger.error("could not read BoundingRectangleValues: " + js.toString)
+              JsError("could not read BoundingRectangleValues: " + js.toString)
+          }
+        }
       }
     }
 
-    implicit val fmt: Format[BoundingRectangleValue] = Format(theReads, theWrites)
+    val theWrites = new Writes[BoundingRectangleValues] {
+      def writes(nearFarVals: BoundingRectangleValues) = {
+        val vList = for (v <- nearFarVals.values) yield {
+          v.t match {
+            case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(v.x), JsNumber(v.y), JsNumber(v.width), JsNumber(v.height))
+            case None => List(JsNumber(v.x), JsNumber(v.y), JsNumber(v.width), JsNumber(v.height))
+          }
+        }
+        JsArray(vList.flatten)
+      }
+    }
+    implicit val fmt: Format[BoundingRectangleValues] = Format(theReads, theWrites)
   }
 
-  case class BoundingRectangle(boundingRectangle: Seq[BoundingRectangleValue],
+  /**
+    * A bounding rectangle specified by a corner, width and height
+    *
+    * @param boundingRectangle the BoundingRectangleValues
+    */
+  case class BoundingRectangle(boundingRectangle: BoundingRectangleValues,
                                reference: Option[String] = None,
                                timeFields: Option[Interpolatable] = None) {
 
-    def this(boundingRectangle: BoundingRectangleValue) = this(Seq(boundingRectangle))
+    def this(x: Double, y: Double, width: Double, height: Double) = this(new BoundingRectangleValues(x, y, width, height))
 
-    def this(x: Double, y: Double, width: Double, height: Double) = this(new BoundingRectangleValue(None, x, y, width, height))
+    def this(t: String, x: Double, y: Double, width: Double, height: Double) = this(new BoundingRectangleValues(t, x, y, width, height))
+
+    def this(t: Double, x: Double, y: Double, width: Double, height: Double) = this(new BoundingRectangleValues(t, x, y, width, height))
+
+    def this(t: TimeValue, x: Double, y: Double, width: Double, height: Double) = this(new BoundingRectangleValues(t, x, y, width, height))
+
   }
 
   object BoundingRectangle {
 
-    def apply(boundingRectangle: BoundingRectangleValue) = new BoundingRectangle(boundingRectangle)
+    def apply(t: TimeValue, x: Double, y: Double, width: Double, height: Double) = new BoundingRectangle(t, x, y, width, height)
 
     def apply(x: Double, y: Double, width: Double, height: Double) = new BoundingRectangle(x, y, width, height)
 
+    def apply(t: String, x: Double, y: Double, width: Double, height: Double) = new BoundingRectangle(t, x, y, width, height)
+
+    def apply(t: Double, x: Double, y: Double, width: Double, height: Double) = new BoundingRectangle(t, x, y, width, height)
+
     val theReads: Reads[BoundingRectangle] =
-      ((JsPath \ "boundingRectangle").read[Seq[BoundingRectangleValue]] and
+      ((JsPath \ "boundingRectangle").read[BoundingRectangleValues] and
         (JsPath \ "reference").readNullable[String] and
         Interpolatable.fmt) ((n, ref, interpo) => BoundingRectangle(n, ref, Option(interpo)))
 
     val theWrites: Writes[BoundingRectangle] =
-      ((JsPath \ "boundingRectangle").write[Seq[BoundingRectangleValue]] and
+      ((JsPath \ "boundingRectangle").write[BoundingRectangleValues] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(BoundingRectangle.unapply))
 
