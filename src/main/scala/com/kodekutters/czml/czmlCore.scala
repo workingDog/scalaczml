@@ -1306,9 +1306,9 @@ package object czmlCore {
 
   /**
     * A near-far scalar value specified as four values [NearDistance, NearValue, FarDistance, FarValue].
-    * If the array has four elements, the value is constant.  If it has five or more elements, they are
-    * time-tagged samples arranged as [Time, NearDistance, NearValue, FarDistance, FarValue, Time, NearDistance,
-    * NearValue, FarDistance, FarValue, ...], where Time is an ISO 8601 date and time string or seconds since epoch.
+    * If the array has four elements, the value is constant.  If it has five, they are
+    * time-tagged samples arranged as [Time, NearDistance, NearValue, FarDistance, FarValue],
+    * where Time is an ISO 8601 date and time string or seconds since epoch.
     */
   case class NearFarScalarValue(t: Option[TimeValue] = None, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) {
     def this(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = this(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)
@@ -1324,22 +1324,80 @@ package object czmlCore {
     def apply(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
 
     def apply(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double): UnitQuaternionValue = new UnitQuaternionValue(TimeValue(t), nearDist, nearVal, farDist, farVal)
+  }
 
-    val theReads: Reads[NearFarScalarValue] =
-      (JsPath.readNullable[TimeValue] and
-        JsPath.read[Array[Double]]) ((t, q) => NearFarScalarValue(t, q(0), q(1), q(2), q(3)))
+  /**
+    * A near-far scalar value(s) specified as four values [NearDistance, NearValue, FarDistance, FarValue].
+    * If the array has four elements, the value is constant.  If it has five or more elements, they are
+    * time-tagged samples arranged as [Time, NearDistance, NearValue, FarDistance, FarValue, Time, NearDistance,
+    * NearValue, FarDistance, FarValue, ...], where Time is an ISO 8601 date and time string or seconds since epoch.
+    */
+  case class NearFarScalarValues(values: Seq[NearFarScalarValue]) {
 
-    val theWrites = new Writes[NearFarScalarValue] {
-      def writes(values: NearFarScalarValue) = {
-        val theList = values.t match {
-          case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(values.nearDist), JsNumber(values.nearVal), JsNumber(values.farDist), JsNumber(values.farVal))
-          case None => List(JsNumber(values.nearDist), JsNumber(values.nearVal), JsNumber(values.farDist), JsNumber(values.farVal))
+    def this(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new NearFarScalarValue(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)))
+
+    def this(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new NearFarScalarValue(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)))
+
+    def this(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new NearFarScalarValue(Option(t), nearDist, nearVal, farDist, farVal)))
+
+    def this(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(Seq(new NearFarScalarValue(None, nearDist, nearVal, farDist, farVal)))
+  }
+
+  object NearFarScalarValues {
+
+    def apply(t: String, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      new NearFarScalarValues(Seq(new NearFarScalarValue(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)))
+
+    def apply(t: Double, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      new NearFarScalarValues(Seq(new NearFarScalarValue(Option(TimeValue(t)), nearDist, nearVal, farDist, farVal)))
+
+    def apply(t: TimeValue, nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      new NearFarScalarValues(Seq(new NearFarScalarValue(Option(t), nearDist, nearVal, farDist, farVal)))
+
+    def apply(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      new NearFarScalarValues(Seq(new NearFarScalarValue(None, nearDist, nearVal, farDist, farVal)))
+
+
+    val theReads = new Reads[NearFarScalarValues] {
+      def reads(js: JsValue): JsResult[NearFarScalarValues] = {
+        val jsList = js.as[JsArray].value
+        // have a list of timed values, multiple of 5 elements
+        if (jsList.length >= 5 && (jsList.length % 5) == 0) {
+          JsSuccess(new NearFarScalarValues(
+            (for (i <- jsList.indices by 5) yield ((JsPath \ i).readNullable[TimeValue] and
+              (JsPath \ (i + 1)).read[Double] and (JsPath \ (i + 2)).read[Double] and
+              (JsPath \ (i + 3)).read[Double] and (JsPath \ (i + 4)).read[Double]) (NearFarScalarValue.apply(_, _, _, _, _)).reads(js).asOpt).flatten))
         }
-        JsArray(theList)
+        // have a single set [nearDist, nearVal, farDist, farVal]
+        else {
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]) (NearFarScalarValue.apply(None, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[NearFarScalarValue] => JsSuccess(new NearFarScalarValues(Seq(s.get)))
+            case e: JsError =>
+              logger.error("could not read NearFarScalarValues: " + js.toString)
+              JsError("could not read NearFarScalarValues: " + js.toString)
+          }
+        }
       }
     }
 
-    implicit val fmt: Format[NearFarScalarValue] = Format(theReads, theWrites)
+    val theWrites = new Writes[NearFarScalarValues] {
+      def writes(nearFarVals: NearFarScalarValues) = {
+        val vList = for (v <- nearFarVals.values) yield {
+          v.t match {
+            case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(v.nearDist), JsNumber(v.nearVal), JsNumber(v.farDist), JsNumber(v.farVal))
+            case None => List(JsNumber(v.nearDist), JsNumber(v.nearVal), JsNumber(v.farDist), JsNumber(v.farVal))
+          }
+        }
+        JsArray(vList.flatten)
+      }
+    }
+    implicit val fmt: Format[NearFarScalarValues] = Format(theReads, theWrites)
   }
 
   /**
@@ -1351,34 +1409,30 @@ package object czmlCore {
     *
     * @param nearFarScalar the sequence of NearFarScalarValue
     */
-  case class NearFarScalar(nearFarScalar: Seq[NearFarScalarValue],
+  case class NearFarScalar(nearFarScalar: NearFarScalarValues,
                            reference: Option[String] = None,
                            timeFields: Option[Interpolatable] = None) {
 
-    def this(nearFarScalar: NearFarScalarValue) = this(Seq(nearFarScalar))
-
-    def this(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = this(new NearFarScalarValue(None, nearDist, nearVal, farDist, farVal))
+    def this(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) =
+      this(new NearFarScalarValues(nearDist, nearVal, farDist, farVal))
   }
 
   object NearFarScalar {
 
-    def apply(nearFarScalar: NearFarScalarValue) = new NearFarScalar(nearFarScalar)
-
     def apply(nearDist: Double, nearVal: Double, farDist: Double, farVal: Double) = new NearFarScalar(nearDist, nearVal, farDist, farVal)
 
     val theReads: Reads[NearFarScalar] =
-      ((JsPath \ "nearFarScalar").read[Seq[NearFarScalarValue]] and
+      ((JsPath \ "nearFarScalar").read[NearFarScalarValues] and
         (JsPath \ "reference").readNullable[String] and
         Interpolatable.fmt) ((n, ref, interpo) => NearFarScalar(n, ref, Option(interpo)))
 
     val theWrites: Writes[NearFarScalar] =
-      ((JsPath \ "nearFarScalar").write[Seq[NearFarScalarValue]] and
+      ((JsPath \ "nearFarScalar").write[NearFarScalarValues] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(NearFarScalar.unapply))
 
     implicit val fmt: Format[NearFarScalar] = Format(theReads, theWrites)
   }
-
 
   /**
     * A near-far scalar value specified as four values [X, Y, Width, Height].  If the array has four elements,
@@ -1419,8 +1473,8 @@ package object czmlCore {
   }
 
   case class BoundingRectangle(boundingRectangle: Seq[BoundingRectangleValue],
-                           reference: Option[String] = None,
-                           timeFields: Option[Interpolatable] = None) {
+                               reference: Option[String] = None,
+                               timeFields: Option[Interpolatable] = None) {
 
     def this(boundingRectangle: BoundingRectangleValue) = this(Seq(boundingRectangle))
 
