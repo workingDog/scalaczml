@@ -40,6 +40,10 @@ Change Log
     * added maximumScale to Model
     * added BoundingRectangle and BoundingRectangleValue to CzmlCore
     * added outlineWidth to Ellipsoid
+    * added RectangleCoordValue and RectangleCoordValues to czmlCore
+    * added wsen to RectangleCoordinates and made wsen and wsenDegrees Option[RectangleCoordValues]
+    * added RectCoordToRectCoordValOp to CzmlImplicits
+    * removed ArrayOfDoubleToRect from CzmlImplicits
 
 
 

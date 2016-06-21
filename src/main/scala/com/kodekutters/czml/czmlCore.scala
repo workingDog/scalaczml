@@ -163,24 +163,144 @@ package object czmlCore {
   }
 
   /**
-    * an array of west south, east north degrees coordinates for a rectangle
+    * A two dimensional region specified as [WestLongitude, SouthLatitude, EastLongitude, NorthLatitude].
+    * with an optional time value
     */
-  case class RectangleCoordinates(wsenDegrees: Array[Double], reference: Option[String] = None,
+  case class RectangleCoordValue(t: Option[TimeValue] = None, w: Double, s: Double, e: Double, n: Double) {
+    def this(t: String, w: Double, s: Double, e: Double, n: Double) = this(Option(TimeValue(t)), w, s, e, n)
+
+    def this(t: Double, w: Double, s: Double, e: Double, n: Double) = this(Option(TimeValue(t)), w, s, e, n)
+
+    def this(t: TimeValue, w: Double, s: Double, e: Double, n: Double) = this(Option(t), w, s, e, n)
+  }
+
+  object RectangleCoordValue {
+    def apply(t: TimeValue, w: Double, s: Double, e: Double, n: Double): RectangleCoordValue = new RectangleCoordValue(t, w, s, e, n)
+
+    def apply(t: String, w: Double, s: Double, e: Double, n: Double): RectangleCoordValue = new RectangleCoordValue(TimeValue(t), w, s, e, n)
+
+    def apply(t: Double, w: Double, s: Double, e: Double, n: Double): RectangleCoordValue = new RectangleCoordValue(TimeValue(t), w, s, e, n)
+  }
+
+  /**
+    * A two dimensional region specified as [WestLongitude, SouthLatitude, EastLongitude, NorthLatitude].
+    * If the array has four elements, the value is constant.
+    * If it has five or more elements, they are time-tagged samples arranged
+    * as [Time, WestLongitude, SouthLatitude, EastLongitude, NorthLatitude, Time, WestLongitude, SouthLatitude, EastLongitude, NorthLatitude, ...],
+    * where Time is an ISO 8601 date and time string or seconds since epoch.
+    */
+  case class RectangleCoordValues(values: Seq[RectangleCoordValue]) {
+
+    def this(t: String, w: Double, s: Double, e: Double, n: Double) =
+      this(Seq(new RectangleCoordValue(Option(TimeValue(t)),w, s, e, n)))
+
+    def this(t: Double, w: Double, s: Double, e: Double, n: Double) =
+      this(Seq(new RectangleCoordValue(Option(TimeValue(t)),w, s, e, n)))
+
+    def this(t: TimeValue, w: Double, s: Double, e: Double, n: Double) =
+      this(Seq(new RectangleCoordValue(Option(t),w, s, e, n)))
+
+    def this(w: Double, s: Double, e: Double, n: Double) =
+      this(Seq(new RectangleCoordValue(None,w, s, e, n)))
+  }
+
+  object RectangleCoordValues {
+
+    def apply(t: String, w: Double, s: Double, e: Double, n: Double) =
+      new RectangleCoordValues(Seq(new RectangleCoordValue(Option(TimeValue(t)), w, s, e, n)))
+
+    def apply(t: Double, w: Double, s: Double, e: Double, n: Double) =
+      new RectangleCoordValues(Seq(new RectangleCoordValue(Option(TimeValue(t)), w, s, e, n)))
+
+    def apply(t: TimeValue, w: Double, s: Double, e: Double, n: Double) =
+      new RectangleCoordValues(Seq(new RectangleCoordValue(Option(t), w, s, e, n)))
+
+    def apply(w: Double, s: Double, e: Double, n: Double) =
+      new RectangleCoordValues(Seq(new RectangleCoordValue(None, w, s, e, n)))
+
+
+    val theReads = new Reads[RectangleCoordValues] {
+      def reads(js: JsValue): JsResult[RectangleCoordValues] = {
+        val jsList = js.as[JsArray].value
+        // have a list of timed values, multiple of 5 elements
+        if (jsList.length >= 5 && (jsList.length % 5) == 0) {
+          JsSuccess(new RectangleCoordValues(
+            (for (i <- jsList.indices by 5) yield ((JsPath \ i).readNullable[TimeValue] and
+              (JsPath \ (i + 1)).read[Double] and (JsPath \ (i + 2)).read[Double] and
+              (JsPath \ (i + 3)).read[Double] and (JsPath \ (i + 4)).read[Double]) (RectangleCoordValue.apply(_, _, _, _, _)).reads(js).asOpt).flatten))
+        }
+        // have a single set [WestLongitude, SouthLatitude, EastLongitude, NorthLatitude]
+        else {
+          val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double] and
+            (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]) (RectangleCoordValue.apply(None, _, _, _, _)).reads(js)
+          result match {
+            case s: JsSuccess[RectangleCoordValue] => JsSuccess(new RectangleCoordValues(Seq(s.get)))
+            case e: JsError =>
+              logger.error("could not read RectangleCoordValues: " + js.toString)
+              JsError("could not read RectangleCoordValues: " + js.toString)
+          }
+        }
+      }
+    }
+
+    val theWrites = new Writes[RectangleCoordValues] {
+      def writes(coords: RectangleCoordValues) = {
+        val vList = for (v <- coords.values) yield {
+          v.t match {
+            case Some(time) => List(TimeValue.fmt.writes(time), JsNumber(v.w), JsNumber(v.s), JsNumber(v.e), JsNumber(v.n))
+            case None => List(JsNumber(v.w), JsNumber(v.s), JsNumber(v.e), JsNumber(v.n))
+          }
+        }
+        JsArray(vList.flatten)
+      }
+    }
+    implicit val fmt: Format[RectangleCoordValues] = Format(theReads, theWrites)
+  }
+
+  /**
+    * A two dimensional region specified as [WestLongitude, SouthLatitude, EastLongitude, NorthLatitude].
+    * If the array has four elements, the value is constant.
+    * If it has five or more elements, they are time-tagged samples arranged
+    * as [Time, WestLongitude, SouthLatitude, EastLongitude, NorthLatitude, Time, WestLongitude, SouthLatitude, EastLongitude, NorthLatitude, ...],
+    * where Time is an ISO 8601 date and time string or seconds since epoch.
+    *
+    * @param wsen        The set of coordinates specified as Cartographic values [WestLongitude, SouthLatitude, EastLongitude, NorthLatitude], with values in radians
+    * @param wsenDegrees The set of coordinates specified as Cartographic values [WestLongitude, SouthLatitude, EastLongitude, NorthLatitude], with values in degrees
+    * @param reference   The set of coordinates specified as a reference to another property
+    * @param timeFields  The interpolatable time fields
+    */
+  case class RectangleCoordinates(wsen: Option[RectangleCoordValues] = None,
+                                  wsenDegrees: Option[RectangleCoordValues] = None,
+                                  reference: Option[String] = None,
                                   timeFields: Option[Interpolatable] = None) {
-    def this(w: Double, s: Double, e: Double, n: Double) = this(Array(w, s, e, n))
+
+    // wsen in radians
+    def this(w: Double, s: Double, e: Double, n: Double) = this(Option(new RectangleCoordValues(w, s, e, n)))
+    // wsen in radians
+    def this(t: String, w: Double, s: Double, e: Double, n: Double) = this(Option(new RectangleCoordValues(t, w, s, e, n)))
+    // wsen in radians
+    def this(t: Double, w: Double, s: Double, e: Double, n: Double) = this(Option(new RectangleCoordValues(t, w, s, e, n)))
   }
 
   object RectangleCoordinates {
 
+    // wsen in radians
     def apply(w: Double, s: Double, e: Double, n: Double): RectangleCoordinates = new RectangleCoordinates(w, s, e, n)
+    // wsen in radians
+    def apply(t: String, w: Double, s: Double, e: Double, n: Double): RectangleCoordinates = new RectangleCoordinates(t, w, s, e, n)
+    // wsen in radians
+    def apply(t: Double, w: Double, s: Double, e: Double, n: Double): RectangleCoordinates = new RectangleCoordinates(t, w, s, e, n)
+
 
     val theReads: Reads[RectangleCoordinates] =
-      ((JsPath \ "wsenDegrees").read[Array[Double]] and
+      ((JsPath \ "wsen").readNullable[RectangleCoordValues] and
+        (JsPath \ "wsenDegrees").readNullable[RectangleCoordValues] and
         (JsPath \ "reference").readNullable[String] and
-        Interpolatable.fmt) ((ws, ref, interpo) => RectangleCoordinates(ws, ref, Option(interpo)))
+        Interpolatable.fmt) ((ws, wsd, ref, interpo) => RectangleCoordinates(ws, wsd, ref, Option(interpo)))
 
     val theWrites: Writes[RectangleCoordinates] =
-      ((JsPath \ "wsenDegrees").write[Array[Double]] and
+      ((JsPath \ "wsen").writeNullable[RectangleCoordValues] and
+        (JsPath \ "wsenDegrees").writeNullable[RectangleCoordValues] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(RectangleCoordinates.unapply))
 
@@ -2869,7 +2989,6 @@ package object czmlCore {
     def this(cartesian: Cartesian3D) = this(Option(cartesian))
 
     def this(cartesian: Cartesian3D, reference: String) = this(Option(cartesian), Option(reference))
-
   }
 
   object BoxDimensions {
