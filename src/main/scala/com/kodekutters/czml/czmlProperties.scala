@@ -127,13 +127,13 @@ package object czmlProperties {
   /**
     * A box, which is a closed rectangular cuboid
     *
-    * @param show           A boolean Property specifying the visibility of the box.
-    * @param dimensions     The dimensions of the box
-    * @param material       A Property specifying the material used to fill the box.
-    * @param fill           A boolean Property specifying whether the box is filled with the provided material.
-    * @param outline        A boolean Property specifying whether the box is outlined.
-    * @param outlineColor   A Property specifying the Color of the outline.
-    * @param outlineWidth   A numeric Property specifying the width of the outline.
+    * @param show         A boolean Property specifying the visibility of the box.
+    * @param dimensions   The dimensions of the box
+    * @param material     A Property specifying the material used to fill the box.
+    * @param fill         A boolean Property specifying whether the box is filled with the provided material.
+    * @param outline      A boolean Property specifying whether the box is outlined.
+    * @param outlineColor A Property specifying the Color of the outline.
+    * @param outlineWidth A numeric Property specifying the width of the outline.
     */
   case class Box(show: Option[CzmlBoolean] = None,
                  dimensions: Option[BoxDimensions] = None,
@@ -216,36 +216,42 @@ package object czmlProperties {
     * A billboard, or viewport-aligned image. The billboard is positioned in the scene by the position property.
     * A billboard is sometimes called a marker.
     *
-    * @param color            This color value is multiplied with the values of the billboard's "image" to produce the final color.
-    * @param eyeOffset        The eye offset of the billboard, which is the offset in eye coordinates at which
-    *                         to place the billboard relative to the position property. Eye coordinates are
-    *                         a left-handed coordinate system where the X-axis points toward the viewer's right,
-    *                         the Y-axis points up, and the Z-axis points into the screen.
-    * @param horizontalOrigin The horizontal origin of the billboard. It controls whether the billboard
-    *                         image is left-, center-, or right-aligned with the position.
-    * @param image            The image displayed on the billboard, expressed as a URL. For broadest client compatibility,
-    *                         the URL should be accessible via Cross-Origin Resource Sharing (CORS).
-    *                         The URL may also be a data URI.
-    * @param pixelOffset      The offset, in viewport pixels, of the billboard origin from the position.
-    *                         A pixel offset is the number of pixels up and to the right to place the billboard,
-    *                         relative to the position.
-    * @param scale            The scale of the billboard. The scale is multiplied with the pixel size of the billboard's image.
-    *                         For example, if the scale is 2.0, the billboard will be rendered with twice the number of pixels,
-    *                         in each direction, of the image.
-    * @param rotation         The rotation of the billboard offset from the alignedAxes.
-    * @param alignedAxis      The aligned axis is the unit vector, in world coordinates, that the billboard up vector points towards.
-    *                         The default is the zero vector, which means the billboard is aligned to the screen up vector.
-    * @param show             whether or not to show this property
-    * @param verticalOrigin   The vertical origin of the billboard. It controls whether the billboard image
-    *                         is bottom-, center-, or top-aligned with the position.
-    * @param sizeInMeters     whether this billboard's size (width and height) should be measured in meters, otherwise size is measured in pixels
+    * @param color                      This color value is multiplied with the values of the billboard's "image" to produce the final color.
+    * @param eyeOffset                  The eye offset of the billboard, which is the offset in eye coordinates at which
+    *                                   to place the billboard relative to the position property. Eye coordinates are
+    *                                   a left-handed coordinate system where the X-axis points toward the viewer's right,
+    *                                   the Y-axis points up, and the Z-axis points into the screen.
+    * @param horizontalOrigin           The horizontal origin of the billboard. It controls whether the billboard
+    *                                   image is left-, center-, or right-aligned with the position.
+    * @param image                      The image displayed on the billboard, expressed as a URL. For broadest client compatibility,
+    *                                   the URL should be accessible via Cross-Origin Resource Sharing (CORS).
+    *                                   The URL may also be a data URI.
+    * @param pixelOffset                The offset, in viewport pixels, of the billboard origin from the position.
+    *                                   A pixel offset is the number of pixels up and to the right to place the billboard,
+    *                                   relative to the position.
+    * @param scale                      The scale of the billboard. The scale is multiplied with the pixel size of the billboard's image.
+    *                                   For example, if the scale is 2.0, the billboard will be rendered with twice the number of pixels,
+    *                                   in each direction, of the image.
+    * @param rotation                   The rotation of the billboard offset from the alignedAxes.
+    * @param alignedAxis                The aligned axis is the unit vector, in world coordinates, that the billboard up vector points towards.
+    *                                   The default is the zero vector, which means the billboard is aligned to the screen up vector.
+    * @param show                       whether or not to show this property
+    * @param verticalOrigin             The vertical origin of the billboard. It controls whether the billboard image
+    *                                   is bottom-, center-, or top-aligned with the position.
+    * @param sizeInMeters               whether this billboard's size (width and height) should be measured in meters, otherwise size is measured in pixels
+    * @param width                      The width of the billboard, in pixels (or meters, if `sizeInMeters` is true). By default, the native width of the image is used
+    * @param height                     The height of the billboard, in pixels (or meters, if `sizeInMeters` is true). By default, the native height of the image is use
+    * @param scaleByDistance            How the billboard's scale should change based on the billboard's distance from the camera.  This scalar value will be multiplied by scale
+    * @param translucencyByDistance     How the billboard's translucency should change based on the billboard's distance from the camera.  This scalar value should range from 0 to 1
+    * @param pixelOffsetScaleByDistance How the billboard's pixel offset should change based on the billboard's distance from the camera.  This scalar value will be multiplied by pixelOffset
+    * @param imageSubRegion             A sub-region of the image which will be used for the billboard, rather than the entire image, measured in pixels from the bottom-left
     */
   case class Billboard(color: Option[ColorProperty] = None, eyeOffset: Option[CzmlCartesian] = None,
                        horizontalOrigin: Option[Origin[HORIZONTAL]] = None, image: Option[CzmlUri] = None,
                        pixelOffset: Option[CzmlCartesian2] = None, scale: Option[Number] = None,
                        rotation: Option[Number] = None,
                        show: Option[CzmlBoolean] = None,
-                       verticalOrigin: Option[Origin[VERTICAL]]= None,
+                       verticalOrigin: Option[Origin[VERTICAL]] = None,
                        sizeInMeters: Option[CzmlBoolean] = None,
                        alignedAxis: Option[CzmlCartesian] = None,
                        width: Option[Number] = None,
@@ -265,9 +271,9 @@ package object czmlProperties {
     *
     * @param axes
     * @param unitQuaternion The orientation specified as a 4-dimensional unit magnitude quaternion, specified as [X, Y, Z, W]
-    * @param reference  A reference property.
-    * @param interval   an interval
-    * @param timeFields the time interpolatable part of this property
+    * @param reference      A reference property.
+    * @param interval       an interval
+    * @param timeFields     the time interpolatable part of this property
     */
   case class Orientation(axes: Option[String] = None, unitQuaternion: Option[UnitQuaternionValue] = None,
                          interval: Option[String] = None,
@@ -865,13 +871,13 @@ package object czmlProperties {
   /**
     * A 3D model. The model is positioned and oriented using the position and orientation properties.
     *
-    * @param show                whether or not to show this property
-    * @param scale               The scale of the property.
-    * @param minimumPixelSize    The approximate minimum pixel size of the model regardless of zoom.
-    * @param gltf                The URL of a glTF model.
-    * @param incrementallyLoadTextures   Whether or not the model can be rendered before all textures have loaded
-    * @param runAnimations       Whether or not to run animations.
-    * @param nodeTransformations node transformations.
+    * @param show                      whether or not to show this property
+    * @param scale                     The scale of the property.
+    * @param minimumPixelSize          The approximate minimum pixel size of the model regardless of zoom.
+    * @param gltf                      The URL of a glTF model.
+    * @param incrementallyLoadTextures Whether or not the model can be rendered before all textures have loaded
+    * @param runAnimations             Whether or not to run animations.
+    * @param nodeTransformations       node transformations.
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
                    maximumScale: Option[Number] = None,

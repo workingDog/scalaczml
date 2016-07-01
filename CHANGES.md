@@ -1,7 +1,10 @@
 Change Log
 ==========
 
-## changes in 0.2-SNAPSHOT
+## changes in 0.3-SNAPSHOT
+
+
+## changes in 0.2
 
 * Breaking changes
     * renamed LineMaterial to PolylineMaterial
