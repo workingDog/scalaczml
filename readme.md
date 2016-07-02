@@ -1,20 +1,18 @@
 # ScalaCZML a CZML library in scala 
 
-This library **ScalaCZML** reads and writes 
-[CZML JSON](https://github.com/AnalyticalGraphicsInc/cesium/wiki/CZML-Guide) entities and 
-presents them as [Scala](http://www.scala-lang.org/) objects.
+This library **ScalaCZML** reads and writes [CZML JSON](https://github.com/AnalyticalGraphicsInc/cesium/wiki/CZML-Guide) entities and presents them as [Scala](http://www.scala-lang.org/) objects.
 
 [Cesium](http://cesiumjs.org/) is a JavaScript library for creating 3D globes and 2D maps in a web browser without a plugin. 
 It uses WebGL for hardware-accelerated graphics, and is cross-platform, cross-browser, 
 and tuned for dynamic-data visualization. 
 
-[CZML](https://github.com/AnalyticalGraphicsInc/cesium/wiki/CZML-Guide) is a JSON schema for 
-describing a time-dynamic graphical scene, primarily for display in a web browser running Cesium.
-It describes lines, points, billboards (markers), models and
-other graphical primitives, and specifies how they change with time.
+[CZML](https://github.com/AnalyticalGraphicsInc/cesium/wiki/CZML-Guide) is a JSON schema for describing a time-dynamic graphical scene, primarily for display in a web browser running Cesium.
+It describes lines, points, billboards (markers), models and other graphical primitives, and specifies how they change with time.
 
-**ScalaCZML** makes the CZML JSON entities available as Scala objects. 
-The library follows the specifications of reference 1.
+**ScalaCZML** makes the CZML JSON entities available as Scala objects. The library follows the specifications of reference 1. 
+Typically **ScalaCZML** is for server side application development.
+
+There is also the Cesium library in Scala, [CesiumScala](https://github.com/workingDog/CesiumScala) for client side development.
 
 ## References
  
