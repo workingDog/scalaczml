@@ -6,6 +6,13 @@ Change Log
    * restructured RADIAN and DEGREES as extending GEOTYPE
    * modified Cartographic and LngLatAlt to use GEOTYPE
    * added convenience constructors for CzmlPosition and CzmlPositions using GEOTYPE, similarly in CzmlImplicits
+   * added HeightReference
+   * added heightReference to Billboard, Label, Model and Point
+
+
+
+
+
 
 ## changes in 0.2
 

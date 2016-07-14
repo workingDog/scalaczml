@@ -1392,6 +1392,44 @@ package object czmlCore {
   }
 
   /**
+    * HeightReference of the object.
+    *
+    * @param heightReference The string value either "NONE", "CLAMP_TO_GROUND" or "RELATIVE_TO_GROUND"
+    * @param reference A reference property.
+    */
+  case class HeightReference(heightReference: Option[String] = None, reference: Option[String] = None) {
+    def this(string: String) = this(Option(string))
+  }
+
+  object HeightReference {
+
+    def apply(heightReference: String): HeightReference = new HeightReference(heightReference)
+
+    val theReads = new Reads[HeightReference] {
+      def reads(js: JsValue): JsResult[HeightReference] = {
+        // try to read a simple String
+        JsPath.read[String].reads(js).asOpt match {
+          case None => JsSuccess(
+            new HeightReference((JsPath \ "heightReference").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
+
+          case Some(str) => JsSuccess(new HeightReference(Some(str)))
+        }
+      }
+    }
+
+    val theWrites = new Writes[HeightReference] {
+      def writes(obj: HeightReference) = {
+        obj.reference match {
+          case Some(ref) => Json.obj("heightReference" -> JsString(obj.heightReference.getOrElse("")), "reference" -> JsString(ref))
+          case None => JsString(obj.heightReference.getOrElse(""))
+        }
+      }
+    }
+
+    implicit val fmt: Format[HeightReference] = Format(theReads, theWrites)
+  }
+
+  /**
     * An HTML description of the object.
     *
     * @param string    The string value

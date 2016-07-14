@@ -241,6 +241,7 @@ package object czmlProperties {
     * @param sizeInMeters               whether this billboard's size (width and height) should be measured in meters, otherwise size is measured in pixels
     * @param width                      The width of the billboard, in pixels (or meters, if `sizeInMeters` is true). By default, the native width of the image is used
     * @param height                     The height of the billboard, in pixels (or meters, if `sizeInMeters` is true). By default, the native height of the image is use
+    * @param heightReference            The height reference of the billboad, which indicates if the position is relative to terrain or not.
     * @param scaleByDistance            How the billboard's scale should change based on the billboard's distance from the camera.  This scalar value will be multiplied by scale
     * @param translucencyByDistance     How the billboard's translucency should change based on the billboard's distance from the camera.  This scalar value should range from 0 to 1
     * @param pixelOffsetScaleByDistance How the billboard's pixel offset should change based on the billboard's distance from the camera.  This scalar value will be multiplied by pixelOffset
@@ -256,6 +257,7 @@ package object czmlProperties {
                        alignedAxis: Option[CzmlCartesian] = None,
                        width: Option[Number] = None,
                        height: Option[Number] = None,
+                       heightReference: Option[HeightReference] = None,
                        scaleByDistance: Option[NearFarScalar] = None,
                        translucencyByDistance: Option[NearFarScalar] = None,
                        pixelOffsetScaleByDistance: Option[NearFarScalar] = None,
@@ -307,12 +309,14 @@ package object czmlProperties {
     * @param outlineWidth The width of the outline of the point.
     * @param pixelSize    The size of the point, in pixels.
     * @param show         whether or not to show this property
+    * @param heightReference  The height reference of the point, which indicates if the position is relative to terrain or not.
     */
   case class Point(color: Option[ColorProperty] = None, outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None, pixelSize: Option[Number] = None,
                    show: Option[CzmlBoolean] = None,
                    scaleByDistance: Option[NearFarScalar] = None,
-                   translucencyByDistance: Option[NearFarScalar] = None) extends CzmlProperty
+                   translucencyByDistance: Option[NearFarScalar] = None,
+                   heightReference: Option[HeightReference] = None) extends CzmlProperty
 
   object Point {
     implicit val fmt = Json.format[Point]
@@ -329,6 +333,7 @@ package object czmlProperties {
     * @param font             The font to use for the label.
     * @param horizontalOrigin The horizontal origin of the label.
     *                         It controls whether the label is left-, center-, or right-aligned with the position.
+    * @param heightReference  The height reference of the label, which indicates if the position is relative to terrain or not.
     * @param outlineColor     The outline color of the label.
     * @param outlineWidth     The outline width of the label.
     * @param pixelOffset      The offset, in viewport pixels, of the label origin from the position. A pixel offset is
@@ -346,6 +351,7 @@ package object czmlProperties {
                    fillColor: Option[ColorProperty] = None,
                    font: Option[Font] = None,
                    horizontalOrigin: Option[Origin[HORIZONTAL]] = None,
+                   heightReference: Option[HeightReference] = None,
                    outlineColor: Option[ColorProperty] = None,
                    outlineWidth: Option[Number] = None,
                    pixelOffset: Option[CzmlCartesian2] = None,
@@ -881,6 +887,7 @@ package object czmlProperties {
     * @param gltf                      The URL of a glTF model.
     * @param incrementallyLoadTextures Whether or not the model can be rendered before all textures have loaded
     * @param runAnimations             Whether or not to run animations.
+    * @param heightReference           The height reference of the model, which indicates if the position is relative to terrain or not.
     * @param nodeTransformations       node transformations.
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
@@ -888,6 +895,7 @@ package object czmlProperties {
                    minimumPixelSize: Option[Number] = None, gltf: Option[CzmlUri] = None,
                    incrementallyLoadTextures: Option[CzmlBoolean] = None,
                    runAnimations: Option[CzmlBoolean] = None,
+                   heightReference: Option[HeightReference] = None,
                    nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
 
   object Model {
