@@ -373,7 +373,7 @@ package object czmlProperties {
 
     def this(x: Double, y: Double, z: Double) = this(CzmlPosition(x, y, z))
 
-    def this(cartographicDegrees: Cartographic[DEGREE]) = this(CzmlPosition(cartographicDegrees))
+    def this(cartographic: Cartographic[GEOTYPE]) = this(CzmlPosition(cartographic))
 
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(CzmlPosition(referenceFrame, x, y, z))
 
@@ -387,7 +387,7 @@ package object czmlProperties {
 
     def apply(x: Double, y: Double, z: Double): CzmlPositions = new CzmlPositions(x, y, z)
 
-    def apply(cartographicDegrees: Cartographic[DEGREE]): CzmlPositions = new CzmlPositions(cartographicDegrees)
+    def apply(cartographic: Cartographic[GEOTYPE]): CzmlPositions = new CzmlPositions(cartographic)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPositions = new CzmlPositions(referenceFrame, x, y, z)
 

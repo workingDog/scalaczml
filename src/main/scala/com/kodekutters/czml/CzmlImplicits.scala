@@ -16,7 +16,7 @@ object CzmlImplicits {
 
   implicit def SeqOfCoordinate2DToCartesian2D(value: Seq[Coordinate2D]): Cartesian2D = new Cartesian2D(value)
 
-  implicit def SeqOfLngLatAltToCartographic[T: TypeTag](value: Seq[LngLatAlt[T]]): Cartographic[T] = new Cartographic[T](value)
+  implicit def SeqOfLngLatAltToCartographic[T <: GEOTYPE : TypeTag](value: Seq[LngLatAlt[T]]): Cartographic[T] = new Cartographic[T](value)
 
   implicit def StringToTimeInterval(value: String): TimeInterval = TimeInterval(value.trim)
 
@@ -134,7 +134,7 @@ object CzmlImplicits {
 
   implicit def Cartesian2DToCartesian2DOp(value: Cartesian2D): Option[Cartesian2D] = Option(value)
 
-  implicit def CartographicToCartographicOp[T: TypeTag](value: Cartographic[T]): Option[Cartographic[T]] = Option(value)
+  implicit def CartographicToCartographicOp[T <: GEOTYPE : TypeTag](value: Cartographic[T]): Option[Cartographic[T]] = Option(value)
 
   implicit def CartesianVelocityToCartesianVelocityOp(value: CartesianVelocity): Option[CartesianVelocity] = Option(value)
 

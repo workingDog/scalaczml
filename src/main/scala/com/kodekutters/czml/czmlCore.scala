@@ -537,14 +537,19 @@ package object czmlCore {
   }
 
   /**
-    * represents the geographic coordinate radian "type"
+    * represents a geographic coordinate "type", should only be RADIAN or DEGREE
     */
-  sealed trait RADIAN
+  sealed trait GEOTYPE
 
   /**
-    * represents the geographic coordinate degree "type"
+    * represents the geographic coordinate RADIAN "type"
     */
-  sealed trait DEGREE
+  sealed trait RADIAN extends GEOTYPE
+
+  /**
+    * represents the geographic coordinate DEGREE "type"
+    */
+  sealed trait DEGREE extends GEOTYPE
 
   /**
     * A timed geographic coordinate (time,long,lat,alt) coordinate.
@@ -552,7 +557,7 @@ package object czmlCore {
     * The geographic coordinate values can represent either
     * degrees or radians depending on the type parameter [T], either DEGREE or RADIAN.
     */
-  case class LngLatAlt[T: TypeTag](t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
+  case class LngLatAlt[+T <: GEOTYPE : TypeTag](t: Option[TimeValue] = None, lng: Double, lat: Double, alt: Double) {
 
     def this(lng: Double, lat: Double, alt: Double) = this(None, lng, lat, alt)
 
@@ -571,15 +576,15 @@ package object czmlCore {
   }
 
   object LngLatAlt {
-    def apply[T: TypeTag](lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat, alt)
+    def apply[T <: GEOTYPE : TypeTag](lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat, alt)
 
-    def apply[T: TypeTag](lng: Double, lat: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat)
+    def apply[T <: GEOTYPE : TypeTag](lng: Double, lat: Double): LngLatAlt[T] = new LngLatAlt[T](lng, lat)
 
-    def apply[T: TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](Option(t), lng, lat, alt)
+    def apply[T <: GEOTYPE : TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](Option(t), lng, lat, alt)
 
-    def apply[T: TypeTag](t: String, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](TimeValue(t), lng, lat, alt)
+    def apply[T <: GEOTYPE : TypeTag](t: String, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](TimeValue(t), lng, lat, alt)
 
-    def apply[T: TypeTag](t: Double, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](TimeValue(t), lng, lat, alt)
+    def apply[T <: GEOTYPE : TypeTag](t: Double, lng: Double, lat: Double, alt: Double): LngLatAlt[T] = new LngLatAlt[T](TimeValue(t), lng, lat, alt)
   }
 
   /**
@@ -593,7 +598,7 @@ package object czmlCore {
     * where Time is an ISO 8601 date and time string or seconds since "epoch".
     *
     */
-  case class Cartographic[T: TypeTag](coordinates: Seq[LngLatAlt[T]]) {
+  case class Cartographic[+T <: GEOTYPE : TypeTag](coordinates: Seq[LngLatAlt[T]]) {
 
     def this(lngLatAltT: LngLatAlt[T]) = this(Seq(lngLatAltT))
 
@@ -614,19 +619,19 @@ package object czmlCore {
 
   object Cartographic {
 
-    def apply[T: TypeTag](lngLatAltT: LngLatAlt[T]): Cartographic[T] = new Cartographic[T](Seq(lngLatAltT))
+    def apply[T <: GEOTYPE : TypeTag](lngLatAltT: LngLatAlt[T]): Cartographic[T] = new Cartographic[T](Seq(lngLatAltT))
 
-    def apply[T: TypeTag](lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat, alt))
+    def apply[T <: GEOTYPE : TypeTag](lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat, alt))
 
-    def apply[T: TypeTag](lng: Double, lat: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat))
+    def apply[T <: GEOTYPE : TypeTag](lng: Double, lat: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](lng, lat))
 
-    def apply[T: TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](t, lng, lat, alt))
+    def apply[T <: GEOTYPE : TypeTag](t: TimeValue, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](LngLatAlt[T](t, lng, lat, alt))
 
-    def apply[T: TypeTag](t: String, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](TimeValue(t), lng, lat, alt)
+    def apply[T <: GEOTYPE : TypeTag](t: String, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](TimeValue(t), lng, lat, alt)
 
-    def apply[T: TypeTag](t: Double, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](TimeValue(t), lng, lat, alt)
+    def apply[T <: GEOTYPE : TypeTag](t: Double, lng: Double, lat: Double, alt: Double): Cartographic[T] = new Cartographic[T](TimeValue(t), lng, lat, alt)
 
-    implicit def theReads[T: TypeTag] = new Reads[Cartographic[T]] {
+    implicit def theReads[T <: GEOTYPE : TypeTag] = new Reads[Cartographic[T]] {
       def reads(js: JsValue): JsResult[Cartographic[T]] = {
         val jsList = js.as[JsArray].value
         // have a list of timed coordinates, multiple of 4 elements
@@ -651,7 +656,7 @@ package object czmlCore {
       }
     }
 
-    implicit def theWrites[T: TypeTag] = new Writes[Cartographic[T]] {
+    implicit def theWrites[T <: GEOTYPE : TypeTag] = new Writes[Cartographic[T]] {
       def writes(cart: Cartographic[T]) = {
         val coordList = for (coord <- cart.coordinates) yield {
           coord.t match {
@@ -2383,7 +2388,9 @@ package object czmlCore {
 
     def this(cartesian: Cartesian3D) = this(None, Option(cartesian))
 
-    def this(cartographicDegrees: Cartographic[DEGREE]) = this(None, None, None, Option(cartographicDegrees))
+    def this(cartographic: Cartographic[GEOTYPE]) =
+      this(cartographicRadians = if (cartographic.isRadian()) Option(cartographic.asInstanceOf[Cartographic[RADIAN]]) else None,
+        cartographicDegrees = if (cartographic.isDegree()) Option(cartographic.asInstanceOf[Cartographic[DEGREE]]) else None)
 
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(Option(referenceFrame), Option(new Cartesian3D(x, y, z)))
 
@@ -2399,7 +2406,7 @@ package object czmlCore {
 
     def apply(cartesian: Cartesian3D): CzmlPosition = new CzmlPosition(cartesian)
 
-    def apply(cartographicDegrees: Cartographic[DEGREE]): CzmlPosition = new CzmlPosition(cartographicDegrees)
+    def apply(cartographic: Cartographic[GEOTYPE]): CzmlPosition = new CzmlPosition(cartographic)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z)
 

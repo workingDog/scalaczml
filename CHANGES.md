@@ -3,7 +3,9 @@ Change Log
 
 ## changes in 0.3-SNAPSHOT
 
-   * added convenience constructors for CzmlPosition and CzmlPositions
+   * restructured RADIAN and DEGREES as extending GEOTYPE
+   * modified Cartographic and LngLatAlt to use GEOTYPE
+   * added convenience constructors for CzmlPosition and CzmlPositions using GEOTYPE, similarly in CzmlImplicits
 
 ## changes in 0.2
 
