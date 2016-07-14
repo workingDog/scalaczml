@@ -3,6 +3,7 @@ Change Log
 
 ## changes in 0.3-SNAPSHOT
 
+   * added convenience constructors for CzmlPosition and CzmlPositions
 
 ## changes in 0.2
 

@@ -37,7 +37,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 
 import scala.collection.mutable.{ArrayBuffer, HashSet}
-import com.kodekutters.czml.czmlCore._
+import com.kodekutters.czml.czmlCore.{CzmlPosition, _}
 import com.kodekutters.czml.czmlCustom.CustomProperty
 
 import scala.collection.immutable.ListMap
@@ -373,6 +373,8 @@ package object czmlProperties {
 
     def this(x: Double, y: Double, z: Double) = this(CzmlPosition(x, y, z))
 
+    def this(cartographicDegrees: Cartographic[DEGREE]) = this(CzmlPosition(cartographicDegrees))
+
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(CzmlPosition(referenceFrame, x, y, z))
 
   }
@@ -384,6 +386,8 @@ package object czmlProperties {
     def apply(position: CzmlPosition): CzmlPositions = new CzmlPositions(Option(Array(position)))
 
     def apply(x: Double, y: Double, z: Double): CzmlPositions = new CzmlPositions(x, y, z)
+
+    def apply(cartographicDegrees: Cartographic[DEGREE]): CzmlPositions = new CzmlPositions(cartographicDegrees)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPositions = new CzmlPositions(referenceFrame, x, y, z)
 

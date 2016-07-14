@@ -2383,6 +2383,8 @@ package object czmlCore {
 
     def this(cartesian: Cartesian3D) = this(None, Option(cartesian))
 
+    def this(cartographicDegrees: Cartographic[DEGREE]) = this(None, None, None, Option(cartographicDegrees))
+
     def this(referenceFrame: String, x: Double, y: Double, z: Double) = this(Option(referenceFrame), Option(new Cartesian3D(x, y, z)))
 
   }
@@ -2396,6 +2398,8 @@ package object czmlCore {
     def apply(x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(x, y, z)
 
     def apply(cartesian: Cartesian3D): CzmlPosition = new CzmlPosition(cartesian)
+
+    def apply(cartographicDegrees: Cartographic[DEGREE]): CzmlPosition = new CzmlPosition(cartographicDegrees)
 
     def apply(referenceFrame: String, x: Double, y: Double, z: Double): CzmlPosition = new CzmlPosition(referenceFrame, x, y, z)
 
