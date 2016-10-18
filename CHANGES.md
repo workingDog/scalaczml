@@ -10,10 +10,6 @@ Change Log
    * added heightReference to Billboard, Label, Model and Point
 
 
-
-
-
-
 ## changes in 0.2
 
 * Breaking changes

@@ -1398,7 +1398,7 @@ package object czmlCore {
     * @param reference A reference property.
     */
   case class HeightReference(heightReference: Option[String] = None, reference: Option[String] = None) {
-    def this(string: String) = this(Option(string))
+    def this(heightReference: String) = this(Option(heightReference))
   }
 
   object HeightReference {
