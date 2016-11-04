@@ -1,7 +1,10 @@
 Change Log
 ==========
 
-## changes in 0.3-SNAPSHOT
+## changes in 0.4-SNAPSHOT
+
+
+## changes in 0.3
 
    * restructured RADIAN and DEGREES as extending GEOTYPE
    * modified Cartographic and LngLatAlt to use GEOTYPE

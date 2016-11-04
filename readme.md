@@ -33,13 +33,13 @@ See also the build.sbt file.
 
 Add the following dependency to build.sbt:
 
-    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.2"
+    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.3"
 
 To compile and generate a jar file from the source:
 
     sbt package
 
-The jar file (scalaczml_2.11-0.3-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
+The jar file (scalaczml_2.11-0.4-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
 
 ## Documentation
 
@@ -73,5 +73,5 @@ To generate the ScalaCZML API documentation, type "sbt doc". The documentation w
     
 ## Status
 
-usable, ongoing work
+usable
 
