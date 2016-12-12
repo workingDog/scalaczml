@@ -888,6 +888,9 @@ package object czmlProperties {
     * @param incrementallyLoadTextures Whether or not the model can be rendered before all textures have loaded
     * @param runAnimations             Whether or not to run animations.
     * @param heightReference           The height reference of the model, which indicates if the position is relative to terrain or not.
+    * @param color The color to blend with the model's rendered color
+    * @param colorBlendMode The mode to use for blending between `color` and the model's color
+    * @param colorBlendAmount The color strength when `colorBlendMode` is `MIX`. A value of 0.0 results in the model's rendered color while a value of 1.0 results in a solid color, with any value in-between resulting in a mix of the two
     * @param nodeTransformations       node transformations.
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
@@ -896,6 +899,9 @@ package object czmlProperties {
                    incrementallyLoadTextures: Option[CzmlBoolean] = None,
                    runAnimations: Option[CzmlBoolean] = None,
                    heightReference: Option[HeightReference] = None,
+                   color: Option[ColorProperty] = None,
+                   colorBlendMode: Option[String] = None,  // todo either HIGHLIGHT, REPLACE, MIX
+                   colorBlendAmount: Option[Number] = None,
                    nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
 
   object Model {

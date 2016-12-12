@@ -3,6 +3,10 @@ Change Log
 
 ## changes in 0.4-SNAPSHOT
 
+* added color, colorBlendMode, and colorBlendAmount properties to Model
+
+
+
 
 ## changes in 0.3
 
