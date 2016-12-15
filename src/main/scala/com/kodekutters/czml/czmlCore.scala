@@ -1468,6 +1468,42 @@ package object czmlCore {
   }
 
   /**
+    * Defines different modes for blending between a target color and an entity's source color.
+    *
+    * @param colorBlendMode    The color blend mode string, either HIGHLIGHT, REPLACE, MIX
+    * @param reference          A reference property.
+    */
+  case class ColorBlendMode(colorBlendMode: String, reference: Option[String] = None)
+
+  object ColorBlendMode {
+
+    def apply(colorBlendMode: String): ColorBlendMode = new ColorBlendMode(colorBlendMode)
+
+    val theReads = new Reads[ColorBlendMode] {
+      def reads(js: JsValue): JsResult[ColorBlendMode] = {
+        // try to read a simple String
+        JsPath.read[String].reads(js).asOpt match {
+          case None => JsSuccess(
+            new ColorBlendMode((JsPath \ "colorBlendMode").read[String].reads(js).getOrElse(""), (JsPath \ "reference").read[String].reads(js).asOpt))
+
+          case Some(str) => JsSuccess(new ColorBlendMode(str))
+        }
+      }
+    }
+
+    val theWrites = new Writes[ColorBlendMode] {
+      def writes(obj: ColorBlendMode) = {
+        obj.reference match {
+          case Some(ref) => Json.obj("colorBlendMode" -> JsString(obj.colorBlendMode), "reference" -> JsString(ref))
+          case None => JsString(obj.colorBlendMode)
+        }
+      }
+    }
+
+    implicit val fmt: Format[ColorBlendMode] = Format(theReads, theWrites)
+  }
+
+  /**
     * A near-far scalar value specified as four values [NearDistance, NearValue, FarDistance, FarValue].
     * If the array has four elements, the value is constant.  If it has five, they are
     * time-tagged samples arranged as [Time, NearDistance, NearValue, FarDistance, FarValue],
