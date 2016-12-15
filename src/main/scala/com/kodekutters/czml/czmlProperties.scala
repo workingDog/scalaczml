@@ -900,7 +900,7 @@ package object czmlProperties {
                    runAnimations: Option[CzmlBoolean] = None,
                    heightReference: Option[HeightReference] = None,
                    color: Option[ColorProperty] = None,
-                   colorBlendMode: Option[ColorBlendMode] = None,  // todo either HIGHLIGHT, REPLACE, MIX
+                   colorBlendMode: Option[ColorBlendMode] = None,
                    colorBlendAmount: Option[Number] = None,
                    nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
 

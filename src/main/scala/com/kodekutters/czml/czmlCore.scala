@@ -1477,6 +1477,10 @@ package object czmlCore {
 
   object ColorBlendMode {
 
+    val HIGHLIGHT = "HIGHLIGHT"
+    val REPLACE = "REPLACE"
+    val MIX = "MIX"
+
     def apply(colorBlendMode: String): ColorBlendMode = new ColorBlendMode(colorBlendMode)
 
     val theReads = new Reads[ColorBlendMode] {
