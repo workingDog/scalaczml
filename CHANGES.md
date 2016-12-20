@@ -5,7 +5,10 @@ Change Log
 
 * added color, colorBlendMode, and colorBlendAmount properties to Model
 * added ColorBlendMode
-
+* added ShadowMode
+* added shadows to Box, Corridor, Cylinder, Ellipse, Ellipsoid, Polygon, Polyline, Rectangle, Wall, Model
+* added silhouetteColor and silhouetteSize to Model
+* added 
 
 
 ## changes in 0.3

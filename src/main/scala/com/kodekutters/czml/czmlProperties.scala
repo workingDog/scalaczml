@@ -134,6 +134,7 @@ package object czmlProperties {
     * @param outline      A boolean Property specifying whether the box is outlined.
     * @param outlineColor A Property specifying the Color of the outline.
     * @param outlineWidth A numeric Property specifying the width of the outline.
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Box(show: Option[CzmlBoolean] = None,
                  dimensions: Option[BoxDimensions] = None,
@@ -141,7 +142,8 @@ package object czmlProperties {
                  fill: Option[CzmlBoolean] = None,
                  outline: Option[CzmlBoolean] = None,
                  outlineColor: Option[ColorProperty] = None,
-                 outlineWidth: Option[Number] = None) extends CzmlProperty
+                 outlineWidth: Option[Number] = None,
+                 shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Box {
     implicit val fmt = Json.format[Box]
@@ -163,6 +165,7 @@ package object czmlProperties {
     * @param outline        A boolean Property specifying whether the corridor is outlined.
     * @param outlineColor   A Property specifying the Color of the outline.
     * @param outlineWidth   A numeric Property specifying the width of the outline.
+    * @param shadows      Whether or not the box casts or receives shadows.
     *
     */
   case class Corridor(show: Option[CzmlBoolean] = None,
@@ -176,7 +179,8 @@ package object czmlProperties {
                       fill: Option[CzmlBoolean] = None,
                       outline: Option[CzmlBoolean] = None,
                       outlineColor: Option[ColorProperty] = None,
-                      outlineWidth: Option[Number] = None) extends CzmlProperty
+                      outlineWidth: Option[Number] = None,
+                      shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Corridor {
     implicit val fmt = Json.format[Corridor]
@@ -194,7 +198,7 @@ package object czmlProperties {
     * @param outline      A boolean Property specifying whether the cylinder is outlined.
     * @param outlineColor A Property specifying the Color of the outline.
     * @param outlineWidth A numeric Property specifying the width of the outline.
-    *
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Cylinder(show: Option[CzmlBoolean] = None,
                       length: Option[Number] = None,
@@ -206,7 +210,8 @@ package object czmlProperties {
                       outlineColor: Option[ColorProperty] = None,
                       outlineWidth: Option[Number] = None,
                       numberOfVerticalLines: Option[Number] = None,
-                      slices: Option[Number] = None) extends CzmlProperty
+                      slices: Option[Number] = None,
+                      shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Cylinder {
     implicit val fmt = Json.format[Cylinder]
@@ -453,10 +458,12 @@ package object czmlProperties {
     * @param width         The width of the polyline.
     * @param granularity   The sampling distance, in radians
     * @param followSurface Whether or not the positions are connected as great arcs (the default) or as straight lines.
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Polyline(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                       material: Option[PolylineMaterial] = None, width: Option[Number] = None,
-                      granularity: Option[Number] = None, followSurface: Option[CzmlBoolean] = None) extends CzmlProperty
+                      granularity: Option[Number] = None, followSurface: Option[CzmlBoolean] = None,
+                      shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Polyline {
     implicit val fmt = Json.format[Polyline]
@@ -479,6 +486,7 @@ package object czmlProperties {
     * @param outlineWidth   A numeric Property specifying the width of the outline.
     * @param closeBottom    A boolean Property specifying whether the rectangle has a bottom cover when extruded.
     * @param closeTop       A boolean Property specifying whether the rectangle has a top cover when extruded
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Rectangle(coordinates: Option[RectangleCoordinates] = None,
                        show: Option[CzmlBoolean] = None,
@@ -493,7 +501,8 @@ package object czmlProperties {
                        outlineColor: Option[ColorProperty] = None,
                        outlineWidth: Option[Number] = None,
                        closeBottom: Option[CzmlBoolean] = None,
-                       closeTop: Option[CzmlBoolean] = None) extends CzmlProperty {
+                       closeTop: Option[CzmlBoolean] = None,
+                       shadows: Option[ShadowMode] = None) extends CzmlProperty {
 
     def this(w: Double, s: Double, e: Double, n: Double) = this(Option(RectangleCoordinates(w, s, e, n)))
 
@@ -517,6 +526,7 @@ package object czmlProperties {
     * @param outline        A boolean Property specifying whether the wall is outlined.
     * @param outlineColor   A Property specifying the Color of the outline.
     * @param outlineWidth   A numeric Property specifying the width of the outline.
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Wall(positions: Option[Positions] = None,
                   show: Option[CzmlBoolean] = None,
@@ -527,7 +537,8 @@ package object czmlProperties {
                   fill: Option[CzmlBoolean] = None,
                   outline: Option[CzmlBoolean] = None,
                   outlineColor: Option[ColorProperty] = None,
-                  outlineWidth: Option[Number] = None) extends CzmlProperty
+                  outlineWidth: Option[Number] = None,
+                  shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Wall {
     implicit val fmt = Json.format[Wall]
@@ -547,6 +558,7 @@ package object czmlProperties {
     * @param outline           Whether or not the polygon is outlined.
     * @param outlineColor      The color of the polygon outline.
     * @param perPositionHeight Whether to use the height of each position to define the polygon or a constant height above the surface.
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Polygon(positions: Option[Positions] = None, show: Option[CzmlBoolean] = None,
                      material: Option[Material] = None, height: Option[Number] = None,
@@ -554,7 +566,8 @@ package object czmlProperties {
                      stRotation: Option[Number] = None, fill: Option[CzmlBoolean] = None,
                      outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                      outlineWidth: Option[Number] = None,
-                     perPositionHeight: Option[CzmlBoolean] = None) extends CzmlProperty
+                     perPositionHeight: Option[CzmlBoolean] = None,
+                     shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Polygon {
     implicit val fmt = Json.format[Polygon]
@@ -666,13 +679,15 @@ package object czmlProperties {
     * @param stackPartitions The number of times to partition the ellipsoid into stacks.
     * @param slicePartitions The number of times to partition the ellipsoid into radial slices.
     * @param subdivisions    The number of points per outline line, determining the granularity of the curvature.
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Ellipsoid(show: Option[CzmlBoolean] = None, radii: Option[CzmlCartesian] = None,
                        fill: Option[CzmlBoolean] = None, material: Option[Material] = None,
                        outline: Option[CzmlBoolean] = None, outlineColor: Option[ColorProperty] = None,
                        outlineWidth: Option[Number] = None,
                        stackPartitions: Option[Number] = None, slicePartitions: Option[Number] = None,
-                       subdivisions: Option[Number] = None) extends CzmlProperty
+                       subdivisions: Option[Number] = None,
+                       shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Ellipsoid {
     implicit val fmt = Json.format[Ellipsoid]
@@ -695,6 +710,7 @@ package object czmlProperties {
     * @param outline               Whether or not the ellipse is outlined.
     * @param outlineColor          The color of the ellipse outline.
     * @param numberOfVerticalLines The number of vertical lines to use when outlining an extruded ellipse.
+    * @param shadows      Whether or not the box casts or receives shadows.
     */
   case class Ellipse(show: Option[CzmlBoolean] = None, semiMajorAxis: Option[Number] = None, semiMinorAxis: Option[Number] = None,
                      rotation: Option[Number] = None, material: Option[Material] = None,
@@ -702,7 +718,8 @@ package object czmlProperties {
                      granularity: Option[Number] = None, stRotation: Option[Number] = None,
                      fill: Option[CzmlBoolean] = None, outline: Option[CzmlBoolean] = None,
                      outlineColor: Option[ColorProperty] = None,
-                     numberOfVerticalLines: Option[Number] = None) extends CzmlProperty
+                     numberOfVerticalLines: Option[Number] = None,
+                     shadows: Option[ShadowMode] = None) extends CzmlProperty
 
   object Ellipse {
     implicit val fmt = Json.format[Ellipse]
@@ -892,6 +909,9 @@ package object czmlProperties {
     * @param colorBlendMode The mode to use for blending between `color` and the model's color
     * @param colorBlendAmount The color strength when `colorBlendMode` is `MIX`. A value of 0.0 results in the model's rendered color while a value of 1.0 results in a solid color, with any value in-between resulting in a mix of the two
     * @param nodeTransformations       node transformations.
+    * @param shadows      Whether or not the box casts or receives shadows.
+    * @param silhouetteColor The color of the silhouette drawn around the model
+    *  @param silhouetteSize The size, in pixels, of the silhouette drawn around the model
     */
   case class Model(show: Option[CzmlBoolean] = None, scale: Option[Number] = None,
                    maximumScale: Option[Number] = None,
@@ -902,7 +922,10 @@ package object czmlProperties {
                    color: Option[ColorProperty] = None,
                    colorBlendMode: Option[ColorBlendMode] = None,
                    colorBlendAmount: Option[Number] = None,
-                   nodeTransformations: Option[NodeTransformations] = None) extends CzmlProperty
+                   nodeTransformations: Option[NodeTransformations] = None,
+                   shadows: Option[ShadowMode] = None,
+                   silhouetteColor: Option[ColorProperty] = None,
+                   silhouetteSize: Option[Number] = None) extends CzmlProperty
 
   object Model {
     implicit val fmt = Json.format[Model]

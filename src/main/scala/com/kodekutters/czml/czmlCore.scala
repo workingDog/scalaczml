@@ -1507,6 +1507,49 @@ package object czmlCore {
     implicit val fmt: Format[ColorBlendMode] = Format(theReads, theWrites)
   }
 
+
+  /**
+    * Whether or not an object casts or receives shadows from each light source when shadows are enabled.
+    *
+    * @param shadowMode    The shadow mode
+    * @param reference     A reference property.
+    */
+  case class ShadowMode(shadowMode: String, reference: Option[String] = None)
+
+  object ShadowMode {
+
+    val DISABLED = "DISABLED"
+    val ENABLED = "ENABLED"
+    val CAST_ONLY = "CAST_ONLY"
+    val RECEIVE_ONLY = "RECEIVE_ONLY"
+
+    def apply(shadowMode: String): ShadowMode = new ShadowMode(shadowMode)
+
+    val theReads = new Reads[ShadowMode] {
+      def reads(js: JsValue): JsResult[ShadowMode] = {
+        // try to read a simple String
+        JsPath.read[String].reads(js).asOpt match {
+          case None => JsSuccess(
+            new ShadowMode((JsPath \ "shadowMode").read[String].reads(js).getOrElse(""), (JsPath \ "reference").read[String].reads(js).asOpt))
+
+          case Some(str) => JsSuccess(new ShadowMode(str))
+        }
+      }
+    }
+
+    val theWrites = new Writes[ShadowMode] {
+      def writes(obj: ShadowMode) = {
+        obj.reference match {
+          case Some(ref) => Json.obj("shadowMode" -> JsString(obj.shadowMode), "reference" -> JsString(ref))
+          case None => JsString(obj.shadowMode)
+        }
+      }
+    }
+
+    implicit val fmt: Format[ShadowMode] = Format(theReads, theWrites)
+  }
+
+
   /**
     * A near-far scalar value specified as four values [NearDistance, NearValue, FarDistance, FarValue].
     * If the array has four elements, the value is constant.  If it has five, they are
