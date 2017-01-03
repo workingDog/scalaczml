@@ -31,15 +31,15 @@ See also the build.sbt file.
 
 ## Installation and packaging
 
-Add the following dependency to build.sbt:
+To use the last release (compatible with Cesium 1.29) add the following dependency to your build.sbt:
 
-    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.3"
+    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.4"
 
 To compile and generate a jar file from the source:
 
     sbt package
 
-The jar file (scalaczml_2.11-0.4-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
+The jar file (scalaczml_2.11-0.5-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
 
 ## Documentation
 

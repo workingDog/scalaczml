@@ -1,15 +1,15 @@
 Change Log
 ==========
+## changes in 0.5-SNAPSHOT
 
-## changes in 0.4-SNAPSHOT
+
+## changes in 0.4
 
 * added color, colorBlendMode, and colorBlendAmount properties to Model
 * added ColorBlendMode
 * added ShadowMode
 * added shadows to Box, Corridor, Cylinder, Ellipse, Ellipsoid, Polygon, Polyline, Rectangle, Wall, Model
 * added silhouetteColor and silhouetteSize to Model
-* added 
-
 
 ## changes in 0.3
 
@@ -18,7 +18,6 @@ Change Log
    * added convenience constructors for CzmlPosition and CzmlPositions using GEOTYPE, similarly in CzmlImplicits
    * added HeightReference
    * added heightReference to Billboard, Label, Model and Point
-
 
 ## changes in 0.2
 
@@ -38,7 +37,6 @@ Change Log
     * renamed PolylineGlow to PolylineGlowMaterial
     * renamed PolylineOutline to PolylineOutlineMaterial
     * renamed Style to LabelStyle
-
 
 * other changes
     * added PolylineArrow to czmlCore
@@ -63,7 +61,3 @@ Change Log
     * added wsen to RectangleCoordinates and made wsen and wsenDegrees Option[RectangleCoordValues]
     * added RectCoordToRectCoordValOp to CzmlImplicits
     * removed ArrayOfDoubleToRect from CzmlImplicits
-
-
-
-
