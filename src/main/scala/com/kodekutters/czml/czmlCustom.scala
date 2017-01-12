@@ -216,9 +216,7 @@ package object czmlCustom {
           case x: JsObject => JsSuccess(new CustomMap(readFields(x)))
           case x: JsArray => JsSuccess(new CustomMap(Map("value" -> readArray(x))))
           case x: JsValue => JsSuccess(new CustomMap(Map("value" -> basicRead(x))))
-          case x =>
-            logger.error("could not read CustomProperty: " + x.toString())
-            JsError(s"Could not read CustomProperty : $x")
+          case x => JsError(s"Could not read CustomProperty : $x")
         }
       }
     }

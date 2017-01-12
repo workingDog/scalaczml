@@ -1,7 +1,10 @@
 Change Log
 ==========
+
 ## changes in 0.5-SNAPSHOT
 
+* ready for cross publishing for scala_2.12.1
+* remove the Logger
 
 ## changes in 0.4
 

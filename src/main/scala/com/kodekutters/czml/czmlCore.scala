@@ -33,8 +33,6 @@ package com.kodekutters.czml
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{JsObject, _}
@@ -60,8 +58,6 @@ import com.kodekutters.czml.czmlProperties._
   * This package implements all core czml supporting elements but not the czmlProperties.
   */
 package object czmlCore {
-
-  val logger = Logger(LoggerFactory.getLogger("czmlCore"))
 
   object TimeInterval {
 
@@ -235,9 +231,7 @@ package object czmlCore {
             (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]) (RectangleCoordValue.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[RectangleCoordValue] => JsSuccess(new RectangleCoordValues(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read RectangleCoordValues: " + js.toString)
-              JsError("could not read RectangleCoordValues: " + js.toString)
+            case e: JsError => JsError("could not read RectangleCoordValues: " + js.toString)
           }
         }
       }
@@ -436,9 +430,7 @@ package object czmlCore {
             (JsPath \ 2).read[Double]) (Coordinate.apply(None, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[Coordinate] => JsSuccess(new Cartesian3D(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read Coordinate values: " + js.toString)
-              JsError("could not read Coordinate values: " + js.toString)
+            case e: JsError => JsError("could not read Coordinate values: " + js.toString)
           }
         }
       }
@@ -513,9 +505,7 @@ package object czmlCore {
           val result = ((JsPath \ 0).read[Double] and (JsPath \ 1).read[Double]) (Coordinate2D.apply(None, _, _)).reads(js)
           result match {
             case s: JsSuccess[Coordinate2D] => JsSuccess(new Cartesian2D(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read Coordinate2D values: " + js.toString)
-              JsError("could not read Coordinate2D values: " + js.toString)
+            case e: JsError =>  JsError("could not read Coordinate2D values: " + js.toString)
           }
         }
       }
@@ -648,9 +638,7 @@ package object czmlCore {
             (JsPath \ 2).read[Double]) (LngLatAlt.apply(None, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[LngLatAlt[T]] => JsSuccess(new Cartographic[T](Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read LngLatAlt values: " + js.toString)
-              JsError("could not read LngLatAlt values: " + js.toString)
+            case e: JsError => JsError("could not read LngLatAlt values: " + js.toString)
           }
         }
       }
@@ -761,9 +749,7 @@ package object czmlCore {
             ) (Velocity.apply(None, _, _, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[Velocity] => JsSuccess(new CartesianVelocity(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read Velocity values: " + js.toString)
-              JsError("could not read Velocity values: " + js.toString)
+            case e: JsError => JsError("could not read Velocity values: " + js.toString)
           }
         }
       }
@@ -876,9 +862,7 @@ package object czmlCore {
             ) (UnitQuaternionValue.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[UnitQuaternionValue] => JsSuccess(new UnitQuaternion(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read UnitQuaternion values: " + js.toString)
-              JsError("could not read UnitQuaternion values: " + js.toString)
+            case e: JsError => JsError("could not read UnitQuaternion values: " + js.toString)
           }
         }
       }
@@ -1048,9 +1032,7 @@ package object czmlCore {
             ) (Rgba.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[Rgba] => JsSuccess(new RgbaList(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read rgba values: " + js.toString)
-              JsError("could not read rgba values: " + js.toString)
+            case e: JsError => JsError("could not read rgba values: " + js.toString)
           }
         }
       }
@@ -1200,9 +1182,7 @@ package object czmlCore {
             (JsPath \ 2).read[Float] and (JsPath \ 3).read[Float]) (Rgbaf.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[Rgbaf] => JsSuccess(new RgbafList(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read rgbaf values: " + js.toString)
-              JsError("could not read rgbaf values: " + js.toString)
+            case e: JsError =>  JsError("could not read rgbaf values: " + js.toString)
           }
         }
       }
@@ -1281,9 +1261,7 @@ package object czmlCore {
               val result = (JsPath \ 0).read[Double].map(TimedDouble.apply(None, _)).reads(js)
               result match {
                 case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
-                case e: JsError =>
-                  logger.error("could not read TimedNumbers values: " + js.toString)
-                  JsError("could not read TimedNumbers values: " + js.toString)
+                case e: JsError => JsError("could not read TimedNumbers values: " + js.toString)
               }
             }
 
@@ -1292,9 +1270,7 @@ package object czmlCore {
             val result = JsPath.read[Double].map(TimedDouble.apply(None, _)).reads(js)
             result match {
               case s: JsSuccess[TimedDouble] => JsSuccess(new TimedNumbers(Seq(s.get)))
-              case e: JsError =>
-                logger.error("could not read TimedNumbers values: " + js.toString)
-                JsError("could not read TimedNumbers values: " + js.toString)
+              case e: JsError => JsError("could not read TimedNumbers values: " + js.toString)
             }
         }
       }
@@ -1364,7 +1340,6 @@ package object czmlCore {
             else if (typeOf[T] =:= typeOf[VERTICAL]) {
               JsSuccess(new Origin[T]((JsPath \ "verticalOrigin").read[String].reads(js).asOpt, (JsPath \ "reference").read[String].reads(js).asOpt))
             } else {
-              logger.error("could not read the origin: " + js.toString())
               JsError("could not read the origin ")
             }
 
@@ -1624,9 +1599,7 @@ package object czmlCore {
             (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]) (NearFarScalarValue.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[NearFarScalarValue] => JsSuccess(new NearFarScalarValues(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read NearFarScalarValues: " + js.toString)
-              JsError("could not read NearFarScalarValues: " + js.toString)
+            case e: JsError => JsError("could not read NearFarScalarValues: " + js.toString)
           }
         }
       }
@@ -1754,9 +1727,7 @@ package object czmlCore {
             (JsPath \ 2).read[Double] and (JsPath \ 3).read[Double]) (BoundingRectangleValue.apply(None, _, _, _, _)).reads(js)
           result match {
             case s: JsSuccess[BoundingRectangleValue] => JsSuccess(new BoundingRectangleValues(Seq(s.get)))
-            case e: JsError =>
-              logger.error("could not read BoundingRectangleValues: " + js.toString)
-              JsError("could not read BoundingRectangleValues: " + js.toString)
+            case e: JsError => JsError("could not read BoundingRectangleValues: " + js.toString)
           }
         }
       }
@@ -3096,9 +3067,7 @@ package object czmlCore {
             }
             JsSuccess(new NodeTransformations(theListMap))
 
-          case x =>
-            logger.error("could not read NodeTransformations: " + x.toString())
-            JsError(s"Could not read NodeTransformations : $x")
+          case x => JsError(s"Could not read NodeTransformations : $x")
         }
       }
     }
