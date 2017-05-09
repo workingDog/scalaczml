@@ -1,10 +1,16 @@
 Change Log
 ==========
 
-## changes in 0.5-SNAPSHOT
+## changes in 0.6-SNAPSHOT
+
+
+## changes in 0.5
 
 * ready for cross publishing for scala_2.12.1
 * remove the Logger
+* added convenience Integer constructors to CzmlNumber and Number
+* minor update to Util.writeJsToFile
+* replaced UnitQuaternionValue in Orientation to UnitQuaternion
 
 ## changes in 0.4
 

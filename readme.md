@@ -24,22 +24,19 @@ There is also the Cesium library in Scala, [CesiumScala](https://github.com/work
 
 ## Dependencies
 
-Using [Scala 2.11](http://www.scala-lang.org/) and the Play-JSON component 
-of the [Play Framework](https://www.playframework.com/)
-
-See also the build.sbt file.
+Using [Scala](http://www.scala-lang.org/) and the Play-JSON library of the [Play Framework](https://www.playframework.com/)
 
 ## Installation and packaging
 
-To use the last release (compatible with Cesium 1.29) add the following dependency to your build.sbt:
+To use the last release add the following dependency to your build.sbt:
 
-    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.4"
+    libraryDependencies += "com.github.workingDog" %% "scalaczml" % "0.5"
 
 To compile and generate a jar file from the source:
 
     sbt package
 
-The jar file (scalaczml_2.11-0.5-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
+The jar file (scalaczml_2.11-0.6-SNAPSHOT.jar) will be in the "./target/scala-2.11/" directory.
 
 ## Documentation
 

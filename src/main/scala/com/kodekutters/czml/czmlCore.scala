@@ -1946,6 +1946,12 @@ package object czmlCore {
     def this(number: TimedNumbers) = this(Option(number))
 
     def this(number: Array[Double], epoch: String) = this(Option(number), None, Option(epoch))
+
+    def this(number: Int) = this(Option(number))
+
+    def this(number: Int, interval: String) = this(Option(number), Option(interval))
+
+    def this(number: Array[Int], epoch: String) = this(Option(number), None, Option(epoch))
   }
 
   object CzmlNumber {
@@ -1957,6 +1963,13 @@ package object czmlCore {
     def apply(number: TimedNumbers): CzmlNumber = new CzmlNumber(number)
 
     def apply(number: Array[Double], epoch: String): CzmlNumber = new CzmlNumber(number, epoch)
+
+    def apply(number: Int) = new CzmlNumber(number)
+
+    def apply(number: Int, interval: String) = new CzmlNumber(number, interval)
+
+    def apply(number: Array[Int], epoch: String) = new CzmlNumber(number, epoch)
+
 
     val theReads = new Reads[CzmlNumber] {
       def reads(js: JsValue): JsResult[CzmlNumber] = {
@@ -2066,6 +2079,12 @@ package object czmlCore {
 
     def this(number: Array[Double], epoch: String) = this(CzmlNumber(number, epoch))
 
+    def this(number: Int) = this(Option(Array(CzmlNumber(number))))
+
+    def this(number: Int, interval: String) = this(CzmlNumber(number, interval))
+
+    def this(number: Array[Int], epoch: String) = this(CzmlNumber(number, epoch))
+
   }
 
   object Number {
@@ -2079,6 +2098,13 @@ package object czmlCore {
     def apply(number: Array[Double], epoch: String): Number = new Number(number, epoch)
 
     def apply(number: Double, interval: String): Number = new Number(number, interval)
+
+
+    def apply(number: Int): Number = new Number(number)
+
+    def apply(number: Array[Int], epoch: String): Number = new Number(number, epoch)
+
+    def apply(number: Int, interval: String): Number = new Number(number, interval)
 
 
     val theReads = new Reads[Number] {

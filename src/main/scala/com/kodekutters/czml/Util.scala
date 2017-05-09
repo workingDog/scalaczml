@@ -65,7 +65,7 @@ object Util {
     * @param outFile the file name to write to, if empty or missing output will be to System.out
     * @param czmljs the CZML document as a (json) string
     */
-  def writeJsToFile(czmljs: String, outFile: Option[String]) = {
+  def writeJsToFile(czmljs: String, outFile: Option[String] = None) = {
     val writer = if (outFile.isEmpty) new PrintWriter(System.out) else new PrintWriter(new File(outFile.get))
     try {
       writer.write(czmljs)

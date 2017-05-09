@@ -1,74 +1,498 @@
 [
+
   {
-    "id" : "document",
-    "name" : "CZML Geometries: Polygon",
-    "version" : "1.0"
-  }, {
-  "id" : "redPolygon",
-  "name" : "Red polygon on surface",
-  "polygon" : {
-    "positions" : {
-      "cartographicDegrees" : [
-        -115.0, 37.0, 0,
-        -115.0, 32.0, 0,
-        -107.0, 33.0, 0,
-        -102.0, 31.0, 0,
-        -102.0, 35.0, 0
+    "id": "oriori",
+    "name": "orientationtest",
+    "orientation":{
+      "interpolationAlgorithm": "LINEAR",
+      "interpolationDegree": 1,
+      "unitQuaternion": [
+        "2017-01-19T02:00:00Z",0,0,0,1,
+        "2017-01-19T06:00:00Z",0,0,0,1,
+        "2017-01-19T10:00:00Z",0,0,1,1
       ]
     },
-    "material" : {
-      "solidColor" : {
-        "color" : {
-          "rgba" : [255, 0, 0, 255]
+    "position": {
+      "cartographicDegrees": [
+        -111.0,
+        40.0,
+        150000.0
+      ]
+    }
+  },
+
+  {
+    "id" : "XHAG - ILL",
+    "name" : "XHAG Catch Details",
+    "description" : "This is the html description of the catch @ XHAG<br/><br/>We like Grenadier best!!!",
+    "rectangle" : {
+      "availability":"2007-07-14T00:00:00Z/2007-07-31T23:59:59Z",
+      "show" : true,
+      "coordinates" : {"wsenDegrees" : [-61,-50,-60.5,-49.75]},
+      "height" : {
+        "interpolationAlgorithm":"LAGRANGE",
+        "interpolationDegree":1,
+        "epoch":"2007-07-14T00:00:00Z",
+        "number":[
+          0,0,
+          86400,5000,
+          172800,10000,
+          259200,21060,
+          345600,31060,
+          432000,51060
+        ]},
+      "extrudedHeight" : 0,
+      "fill" : true,
+      "material" : {"solidColor" : {"color": {"rgba" : [0, 255, 255, 25]}}
+      },
+      "outline" : true,
+      "outlineColor" : {"rgba" : [127, 127, 127, 50]}
+    }
+  },
+
+  {
+    "id": "xxxx",
+    "name": "Green circle at height",
+    "availability": [
+      "2012-08-04T10:00:00Z/2012-08-04T15:00:00Z",
+      "2012-08-04T10:00:00Z/2012-08-04T15:00:00Z"
+    ],
+    "model": {
+      "show": true,
+      "gltf": "../../SampleData/models/CesiumGround/Cesium_Ground.bgltf"
+    },
+    "mydata": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "position": {
+      "cartographicDegrees": [
+        -111.0,
+        40.0,
+        150000.0
+      ]
+    }
+  },
+  {
+    "id" : "shape1",
+    "name" : "Green circle at height",
+    "availability" : ["2012-08-04T10:00:00Z/2012-08-04T15:00:00Z","2012-08-04T10:00:00Z/2012-08-04T15:00:00Z"],
+    "model" : {
+      "show" : true,
+      "gltf" : "../../SampleData/models/CesiumGround/Cesium_Ground.bgltf"
+    },
+    "position" : {
+      "cartographicDegrees" : [-111.0, 40.0, 150000.0]
+    },
+
+    "label":{
+      "fillColor":{
+        "rgba":[
+          255,0,255,255
+        ]
+      },
+      "font":"11pt Lucida Console",
+      "horizontalOrigin":"LEFT",
+      "outlineColor":{
+        "rgba":[
+          0,0,0,255
+        ]
+      },
+      "outlineWidth":2,
+      "pixelOffset":{
+        "cartesian2":[
+          12,0
+        ]
+      },
+      "show":true,
+      "style":"FILL_AND_OUTLINE",
+      "text": "ISS",
+      "verticalOrigin":"CENTER"
+    },
+
+    "rectangle" : {
+      "coordinates" : { "wsenDegrees" : [-100, 40, -90, 50] },
+      "height" : 600000,
+      "extrudedHeight" : 0,
+      "fill" : true,
+      "material" : {
+        "solidColor" : {
+          "color": {
+            "rgba" : [255, 2, 0, 100]
+          }
+        }
+      },
+      "outline" : true,
+      "outlineColor" : {
+        "rgba" : [0, 0, 0, 255]
+      }
+    },
+
+    "wall" : {
+      "positions" : {
+        "cartographicDegrees" : [
+          -115.0, 50.0, 1500000,
+          -112.5, 50.0, 500000,
+          -110.0, 50.0,1500000,
+          -107.5, 50.0,500000,
+          -105.0, 50.0,1500000,
+          -102.5, 50.0,500000,
+          -100.0, 50.0,1500000,
+          -97.5, 50.0,500000,
+          -95.0, 50.0,1500000,
+          -92.5, 50.0,500000,
+          -90.0, 50.0, 1500000
+
+        ]},
+      "material" : {
+        "solidColor" : {
+          "color" : {
+            "rgba" : [255, 0, 0, 150]
+          }
+        }
+      }
+    },
+
+    "ellipse" : {
+      "semiMinorAxis" : 300000.0,
+      "semiMajorAxis" : 300000.0,
+      "height" : 200000.0,
+      "material" : {
+        "solidColor" : {
+          "color" : {
+            "rgba" : [0, 255, 0, 255]
+          }
+        }
+      }
+    },
+    "ellipsoid" : {
+      "radii" : {
+        "epoch" : "12345",
+        "interval" : "2012-08-04T16:00:00Z/2012-08-04T16:20:00Z",
+        "cartesian" : [200000.0, 211212, 300000.0]
+      },
+      "fill" : false,
+      "outline" : true,
+      "outlineColor" : {
+        "rgba" : [255, 3, 0, 255]
+      },
+      "slicePartitions" : 24,
+      "stackPartitions" : 36
+    }
+  },
+  {
+    "id" : "path",
+    "name" : "path with GPS flight data",
+    "description" : "<p>Hang gliding flight log data from Daniel H. Friedman.<br>Icon created by Larisa Skosyrska from the Noun Project</p>",
+    "availability" : "2012-08-04T10:00:00Z/2012-08-04T15:00:00Z",
+
+    "polygon": {
+      "positions": [
+        {
+          "interval" : "2012-08-04T16:00:00Z/2012-08-04T16:20:00Z",
+          "cartographicDegrees" : [
+            -50, 20, 0,
+            -50, 40, 0,
+            -40, 40, 0,
+            -40, 20, 0
+          ]
+        },
+        {
+          "interval" : "2012-08-04T16:20:00Z/2012-08-04T16:40:00Z",
+          "cartographicDegrees": [
+            -35, 50, 0,
+            -35, 10, 0,
+            -45, 30, 0
+          ]
+        },
+        {
+          "interval" : "2012-08-04T16:40:00Z/2012-08-04T17:00:00Z",
+          "cartographicDegrees" : [
+            -35, 50, 0,
+            -40, 50, 0,
+            -40, 20, 0,
+            -35, 20, 0
+          ]
+        }
+      ],
+      "material": {
+        "solidColor": {
+          "color": [
+            {
+              "interval" : "2012-08-04T16:00:00Z/2012-08-04T16:30:00Z",
+              "rgbaf" : [1, 0, 1, 1]
+            }, {
+              "interval" : "2012-08-04T16:30:00Z/2012-08-04T17:00:00Z",
+              "rgbaf" : [0, 1, 1, 1]
+            }
+          ]
         }
       }
     }
-  }
-}, {
-  "id" : "greenPolygon",
-  "name" : "Green extruded polygon",
-  "polygon" : {
-    "positions" : {
-      "cartographicDegrees" : [
-        -108.0, 42.0, 0,
-        -100.0, 42.0, 0,
-        -104.0, 40.0, 0
-      ]
-    },
-    "material" : {
-      "solidColor" : {
-        "color" : {
-          "rgba" : [0, 255, 0, 255]
-        }
+
+  },
+  {
+    "id": "pos object",
+    "availability": "2012-08-04T16:00:00Z/2012-08-04T17:04:54.9962195740191Z",
+    "polyline":{
+      "show":false,
+      "width": 1,
+      "followSurface":false,
+      "positions":{
+        "references":[
+          "Facility/AGI#position","Satellite/Geoeye1/Sensor/Sensor#position"
+        ]
       }
     },
-    "extrudedHeight" : 500000.0
-  }
-}, {
-  "id" : "orangePolygon",
-  "name" : "Orange polygon with per-position heights and outline",
-  "polygon" : {
-    "positions" : {
-      "cartographicDegrees" : [
-        -108.0, 25.0, 100000,
-        -100.0, 25.0, 100000,
-        -100.0, 30.0, 100000,
-        -108.0, 30.0, 300000
+
+    "position": {
+      "interval": "2012-08-04T16:00:00Z/2012-08-04T17:00:00Z",
+      "cartographicDegrees": [
+        -45.0,
+        20,
+        4000000
+      ]
+    }
+  },
+  {
+    "id": "MyObject",
+    "availability":"2012-08-04T16:00:00Z/2012-08-04T17:04:54.9962195740191Z",
+    "position": {
+      "referenceFrame": "INERTIAL",
+      "epoch": "2012-05-02T12:00:00Z",
+      "nextTime": 300.0,
+      "cartographicDegrees": [-75.0, 40.0, 0.0]
+    },
+    "label":{
+      "outlineWidth": [
+        {
+          "interval":"2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "number": 1
+        },
+        {
+          "interval":"2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "number": 2
+        }
+      ],
+      "fillColor":[
+        {
+          "interval":"2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "rgba":[
+            255,255,0,255
+          ]
+        },
+        {
+          "interval":"2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "rgba":[
+            1,2,3,4
+          ]
+        }
+      ],
+      "font":"bold 10pt Segoe UI Semibold",
+      "horizontalOrigin":"LEFT",
+      "outlineColor":{
+        "rgba":[
+          0,0,0,255
+        ]
+      },
+      "pixelOffset":{
+        "cartesian2":[
+          10.0,0.0
+        ]
+      },
+      "scale":0.8333333333333334,
+      "show":[
+        {
+          "interval":"2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "boolean":true
+        }
+      ],
+      "style":"FILL",
+      "text":  "Vehicle" ,
+      "verticalOrigin":"CENTER"
+    }
+  },
+  {
+    "id": "clock document",
+    "name": "simple",
+    "version": "1.0",
+    "clock": {
+      "interval": "2012-03-15T10:00:00Z/2012-03-16T10:00:00Z",
+      "currentTime": "2012-03-15T10:00:00Z",
+      "multiplier": 60,
+      "range": "LOOP_STOP",
+      "step": "SYSTEM_CLOCK_MULTIPLIER"
+    },
+    "path": {
+      "material": {
+        "solidColor": {
+          "color": {
+            "interval": "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+            "rgba": [
+              255,
+              255,
+              0,
+              255
+            ]
+          }
+        }
+      },
+      "width":
+      {
+        "interval": "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+        "number": 5.0
+      },
+      "show": [
+        {
+          "interval": "2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "boolean": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "InternationalSpaceStation",
+    "position": {
+      "referenceFrame": "INERTIAL",
+      "epoch": "2012-05-02T12:00:00Z",
+      "cartesian": [
+        0.0, -6668447.2211117, 1201886.45913705, 146789.427467256,
+        60.0, -6711432.84684144, 919677.673492462, -214047.552431458,
+        90.0, -6721319.92231553, 776899.784034099, -394198.837519575,
+        150.0, -6717826.447064, 488820.628328182, -752924.980158179,
+        180.0, -6704450.41462847, 343851.784836767, -931084.800346031,
+        240.0, -6654518.44949696, 52891.726433174, -1283967.69137678
+      ],
+      "nextTime": "300.0 as a string",
+      "interpolationAlgorithm": "LAGRANGE",
+      "interpolationDegree": 5
+    }
+  },
+  {
+    "id":"document 1",
+    "name":"AGI to Sensor",
+    "parent":"9927edc4-e87a-4e1f-9b8b-0bfb3b05b227",
+    "description":"<h2>No accesses</h2>",
+    "polyline":{
+      "show":false,
+      "width": 1,
+      "material":{
+        "solidColor":{
+          "color":{
+            "rgba":[
+              0,255,255,255
+            ]
+          }
+        }
+      },
+      "followSurface":false,
+      "positions":{
+        "references":[
+          "Facility/AGI#position","Satellite/Geoeye1/Sensor/Sensor#position"
+        ]
+      }
+    }
+  },
+  {
+    "id":"document 2",
+    "name":"Pennsylvania",
+    "path": {
+      "leadTime": [
+        {
+          "interval": "2012-03-15T10:00:00Z/2012-03-15T10:44:56.1031157730031Z",
+          "epoch": "2012-03-15T10:00:00Z",
+          "number": [
+            0,
+            5537.546684141998,
+            5537.546684141998,
+            0
+          ]
+        },
+        {
+          "interval": "2012-03-15T10:44:56.1031157730031Z/2012-03-15T12:17:13.6497999150015Z",
+          "epoch": "2012-03-15T10:44:56.1031157730031Z",
+          "number": [
+            0,
+            5537.546684141998,
+            5537.546684141998,
+            0
+          ]
+        },
+        {
+          "number": 1800
+        },
+        {
+          "interval": "2012-01-01T00:00:00Z/2012-01-01T24:00:00Z",
+          "epoch": "2012-01-01T00:00:00Z",
+          "number": 3600
+        },
+        {
+          "interval": "2012-01-02T00:00:00Z/2012-02-01T24:00:00Z",
+          "epoch": "2012-01-02T00:00:00Z",
+          "number": [
+            0,
+            0,
+            5537.546684141998,
+            5537.546684141998
+          ]
+        }
       ]
     },
-    "material" : {
-      "solidColor" : {
-        "color" : {
-          "rgba" : [255, 100, 0, 100]
-        }
-      }
+    "label":{
+      "fillColor":{
+        "rgba":[
+          255,0,0,255
+        ]
+      },
+      "font": "11pt Lucida Console",
+      "horizontalOrigin":"LEFT",
+      "outlineColor":{
+        "rgba":[
+          0,0,0,255
+        ]
+      },
+      "outlineWidth": 2,
+      "show":true,
+      "style":"FILL_AND_OUTLINE",
+      "text": [{"interval": "xxxxx", "string": "Vehicle"}],
+      "verticalOrigin":"CENTER"
     },
-    "extrudedHeight" : 0,
-    "perPositionHeight" : true,
-    "outline" : true,
-    "outlineColor" : {
-      "rgba" : [0, 0, 0, 255]
+    "billboard" : {
+      "eyeOffset" : {
+        "cartesian" : [0.0, 0.0, 0.0]
+      },
+      "horizontalOrigin" : "CENTER",
+      "image" :  "hurricane.png",
+      "pixelOffset" : {
+        "cartesian2" : [1.0, 2.0]
+      },
+      "scale" : {
+        "epoch": "zzzzz-epoch-zzzzz",
+        "number": [0, 0.125,
+          3600, 0.13,
+          7200, 0.135,
+          10800, 0.135]
+      },
+      "show":[
+        {
+          "interval":"2012-08-04T16:00:00Z/2012-08-04T18:00:00Z",
+          "boolean":true
+        }
+      ],
+      "verticalOrigin" : "CENTER"
+    },
+    "position":{
+      "interpolationAlgorithm":"LAGRANGE",
+      "interpolationDegree":1,
+      "epoch":"2012-08-04T16:00:00Z",
+      "cartesian":[
+        0.0,-2379754.6637012,-4665332.88013588,3628133.68924173,
+        10.0,-2379510.08905552,-4665419.64840452,3628182.20006795,
+        20.0,-2379568.4769522,-4665555.3441867,3627970.83323261,
+        30.0,-2379638.93786855,-4665691.63561896,3627750.82085873
+      ]
     }
   }
-}
 ]

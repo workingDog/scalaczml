@@ -278,7 +278,7 @@ package object czmlProperties {
     * @param interval       an interval
     * @param timeFields     the time interpolatable part of this property
     */
-  case class Orientation(axes: Option[String] = None, unitQuaternion: Option[UnitQuaternionValue] = None,
+  case class Orientation(axes: Option[String] = None, unitQuaternion: Option[UnitQuaternion] = None,
                          interval: Option[String] = None,
                          reference: Option[String] = None,
                          timeFields: Option[Interpolatable] = None) extends CzmlProperty
@@ -287,14 +287,16 @@ package object czmlProperties {
 
     val theReads: Reads[Orientation] =
       ((JsPath \ "axes").readNullable[String] and
-        (JsPath \ "unitQuaternion").readNullable[UnitQuaternionValue] and
+        (JsPath \ "unitQuaternion").readNullable[UnitQuaternion] and
         (JsPath \ "interval").readNullable[String] and
         (JsPath \ "reference").readNullable[String] and
-        Interpolatable.fmt) ((ax, uni, intrv, ref, interpo) => Orientation(ax, uni, intrv, ref, Option(interpo)))
+        Interpolatable.fmt) ((ax, uni, intrv, ref, interpo) => {
+        Orientation(ax, uni, intrv, ref, Option(interpo))
+      })
 
     val theWrites: Writes[Orientation] =
       ((JsPath \ "axes").writeNullable[String] and
-        (JsPath \ "unitQuaternion").writeNullable[UnitQuaternionValue] and
+        (JsPath \ "unitQuaternion").writeNullable[UnitQuaternion] and
         (JsPath \ "interval").writeNullable[String] and
         (JsPath \ "reference").writeNullable[String] and
         JsPath.writeNullable[Interpolatable]) (unlift(Orientation.unapply))

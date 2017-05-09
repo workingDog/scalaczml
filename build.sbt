@@ -5,11 +5,11 @@ version := (version in ThisBuild).value
 
 organization := "com.github.workingDog"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.11.11", "2.12.2")
 
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.5.10"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.5.14"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
